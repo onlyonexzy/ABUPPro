@@ -1,0 +1,187 @@
+<svg width="1100" height="650" viewBox="0 0 1100 650" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1100" height="650" fill="#f8fafc" />
+  
+  <!-- Title -->
+  <text x="550" y="40" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#1e293b" text-anchor="middle">整车刷写执行顺序示意图</text>
+  <text x="550" y="70" font-family="Inter, sans-serif" font-size="14" fill="#64748b" text-anchor="middle">步骤间串行 · 步骤内网段并行 · 网段内 ECU 串行</text>
+
+  <!-- Legend -->
+  <g transform="translate(900, 20)">
+    <rect width="180" height="80" rx="8" fill="#fff" stroke="#e2e8f0" />
+    <circle cx="20" cy="20" r="6" fill="#3b82f6" />
+    <text x="35" y="24" font-family="Inter, sans-serif" font-size="12" fill="#475569">并行组 (串行执行)</text>
+    <circle cx="20" cy="40" r="6" fill="#06b6d4" />
+    <text x="35" y="44" font-family="Inter, sans-serif" font-size="12" fill="#475569">网段 (并行执行)</text>
+    <circle cx="20" cy="60" r="6" fill="#94a3b8" />
+    <text x="35" y="64" font-family="Inter, sans-serif" font-size="12" fill="#475569">ECU (串行执行)</text>
+  </g>
+
+  <!-- Serial Arrow Between Groups -->
+  <g>
+    <path d="M460 325 L560 325" stroke="#94a3b8" stroke-width="4" fill="none" marker-end="url(#arrowhead)" />
+    <text x="510" y="310" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#475569" text-anchor="middle">串行执行</text>
+  </g>
+
+  <!-- Parallel Group 1 -->
+  <g transform="translate(50, 100)">
+    <rect width="400" height="480" rx="12" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+    <rect width="400" height="40" rx="12" fill="#3b82f6" />
+    <text x="200" y="26" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">并行组 1</text>
+    
+    <!-- Parallel Segments -->
+    <!-- Segment 1 -->
+    <g transform="translate(20, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 A (并行)</text>
+      
+      <!-- ECUs -->
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+
+    <!-- Segment 2 -->
+    <g transform="translate(145, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 B (并行)</text>
+      
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+
+    <!-- Segment 3 -->
+    <g transform="translate(270, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 C (并行)</text>
+      
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Parallel Group 2 -->
+  <g transform="translate(620, 100)">
+    <rect width="400" height="480" rx="12" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+    <rect width="400" height="40" rx="12" fill="#3b82f6" />
+    <text x="200" y="26" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">并行组 2</text>
+    
+    <!-- Parallel Segments -->
+    <g transform="translate(20, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 D (并行)</text>
+      
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+
+    <g transform="translate(145, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 E (并行)</text>
+      
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+
+    <g transform="translate(270, 60)">
+      <rect width="110" height="400" rx="8" fill="#f0f9ff" stroke="#06b6d4" stroke-dasharray="4" />
+      <text x="55" y="25" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#0891b2" text-anchor="middle">网段 F (并行)</text>
+      
+      <g transform="translate(10, 45)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 1</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 160)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 2</text>
+        <path d="M45 80 L45 105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowhead-sm)" />
+        <text x="50" y="100" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#64748b">串行</text>
+      </g>
+      <g transform="translate(10, 275)">
+        <rect width="90" height="80" rx="6" fill="#fff" stroke="#cbd5e1" />
+        <text x="45" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#475569" text-anchor="middle">ECU 3</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+    </marker>
+    <marker id="arrowhead-sm" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
+      <polygon points="0 0, 6 2, 0 4" fill="#94a3b8" />
+    </marker>
+  </defs>
+</svg>

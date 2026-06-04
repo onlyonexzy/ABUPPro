@@ -1,0 +1,2499 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Windows 工具端 - GBF转化 Prototype V0.2</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/gbf-prototype.css" />
+    <link rel="stylesheet" href="assets/css/flash-config.css" />
+    <link rel="stylesheet" href="assets/css/flash-config-architecture.css" />
+    <link rel="stylesheet" href="assets/css/flash-config-sequence.css" />
+    <link rel="stylesheet" href="assets/css/pdx-check.css" />
+    <link rel="stylesheet" href="assets/css/vehicle-flash.css" />
+    <link rel="stylesheet" href="assets/css/console.css" />
+    <link rel="stylesheet" href="assets/css/console-sim.css" />
+    <link rel="stylesheet" href="assets/css/console-trace.css" />
+    <link rel="stylesheet" href="assets/css/console-chart.css" />
+    <link rel="stylesheet" href="assets/css/console-record.css" />
+    <link rel="stylesheet" href="assets/css/console-playback.css" />
+    <link rel="stylesheet" href="assets/css/settings.css" />
+    <link rel="stylesheet" href="assets/css/basic-diag.css" />
+    <link rel="stylesheet" href="assets/css/quick-diag.css" />
+    <link rel="stylesheet" href="assets/css/obd-diag.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <div class="page" data-state="logged-out">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand__logo"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <div class="brand__title">Windows 工具端登录</div>
+            <div class="brand__subtitle">Prototype V0.2 - GBF转化评审版</div>
+          </div>
+        </div>
+        <div class="topbar__info">
+          <div class="chip" id="chip-network" data-state="online">
+            <span class="dot"></span>
+            <span>网络：在线</span>
+          </div>
+          <div class="chip" id="chip-login" data-state="logged-out">
+            <span class="dot"></span>
+            <span>未登录</span>
+          </div>
+          <div class="chip" id="chip-lock" data-state="normal">
+            <span class="dot"></span>
+            <span>未锁定</span>
+          </div>
+        </div>
+        <div class="topbar__actions">
+          <button class="btn btn--ghost" data-action="clear-cache">
+            <i class="fa-solid fa-eraser"></i>清空账号缓存
+          </button>
+          <button class="btn btn--ghost" data-action="force-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>退出登录
+          </button>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card login-card">
+          <div class="login-card__brand">
+            <div class="login-card__logo"><i class="fa-solid fa-car-side"></i></div>
+            <div class="login-card__wordmark">GBF</div>
+          </div>
+          <div class="login-card__title-row">
+            <span class="login-card__title">登录</span>
+            <span class="login-card__line"></span>
+            <span class="pill" id="first-install-pill">首次安装模式</span>
+          </div>
+          <div class="notice" id="install-notice">
+            首次安装仅显示【在线登录】与【域账号登录】入口。
+          </div>
+
+          <div class="tabs" role="tablist">
+            <button class="tab is-active" data-tab="online">在线登录</button>
+            <button class="tab" data-tab="domain">域账号</button>
+            <button class="tab" data-tab="offline">离线登录</button>
+          </div>
+
+          <div class="tab-panels">
+            <div class="tab-panel is-active" id="panel-online">
+              <div class="login-field">
+                <div class="login-field__label">
+                  <i class="fa-solid fa-user"></i><span>账号</span>
+                </div>
+                <div class="login-input">
+                  <input
+                    class="input"
+                    id="online-account"
+                    placeholder="请输入登录账号"
+                    autocomplete="username"
+                  />
+                  <button
+                    class="icon-btn"
+                    data-action="toggle-history"
+                    type="button"
+                    aria-label="历史账号"
+                  >
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </button>
+                </div>
+                <div class="history" id="account-history"></div>
+              </div>
+              <div class="login-field">
+                <div class="login-field__label">
+                  <i class="fa-solid fa-lock"></i><span>密码</span>
+                </div>
+                <input
+                  class="input"
+                  id="online-password"
+                  type="password"
+                  placeholder="请输入登录密码"
+                  autocomplete="current-password"
+                />
+                <div class="field__hint" id="password-hint"></div>
+              </div>
+              <div class="login-row">
+                <label class="check">
+                  <input type="checkbox" id="remember-password" />
+                  <span>记住密码</span>
+                </label>
+                <label class="check login-hidden">
+                  <input type="checkbox" id="show-password" />
+                  <span>显示密码</span>
+                </label>
+                <button class="login-link" data-action="login-domain" type="button">
+                  <i class="fa-solid fa-globe"></i>域账号登录
+                </button>
+              </div>
+              <div class="login-actions">
+                <button class="btn btn--primary btn--block" data-action="login-online">
+                  在线登录
+                </button>
+                <button
+                  class="btn btn--primary btn--block is-hidden"
+                  data-action="login-offline"
+                  id="offline-login-button"
+                >
+                  离线登录
+                </button>
+              </div>
+              <div class="alert" id="online-alert"></div>
+              <div class="alert" id="domain-alert"></div>
+              <div class="alert" id="offline-alert"></div>
+              <div class="offline-tip login-tip is-hidden" id="offline-tip"></div>
+            </div>
+
+            <div class="tab-panel login-hidden" id="panel-domain">
+              <input type="hidden" id="domain-account" />
+            </div>
+
+            <div class="tab-panel login-hidden" id="panel-offline">
+              <input type="hidden" id="offline-account" />
+              <input type="hidden" id="offline-password" />
+            </div>
+          </div>
+
+          <div class="lock-hint" id="lock-hint"></div>
+          <div class="footnote">
+            锁定规则：连续 5 次失败将锁定 10 分钟。无交互 1 小时自动退出。
+          </div>
+        </section>
+
+        <section class="card state-card">
+          <div class="card__header">
+            <div>
+              <div class="card__title">状态与规则模拟</div>
+              <div class="card__subtitle">用于演示边界与错误提示</div>
+            </div>
+            <span class="badge" id="attempts-badge">失败次数 0/5</span>
+          </div>
+          <div class="state-grid">
+            <div class="state-item">
+              <label>首次安装</label>
+              <label class="switch">
+                <input type="checkbox" id="toggle-first-install" />
+                <span class="switch__track"></span>
+              </label>
+            </div>
+            <div class="state-item">
+              <label>网络状态</label>
+              <select class="select" id="network-status">
+                <option value="online">在线</option>
+                <option value="offline">离线</option>
+              </select>
+            </div>
+            <div class="state-item">
+              <label>离线权限</label>
+              <select class="select" id="offline-permission">
+                <option value="allowed">允许</option>
+                <option value="denied">禁止</option>
+              </select>
+            </div>
+            <div class="state-item">
+              <label>数据版本</label>
+              <select class="select" id="data-version">
+                <option value="none">无本地版本</option>
+                <option value="same">版本一致</option>
+                <option value="update">版本不一致需更新</option>
+                <option value="fail">更新失败</option>
+              </select>
+            </div>
+            <div class="state-item">
+              <label>锁定控制</label>
+              <div class="state-actions">
+                <button class="btn btn--ghost btn--sm" data-action="force-lock">强制锁定</button>
+                <button class="btn btn--ghost btn--sm" data-action="force-unlock">解除锁定</button>
+              </div>
+            </div>
+            <div class="state-item">
+              <label>超时退出</label>
+              <div class="state-actions">
+                <button class="btn btn--ghost btn--sm" data-action="simulate-timeout">
+                  模拟 1h 无交互
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="state-logs">
+            <div class="state-logs__title">事件日志</div>
+            <div class="log-list" id="event-log"></div>
+          </div>
+        </section>
+
+        <section class="tool-shell" id="tool-shell">
+          <div class="tool-header">
+            <div class="tool-header__left">
+              <div class="tool-brand">
+                <div class="tool-brand__logo">
+                  <img src="docs/image%2021.svg" alt="工具图标" />
+                </div>
+              </div>
+              <div class="tool-user">
+                <button class="user-trigger" id="user-trigger" type="button">
+                  <i class="fa-solid fa-user-circle"></i>
+                  <span id="user-trigger-name">用户</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="user-menu" id="user-menu">
+                  <button class="user-menu__item" data-action="toggle-language">
+                    <i class="fa-solid fa-language"></i>
+                    <span id="languageText">切换中英文</span>
+                  </button>
+                  <button class="user-menu__item" data-action="open-help">
+                    <i class="fa-solid fa-circle-question"></i>帮助文档
+                  </button>
+                  <button class="user-menu__item" data-action="open-update">
+                    <i class="fa-solid fa-rotate"></i>在线更新
+                  </button>
+                  <div class="user-menu__divider"></div>
+                  <button class="user-menu__item" data-action="open-change-password">
+                    <i class="fa-solid fa-key"></i>修改密码
+                  </button>
+                  <button class="user-menu__item user-menu__item--danger" data-action="logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>退出登录
+                  </button>
+                </div>
+              </div>
+              <div class="tool-actions">
+                <div class="dropdown" id="device-dropdown">
+                  <button class="tool-action" data-action="toggle-device-menu" type="button">
+                    <i class="fa-solid fa-plug"></i>打开设备
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <div class="dropdown-title">设备列表</div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        以太网直连
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="以太网直连 (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="以太网直连 (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        CANoe
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="CANoe (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="CANoe (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        周立功
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="周立功 (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="周立功 (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        TSmaster
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="TSmaster (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="TSmaster (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        CANape
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="CANape (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="CANape (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        元征
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="元征 (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="元征 (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                    <div class="dropdown-item-group">
+                      <button class="dropdown-item dropdown-item--submenu" type="button">
+                        CANanalyzer
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                      <div class="dropdown-submenu">
+                        <button class="dropdown-item" data-device="CANanalyzer (OBD/网关)">OBD/网关</button>
+                        <button class="dropdown-item" data-device="CANanalyzer (ECU直连)">ECU直连</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button class="tool-action" data-action="close-device" type="button">
+                  <i class="fa-solid fa-power-off"></i>关闭设备
+                </button>
+                <div class="dropdown" id="save-dropdown">
+                  <button class="tool-action" data-action="toggle-save-menu" type="button">
+                    <i class="fa-solid fa-floppy-disk"></i>保存
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <button class="dropdown-item" data-action="save-project">保存</button>
+                    <button class="dropdown-item" data-action="save-as-project">另存为</button>
+                    <button class="dropdown-item" data-action="open-project">打开工程文件</button>
+                    <button class="dropdown-item" data-action="new-project">新建工程</button>
+                    <button class="dropdown-item" data-action="pack-all">打包工程</button>
+                  </div>
+                </div>
+                <div class="dropdown" id="message-dropdown">
+                  <button class="tool-action" data-action="toggle-message-menu" type="button">
+                    <i class="fa-solid fa-bell"></i>消息
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <button class="dropdown-item" data-action="open-system-messages">系统消息</button>
+                    <button class="dropdown-item" data-action="open-pending-logs">待上传日志</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tool-header__center">
+              <div class="tool-file" id="tool-file-name" title="GDTCfg.gn - 长城工程诊断工具">
+                GDTCfg.gn - 长城工程诊断工具
+              </div>
+              <div class="tool-file__hint">
+                <span class="status-dot status-dot--disconnected" id="conn-dot"></span>
+                <span id="conn-text">未连接</span>
+                <span class="tool-file__split">·</span>
+                <span id="tool-file-meta">GDTCfg.gn</span>
+              </div>
+            </div>
+            <div class="tool-header__right">
+              <div class="tool-header-vin" id="header-vin-display">VIN：LGW12345678901234</div>
+              <div class="window-controls">
+                <button class="window-btn" aria-label="最小化">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <button class="window-btn" aria-label="最大化">
+                  <i class="fa-regular fa-square"></i>
+                </button>
+                <button class="window-btn window-btn--danger" aria-label="关闭" data-action="logout">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-body">
+            <aside class="tool-sidebar">
+              <div class="sidebar-group is-expanded has-active" data-group="console">
+                <button type="button" class="sidebar-group-header" aria-expanded="true">
+                  <i class="fa-solid fa-gauge-high"></i>
+                  <span>数据通讯</span>
+                  <i class="fa-solid fa-chevron-down sidebar-group__chevron"></i>
+                </button>
+                <div class="sidebar-sub">
+                  <button class="sidebar-item is-active" data-window="home">
+                    <i class="fa-solid fa-house"></i>仿真                  </button>
+                  <button class="sidebar-item" data-window="bus-data">
+                    <i class="fa-solid fa-diagram-project"></i>总线数据
+                  </button>
+                  <button class="sidebar-item" data-window="chart-monitor">
+                    <i class="fa-solid fa-chart-line"></i>图形监控
+                  </button>
+                  <button class="sidebar-item" data-window="message-record">
+                    <i class="fa-solid fa-record-vinyl"></i>报文录制
+                  </button>
+                  <button class="sidebar-item" data-window="message-playback">
+                    <i class="fa-solid fa-play-circle"></i>报文回放
+                  </button>
+                </div>
+              </div>
+              <div class="sidebar-group" data-group="flash">
+                <button type="button" class="sidebar-group-header" aria-expanded="false">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>统一刷写</span>
+                  <i class="fa-solid fa-chevron-down sidebar-group__chevron"></i>
+                </button>
+                <div class="sidebar-sub">
+                  <button class="sidebar-item" data-window="gbf-convert">
+                    <i class="fa-solid fa-code-branch"></i>GBF转化
+                  </button>
+                  <button class="sidebar-item" data-window="flash-config">
+                    <i class="fa-solid fa-microchip"></i>刷写配置
+                  </button>
+                  <button class="sidebar-item" data-window="single-flash">
+                    <i class="fa-solid fa-bolt"></i>单件刷写
+                  </button>
+                  <button class="sidebar-item" data-window="vehicle-flash">
+                    <i class="fa-solid fa-car"></i>整车刷写
+                  </button>
+                </div>
+              </div>
+              <div class="sidebar-group" data-group="diagnosis">
+                <button type="button" class="sidebar-group-header" aria-expanded="false">
+                  <i class="fa-solid fa-stethoscope"></i>
+                  <span>工程诊断</span>
+                  <i class="fa-solid fa-chevron-down sidebar-group__chevron"></i>
+                </button>
+                <div class="sidebar-sub">
+                  <button class="sidebar-item" data-window="basic-diag">
+                    <i class="fa-solid fa-terminal"></i>基础诊断
+                  </button>
+                  <button class="sidebar-item" data-window="quick-diag">
+                    <i class="fa-solid fa-gauge"></i>快捷诊断
+                  </button>
+                  <button class="sidebar-item" data-window="obd-diag">
+                    <i class="fa-solid fa-plug-circle-check"></i>OBD排放
+                  </button>
+                  <button class="sidebar-item" data-window="pdx-check" style="display: none;">
+                    <i class="fa-solid fa-file-circle-check"></i>PDX校验
+                  </button>
+                </div>
+              </div>
+              <div class="sidebar-group" data-group="settings">
+                <button type="button" class="sidebar-group-header" aria-expanded="false">
+                  <i class="fa-solid fa-gear"></i>
+                  <span>系统设置</span>
+                  <i class="fa-solid fa-chevron-down sidebar-group__chevron"></i>
+                </button>
+                <div class="sidebar-sub">
+                  <button class="sidebar-item" data-window="flash-settings">
+                    <i class="fa-solid fa-sliders"></i>统一刷写设置
+                  </button>
+                  <button class="sidebar-item" data-window="obd-settings">
+                    <i class="fa-solid fa-plug"></i>通讯设置
+                  </button>
+                </div>
+              </div>
+            </aside>
+
+            <section class="tool-workspace">
+              <div class="workspace-canvas" id="workspace-canvas">
+                <div
+                  class="workspace-window is-active"
+                  data-window="home"
+                  style="left: 48px; top: 28px; width: 760px; height: 520px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-house"></i>仿真                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--console-home">
+                    <div class="console-layout" id="console-layout">
+                      <!-- Left: Bus/ECU Tree Panel -->
+                      <div class="console-tree-panel basic-diag-left" id="console-tree-panel">
+                        <div class="basic-diag-tree-toolbar">
+                          <button class="basic-diag-tree-toolbar__import" data-role="console-import-dbc" title="DBC导入">
+                            <i class="fa-solid fa-database"></i>
+                            <span>DBC导入</span>
+                          </button>
+                        </div>
+                        <div class="basic-diag-tree" id="console-tree"></div>
+                      </div>
+
+                      <!-- Splitter -->
+                      <div class="console-splitter" id="console-splitter">
+                        <button class="console-splitter__toggle" title="折叠/展开面板">
+                          <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                      </div>
+
+                      <!-- Right: Topology Panel -->
+                      <div class="console-topo-panel">
+                        <div class="console-topo-info" id="console-topo-info"></div>
+                        <div class="console-topo-canvas" id="console-topo-canvas"></div>
+                        <div class="console-topo-tabs" id="console-topo-tabs"></div>
+                        <div id="console-can-panel" class="console-sim-panel is-hidden"></div>
+                        <div id="console-eth-panel" class="console-sim-panel is-hidden"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="bus-data"
+                  style="left: 180px; top: 60px; width: 960px; height: 520px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-list-ul"></i>总线数据
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--trace-layout">
+                    <div class="trace-layout">
+                      <!-- Left Side: Filter Tree Panel -->
+                      <aside class="trace-filter-panel">
+                        <!-- Left Toolbar -->
+                        <div class="trace-filter-toolbar">
+                          <button class="trace-btn" title="分析图表"><i class="fa-solid fa-chart-column" style="color:#4a5568"></i></button>
+                          <button class="trace-btn" title="激活过滤器"><i class="fa-solid fa-filter" style="color:#2f6bff"></i></button>
+                          <button class="trace-btn" title="统计分析"><i class="fa-solid fa-chart-pie" style="color:#4a5568"></i></button>
+                          <div class="trace-toolbar-sep"></div>
+                          <button class="trace-btn" title="查找"><i class="fa-solid fa-magnifying-glass" style="color:#4a5568"></i></button>
+                        </div>
+                        <!-- Filter Tree -->
+                        <div class="trace-filter-tree">
+                          <div class="trace-tree-group">
+                            <div class="trace-tree-node is-expanded">
+                              <span class="trace-tree-toggle"><i class="fa-solid fa-caret-down"></i></span>
+                              <label class="trace-tree-label">
+                                <input type="checkbox" id="trace-filter-block-root" checked />
+                                <i class="fa-solid fa-circle-xmark status-icon--block" style="color:#d04030"></i>
+                                <span>阻塞</span>
+                              </label>
+                            </div>
+                            <div class="trace-tree-children">
+                              <div class="trace-tree-item">
+                                <label class="trace-tree-label">
+                                  <input type="checkbox" class="trace-filter-cb" data-filter="block-can" />
+                                  <i class="fa-solid fa-road icon--can" style="color:#d04030"></i>
+                                  <span>CAN</span>
+                                </label>
+                              </div>
+                              <div class="trace-tree-item">
+                                <label class="trace-tree-label">
+                                  <input type="checkbox" class="trace-filter-cb" data-filter="block-diag" />
+                                  <i class="fa-solid fa-envelope icon--diag" style="color:#7b4fbf"></i>
+                                  <span>诊断</span>
+                                </label>
+                              </div>
+
+                            </div>
+                          </div>
+
+                          <div class="trace-tree-group">
+                            <div class="trace-tree-node is-expanded">
+                              <span class="trace-tree-toggle"><i class="fa-solid fa-caret-down"></i></span>
+                              <label class="trace-tree-label">
+                                <input type="checkbox" id="trace-filter-pass-root" checked />
+                                <i class="fa-solid fa-circle-check status-icon--pass" style="color:#2e8b2e"></i>
+                                <span>通过</span>
+                              </label>
+                            </div>
+                            <div class="trace-tree-children">
+                              <div class="trace-tree-item">
+                                <label class="trace-tree-label">
+                                  <input type="checkbox" class="trace-filter-cb" data-filter="pass-can" checked />
+                                  <i class="fa-solid fa-road icon--can" style="color:#2e8b57"></i>
+                                  <span>CAN</span>
+                                </label>
+                              </div>
+                              <div class="trace-tree-item">
+                                <label class="trace-tree-label">
+                                  <input type="checkbox" class="trace-filter-cb" data-filter="pass-diag" checked />
+                                  <i class="fa-solid fa-envelope icon--diag" style="color:#7b4fbf"></i>
+                                  <span>诊断</span>
+                                </label>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </aside>
+
+                      <!-- Splitter -->
+                      <div class="trace-splitter" id="trace-splitter"></div>
+
+                      <!-- Right Side: Trace Table Panel -->
+                      <main class="trace-main-panel">
+                        <!-- Right Toolbar -->
+                        <div class="trace-main-toolbar">
+                          <button class="trace-btn" id="trace-btn-clear" title="清空所有Trace (橡皮擦)"><i class="fa-solid fa-eraser" style="color:#d04030"></i></button>
+                          <button class="trace-btn" id="trace-btn-pause" title="暂停/启动接收"><i class="fa-solid fa-pause" style="color:#e6a23c"></i></button>
+                          <div class="trace-toolbar-sep"></div>
+                          <button class="trace-btn" id="trace-btn-time-mode" title="绝对/相对时间切换"><i class="fa-regular fa-clock" style="color:#4a5568"></i></button>
+                          <button class="trace-btn" title="列表列过滤"><i class="fa-solid fa-filter" style="color:#4a5568"></i></button>
+                          
+                          <!-- Search Box -->
+                          <div class="trace-search-box">
+                            <input type="text" id="trace-search-input" placeholder="Enter text to search..." />
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                          </div>
+
+                          <button class="trace-btn" title="向前查找"><i class="fa-solid fa-arrow-left" style="color:#888"></i></button>
+                          <button class="trace-btn" title="向后查找"><i class="fa-solid fa-arrow-right" style="color:#888"></i></button>
+                          <button class="trace-btn" title="Trace 配置选项"><i class="fa-solid fa-gear" style="color:#4a5568"></i></button>
+
+                          <!-- AI Copilot Dropdown -->
+                          <div class="trace-ai-dropdown">
+                            <button class="trace-btn trace-btn--ai" id="trace-btn-ai" title="AI 报文流智能诊断">
+                              <i class="fa-solid fa-robot" style="margin-right:2px;"></i>
+                              <span>AI</span>
+                              <i class="fa-solid fa-caret-down" style="font-size:9px; margin-left:3px;"></i>
+                            </button>
+                            <div class="trace-ai-menu" id="trace-ai-menu">
+                              <button class="trace-ai-item" data-action="ai-diagnose"><i class="fa-solid fa-stethoscope"></i>智能诊断分析</button>
+                              <button class="trace-ai-item" data-action="ai-uds-nrc"><i class="fa-solid fa-bug"></i>UDS 负响应排错</button>
+                              <button class="trace-ai-item" data-action="ai-load-rate"><i class="fa-solid fa-chart-line"></i>总线负载率评估</button>
+                            </div>
+                          </div>
+
+                          <button class="trace-btn" id="trace-btn-export" title="导出日志文件 (.asc/.csv)"><i class="fa-solid fa-download" style="color:#4a5568"></i></button>
+                        </div>
+
+                        <!-- Trace List Table -->
+                        <div class="trace-table-wrap">
+                          <table class="trace-table" id="trace-table-el">
+                            <thead>
+                              <tr>
+                                <th style="width: 100px;">时间</th>
+                                <th style="width: 60px;">信道</th>
+                                <th style="width: 70px;">标识</th>
+                                <th style="width: 180px;">名称</th>
+                                <th style="width: 50px;">方向</th>
+                                <th style="width: 50px;">长度</th>
+                                <th>数据</th>
+                              </tr>
+                            </thead>
+                            <tbody id="trace-table-tbody">
+                              <!-- 动态滚动灌入的报文 -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </main>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="chart-monitor"
+                  style="left: 120px; top: 120px; width: 960px; height: 520px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-chart-line"></i>图形监控
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--chart-layout">
+                    <div class="chart-layout">
+                      <!-- Left Side: Signal Manager List -->
+                      <aside class="chart-signal-panel" style="width: 250px;">
+                        <div class="chart-signal-toolbar">
+                          <button class="chart-btn" id="chart-btn-add" title="添加信号 (+)"><i class="fa-solid fa-plus" style="color:#2e8b2e"></i></button>
+                          <button class="chart-btn" id="chart-btn-delete" title="删除选中信号 (x)"><i class="fa-solid fa-xmark" style="color:#d04030"></i></button>
+                          <div class="chart-toolbar-sep"></div>
+                          <span style="font-size:11px; color:#718096; font-weight:500;">信号列表</span>
+                        </div>
+                        <div class="chart-signal-list-wrap">
+                          <table class="chart-signal-table">
+                            <thead>
+                              <tr>
+                                <th style="width: 30px;"><input type="checkbox" id="chart-signal-select-all" checked /></th>
+                                <th style="width: 20px;">色</th>
+                                <th>名称</th>
+                                <th style="width: 60px; text-align: right;">当前值</th>
+                              </tr>
+                            </thead>
+                            <tbody id="chart-signal-tbody">
+                              <!-- 动态生成信号列表行 -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </aside>
+
+                      <!-- Resize Splitter -->
+                      <div class="chart-splitter" id="chart-splitter"></div>
+
+                      <!-- Right Side: Oscilloscope Grid -->
+                      <main class="chart-canvas-panel">
+                        <!-- Toolbar -->
+                        <div class="chart-main-toolbar">
+                          <button class="chart-btn" id="chart-btn-grid" title="切换网格线"><i class="fa-solid fa-table-cells" style="color:#2f6bff"></i></button>
+                          <button class="chart-btn" id="chart-btn-pause" title="暂停/启动监视"><i class="fa-solid fa-pause" style="color:#e6a23c"></i></button>
+                          <div class="chart-toolbar-sep"></div>
+                          <button class="chart-btn" id="chart-btn-zoom-in" title="时窗缩小 (波形变宽)"><i class="fa-solid fa-magnifying-glass-plus" style="color:#4a5568"></i></button>
+                          <button class="chart-btn" id="chart-btn-zoom-out" title="时窗扩大 (波形变窄)"><i class="fa-solid fa-magnifying-glass-minus" style="color:#4a5568"></i></button>
+                          <button class="chart-btn" id="chart-btn-fit" title="还原默认时窗"><i class="fa-solid fa-arrows-to-eye" style="color:#4a5568"></i></button>
+                          <div class="chart-toolbar-sep"></div>
+                          <button class="chart-btn" id="chart-btn-clear" title="清空全部信号波形 (橡皮擦)"><i class="fa-solid fa-eraser" style="color:#d04030"></i></button>
+                          <button class="chart-btn" id="chart-btn-settings" title="图形设置选项"><i class="fa-solid fa-gear" style="color:#4a5568"></i></button>
+                        </div>
+
+                        <!-- Canvas Area -->
+                        <div class="chart-viewport" id="chart-canvas-viewport">
+                          <canvas id="chart-monitor-canvas"></canvas>
+                          <!-- Cursor Tooltip -->
+                          <div class="chart-tooltip-bubble" id="chart-tooltip-bubble"></div>
+                        </div>
+
+                        <!-- Bottom Axis Label -->
+                        <div class="chart-axis-footer">
+                          <span id="chart-axis-label-left">0[s]</span>
+                          <span id="chart-axis-label-right" style="font-weight:600; color:#2d3748;">24[s]</span>
+                        </div>
+                      </main>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="message-record"
+                  style="left: 700px; top: 120px; width: 260px; height: 95px;"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-record-vinyl"></i>报文录制
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--record-layout">
+                    <div class="record-layout">
+                      <div class="record-toolbar">
+                        <button class="record-btn" id="record-btn-start" title="开始录制 (Play)">
+                          <i class="fa-solid fa-play" style="color:#555;"></i>
+                        </button>
+                        <button class="record-btn is-disabled" id="record-btn-stop" title="停止录制 (Stop)">
+                          <i class="fa-solid fa-square" style="color:#aaa;"></i>
+                        </button>
+                        <div class="record-toolbar-sep"></div>
+                        <button class="record-btn" id="record-btn-settings" title="配置 Logging 设置">
+                          <i class="fa-solid fa-gear" style="color:#2f6bff;"></i>
+                        </button>
+                        <button class="record-btn" id="record-btn-folder" title="浏览保存目录">
+                          <i class="fa-solid fa-folder-open" style="color:#e6a23c;"></i>
+                        </button>
+                      </div>
+                      <div class="record-status">
+                        <span class="record-status-dot" id="record-status-dot"></span>
+                        <span class="record-status-text" id="record-status-text">Ready</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="message-playback"
+                  style="left: 700px; top: 230px; width: 260px; height: 95px;"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-play-circle"></i>报文回放
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--record-layout">
+                    <div class="record-layout">
+                      <div class="record-toolbar">
+                        <button class="record-btn" id="playback-btn-start" title="开始回放 (Play)">
+                          <i class="fa-solid fa-play" style="color:#555;"></i>
+                        </button>
+                        <button class="record-btn is-disabled" id="playback-btn-stop" title="停止回放 (Stop)">
+                          <i class="fa-solid fa-square" style="color:#aaa;"></i>
+                        </button>
+                        <div class="record-toolbar-sep"></div>
+                        <button class="record-btn" id="playback-btn-settings" title="配置回放设置">
+                          <i class="fa-solid fa-gear" style="color:#2f6bff;"></i>
+                        </button>
+                      </div>
+                      <div class="record-status">
+                        <span class="record-status-dot" id="playback-status-dot"></span>
+                        <span class="record-status-text" id="playback-status-text">Ready</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="gbf-convert"
+                  style="left: 120px; top: 36px; width: 1180px; height: 660px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-code-branch"></i>GBF转化
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--gbf">
+                    <section class="gbf-shell">
+                      <div class="gbf-main gbf-main--snapshot">
+                        <aside class="gbf-pane gbf-pane--files">
+                          <div class="gbf-pane__header gbf-pane__header--tools">
+                            <div class="gbf-pane__tools">
+                              <button class="btn btn--ghost btn--sm gbf-icon-tool" data-action="gbf-add-file" type="button" title="添加文件" aria-label="添加文件">
+                                <i class="fa-regular fa-file"></i>
+                              </button>
+                              <button class="btn btn--ghost btn--sm gbf-icon-tool" data-action="gbf-add-folder" type="button" title="添加文件夹" aria-label="添加文件夹">
+                                <i class="fa-regular fa-folder-open"></i>
+                              </button>
+                              <button class="btn btn--ghost btn--sm gbf-icon-tool" data-action="open-gbf-sync" type="button" title="从云端同步" aria-label="从云端同步">
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                              </button>
+                              <button class="btn btn--ghost btn--sm gbf-icon-tool" data-action="open-gbf-package" id="gbf-package-button" type="button" title="整车打包" aria-label="整车打包">
+                                <i class="fa-solid fa-box-archive"></i>
+                              </button>
+                              <button class="btn btn--primary btn--sm gbf-icon-tool" data-action="gbf-convert-selected" id="gbf-convert-button" type="button" title="转化" aria-label="转化">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="gbf-file-split-container">
+                            <div class="gbf-file-section gbf-file-section--original" data-gbf-file-section="original">
+                              <button class="gbf-file-section__header" data-action="gbf-toggle-file-section" data-section="original" type="button" aria-expanded="true">
+                                <span class="gbf-file-section__title">
+                                  <i class="fa-regular fa-file-zipper"></i>
+                                  <span>原始文件 (.zip)</span>
+                                </span>
+                                <i class="fa-solid fa-chevron-down gbf-file-section__chevron" aria-hidden="true"></i>
+                              </button>
+                              <div class="gbf-file-list" id="gbf-file-list-original"></div>
+                            </div>
+                            <div class="gbf-file-section gbf-file-section--gbf" data-gbf-file-section="gbf">
+                              <button class="gbf-file-section__header" data-action="gbf-toggle-file-section" data-section="gbf" type="button" aria-expanded="true">
+                                <span class="gbf-file-section__title">
+                                  <i class="fa-solid fa-cube"></i>
+                                  <span>GBF 文件 (.gbf)</span>
+                                </span>
+                                <i class="fa-solid fa-chevron-down gbf-file-section__chevron" aria-hidden="true"></i>
+                              </button>
+                              <div class="gbf-file-list" id="gbf-file-list-gbf"></div>
+                            </div>
+                          </div>
+                          <div class="gbf-pane__footer">
+                            <span class="gbf-pane__hint gbf-pane__count" id="gbf-list-count">0/0</span>
+                            <button class="gbf-progress-trigger gbf-pane__progress" data-action="open-gbf-progress" id="gbf-progress-button" type="button">
+                              <span>整体进度</span>
+                              <strong></strong>
+                            </button>
+                            <button class="gbf-pane__toggle" data-action="gbf-toggle-files" id="gbf-toggle-files" type="button">
+                              <i class="fa-solid fa-panel-left"></i>
+                              <span class="gbf-pane__toggle-text">收起列表</span>
+                            </button>
+                          </div>
+                        </aside>
+
+                        <section class="gbf-pane gbf-pane--detail gbf-pane--snapshot">
+                          <div class="gbf-config-sheet" id="gbf-panel-header">
+                            <div class="gbf-empty">正在加载字段配置...</div>
+                          </div>
+                          <div class="gbf-config-sheet is-hidden" id="gbf-panel-binary">
+                            <div class="gbf-empty">正在加载 .gbf 文件数据...</div>
+                          </div>
+                        </section>
+                      </div>
+                    </section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="flash-config"
+                  style="left: 120px; top: 72px; width: 1060px; height: 620px"
+                >
+                  <div class="window-header">
+                      <div class="window-title">
+                        <i class="fa-solid fa-microchip"></i>刷写配置
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--flash-config">
+                    <section class="flash-config-shell" id="flash-config-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="single-flash"
+                  style="left: 120px; top: 72px; width: 1190px; height: 640px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-bolt"></i>单件刷写
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--flash-config">
+                    <section id="single-flash-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="vehicle-flash"
+                  style="left: 120px; top: 72px; width: 1190px; height: 640px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-car"></i>整车刷写
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--vehicle-flash">
+                    <section class="vehicle-flash-shell" id="vehicle-flash-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="pdx-check"
+                  style="left: 140px; top: 84px; width: 1120px; height: 640px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-file-circle-check"></i>PDX校验
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--pdx-check">
+                    <section id="pdx-check-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="basic-diag"
+                  style="left: 100px; top: 60px; width: 1160px; height: 660px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-terminal"></i>基础诊断
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--basic-diag">
+                    <section id="basic-diag-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="quick-diag"
+                  style="left: 100px; top: 60px; width: 1060px; height: 620px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-gauge"></i>快捷诊断
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--quick-diag">
+                    <section id="quick-diag-root"></section>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="obd-diag"
+                  style="left: 200px; top: 120px; width: 800px; height: 500px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-plug-circle-check"></i>OBD排放
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--obd-diag">
+                    <div id="obd-diag-root">
+                      <!-- Main View Workspace -->
+                      <div class="obd-diag-workspace">
+                        
+                        <!-- Test View (Active by default) -->
+                        <div class="obd-diag-view is-active" id="obd-view-test">
+                          <!-- ECU selection cards -->
+                          <div class="obd-ecu-bar">
+                            <div class="obd-ecu-list">
+                              <button class="obd-ecu-btn is-active" data-ecu="1">ECU1</button>
+                              <button class="obd-ecu-btn" data-ecu="2">ECU2</button>
+                              <button class="obd-ecu-btn" data-ecu="3">ECU3</button>
+                              <button class="obd-ecu-btn" data-ecu="4">ECU4</button>
+                              <button class="obd-ecu-btn" data-ecu="5">ECU5</button>
+                              <button class="obd-ecu-btn" data-ecu="6">ECU6</button>
+                              <button class="obd-ecu-btn" data-ecu="7">ECU7</button>
+                              <button class="obd-ecu-btn" data-ecu="8">ECU8</button>
+                            </div>
+                            <button class="obd-btn obd-btn--primary obd-btn-scan" id="obd-btn-scan">
+                              <i class="fa-solid fa-arrows-rotate"></i> 重新扫描
+                            </button>
+                          </div>
+
+                          <!-- OBD mode sub-tabs -->
+                          <div class="obd-mode-bar">
+                            <div class="obd-mode-tabs" role="tablist">
+                              <button class="obd-mode-tab is-active" data-obd-mode="01">实时数据流 (01)</button>
+                              <button class="obd-mode-tab" data-obd-mode="02">冻结帧数据 (02)</button>
+                              <button class="obd-mode-tab" data-obd-mode="03">读取故障码 (03/07/0A)</button>
+                              <button class="obd-mode-tab" data-obd-mode="04">清除故障码 (04)</button>
+                              <button class="obd-mode-tab" data-obd-mode="09">车辆信息 (09)</button>
+                            </div>
+                            <button class="obd-btn obd-btn--secondary obd-btn-read" id="obd-btn-read">
+                              <i class="fa-solid fa-magnifying-glass"></i> 读取
+                            </button>
+                          </div>
+
+                          <!-- PID Data Table -->
+                          <div class="obd-data-area">
+                            <div class="obd-table-wrapper">
+                              <table class="obd-table" id="obd-table-el">
+                                <thead>
+                                  <tr>
+                                    <th style="width: 48px;">
+                                      <button class="obd-play-btn" id="obd-table-play-toggle" title="开启/关闭数据流动态更新">
+                                        <i class="fa-solid fa-play"></i>
+                                      </button>
+                                    </th>
+                                    <th style="width: 32px;"><input type="checkbox" id="obd-table-select-all" checked /></th>
+                                    <th>数据项 (PID)</th>
+                                    <th style="width: 250px;">参数值</th>
+                                    <th style="width: 120px;">单位</th>
+                                  </tr>
+                                </thead>
+                                <tbody id="obd-table-tbody">
+                                  <!-- OBD Mode rows dynamically loaded by obd-diag.js -->
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="system-messages"
+                  style="left: 620px; top: 20px; width: 520px; height: 320px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-list"></i>系统消息
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content">
+                    <div class="system-message__hint">系统消息不保存，退出登录后清除。</div>
+                    <div class="system-message__list" id="system-message-list"></div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="pending-logs"
+                  style="left: 120px; top: 370px; width: 640px; height: 320px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>待上传日志
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content">
+                    <table class="log-table">
+                      <thead>
+                        <tr>
+                          <th>类型</th>
+                          <th>上传时间</th>
+                          <th>失败原因</th>
+                          <th>操作</th>
+                        </tr>
+                      </thead>
+                      <tbody id="pending-log-body"></tbody>
+                    </table>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="update"
+                  style="left: 780px; top: 370px; width: 520px; height: 340px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-rotate"></i>在线更新
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content">
+                    <div class="update-tabs">
+                      <button class="update-tab is-active" data-update-tab="version">版本信息</button>
+                      <button class="update-tab" data-update-tab="content">更新内容</button>
+                    </div>
+                    <div class="update-panel is-active" id="update-panel-version">
+                      <div class="update-row">
+                        <span>当前版本</span>
+                        <strong id="current-version">xxxxxxxxxx</strong>
+                      </div>
+                      <div class="update-row">
+                        <span>最新版本</span>
+                        <strong id="latest-version">---</strong>
+                      </div>
+                      <button class="btn btn--primary btn--sm" data-action="check-update">
+                        检查更新
+                      </button>
+                      <div class="update-list" id="update-version-list"></div>
+                      <div class="update-progress is-hidden" id="update-progress">
+                        <div class="progress-bar">
+                          <div class="progress-fill" id="update-progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="update-progress-text">准备更新...</div>
+                      </div>
+                      <div class="update-result" id="update-result"></div>
+                      <button class="btn btn--primary btn--sm is-hidden" data-action="start-update" id="update-start">
+                        立即更新
+                      </button>
+                    </div>
+                    <div class="update-panel" id="update-panel-content">
+                      <div class="update-empty" id="update-empty">请先点击【检查更新】获取更新内容。</div>
+                      <div class="update-content-list" id="update-content-list"></div>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="help"
+                  style="left: 980px; top: 20px; width: 360px; height: 320px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-circle-question"></i>帮助文档
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content">
+                    <div class="help-section">
+                      <h4>快速入门</h4>
+                      <p>通过顶部快捷功能入口完成设备连接、保存工程与查看系统消息。</p>
+                    </div>
+                    <div class="help-section">
+                      <h4>多窗口</h4>
+                      <p>窗口支持拖拽、缩放与置顶，便于并行查看状态与操作记录。</p>
+                    </div>
+                    <div class="help-section">
+                      <h4>常见问题</h4>
+                      <ul>
+                        <li>设备打开失败请查看系统消息中的错误原因。</li>
+                        <li>更新完成后需退出工具重新登录。</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+                <!-- 统一刷写设置 -->
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="flash-settings"
+                  style="left: 60px; top: 24px; width: 1200px; height: 680px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-sliders"></i>统一刷写设置
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--settings" id="flash-settings-root">
+                    <div class="settings-shell">
+                      <!-- 顶部 Tab 栏 -->
+                      <div class="flash-settings-tabsbar">
+                        <nav class="settings-nav">
+                          <button class="settings-nav__item is-active" data-settings-tab="log-upload">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>日志上传
+                          </button>
+                          <button class="settings-nav__item" data-settings-tab="data-update">
+                            <i class="fa-solid fa-rotate"></i>数据版本
+                          </button>
+                          <button class="settings-nav__item" data-settings-tab="file-path">
+                            <i class="fa-solid fa-folder-open"></i>文件存储
+                          </button>
+                          <button class="settings-nav__item" data-settings-tab="did-settings">
+                            <i class="fa-solid fa-list-check"></i>DID设置
+                          </button>
+                        </nav>
+                      </div>
+
+                      <!-- 内容区 -->
+                      <div class="settings-content">
+
+                        <!-- ===== 2. 日志上传 ===== -->
+                        <div class="settings-section is-active is-editable" data-settings-panel="log-upload">
+                          <div class="settings-card">
+                            <div class="settings-card__header">
+                              <span class="settings-card__title">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>日志上传策略
+                              </span>
+                              <div class="settings-card__actions">
+                                <button class="settings-inline-btn" type="button" data-edit-toggle>编辑</button>
+                                <button class="settings-inline-btn settings-inline-btn--primary" type="button" data-save-toggle hidden>保存</button>
+                                <button class="settings-inline-btn" type="button" data-cancel-toggle hidden>取消</button>
+                              </div>
+                            </div>
+                            <div class="settings-card__body">
+                              <div class="settings-sub-title">单件刷写</div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">日志上传方式</span>
+                                <div class="settings-form-value">
+                                  <div class="settings-radio-group">
+                                    <label class="settings-radio">
+                                      <input type="radio" name="single-log-mode" value="auto" checked />自动上传日志
+                                    </label>
+                                    <label class="settings-radio">
+                                      <input type="radio" name="single-log-mode" value="manual" />手动上传日志
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="settings-sub-title" style="margin-top:14px">整车刷写</div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">日志上传方式</span>
+                                <div class="settings-form-value">
+                                  <div class="settings-radio-group">
+                                    <label class="settings-radio">
+                                      <input type="radio" name="vehicle-log-mode" value="auto" checked />自动上传日志
+                                    </label>
+                                    <label class="settings-radio">
+                                      <input type="radio" name="vehicle-log-mode" value="manual" />手动上传日志
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="settings-hint">
+                                <i class="fa-solid fa-circle-info"></i>
+                                当配置为"自动上传"时，执行页不再展示手动上传按钮。默认值为"手动上传日志"。
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ===== 3. 数据版本 ===== -->
+                        <div class="settings-section" data-settings-panel="data-update">
+                          <div class="settings-card">
+                            <div class="settings-card__header">
+                              <span class="settings-card__title">
+                                <i class="fa-solid fa-rotate"></i>统一刷写数据版本
+                              </span>
+                            </div>
+                            <div class="settings-card__body">
+                              <div class="settings-version-row">
+                                <span class="settings-version-label">当前数据版本</span>
+                                <span class="settings-version-val" id="ver-current">V2.1.0</span>
+                              </div>
+                              <div class="settings-version-row">
+                                <span class="settings-version-label">云端最新版本</span>
+                                <span class="settings-version-val" id="ver-remote">--</span>
+                              </div>
+                              <div style="display:flex;gap:8px;margin-top:12px">
+                                <button class="settings-btn" id="btn-fetch-cloud-ver">
+                                  <i class="fa-solid fa-cloud-arrow-down"></i>获取云端版本
+                                </button>
+                                <button class="settings-btn settings-btn--primary" id="btn-update-ver" disabled>
+                                  <i class="fa-solid fa-cloud-arrow-down"></i>立即更新
+                                </button>
+                              </div>
+                              <div class="settings-version-list" id="cloud-version-list" style="margin-top:10px"></div>
+                              <div class="settings-hint" style="margin-top:10px">
+                                <i class="fa-solid fa-circle-info"></i>
+                                点击“获取云端版本”后，最多展示 3 个可选版本；当所选版本与当前版本一致时，“立即更新”按钮不可点击。
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ===== 4. 文件存储 ===== -->
+                        <div class="settings-section is-editable" data-settings-panel="file-path">
+                          <div class="settings-card">
+                            <div class="settings-card__header">
+                              <span class="settings-card__title">
+                                <i class="fa-solid fa-folder-open"></i>文件存储路径
+                              </span>
+                              <div class="settings-card__actions">
+                                <button class="settings-inline-btn" type="button" data-edit-toggle>编辑</button>
+                                <button class="settings-inline-btn settings-inline-btn--primary" type="button" data-save-toggle hidden>保存</button>
+                                <button class="settings-inline-btn" type="button" data-cancel-toggle hidden>取消</button>
+                              </div>
+                            </div>
+                            <div class="settings-card__body">
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">下载文件路径</span>
+                                <div class="settings-form-value">
+                                  <input
+                                    class="settings-path-input"
+                                    id="path-download"
+                                    type="text"
+                                    value="C:\GDTTools\Downloads"
+                                    readonly
+                                  />
+                                  <button class="settings-btn" data-path-for="path-download">
+                                    <i class="fa-solid fa-folder"></i>选择目录
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">日志文件路径</span>
+                                <div class="settings-form-value">
+                                  <input
+                                    class="settings-path-input"
+                                    id="path-log"
+                                    type="text"
+                                    value="C:\GDTTools\Logs"
+                                    readonly
+                                  />
+                                  <button class="settings-btn" data-path-for="path-log">
+                                    <i class="fa-solid fa-folder"></i>选择目录
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="settings-hint">
+                                <i class="fa-solid fa-circle-info"></i>
+                                路径修改立即生效，影响 GBF 转化下载、单件刷写日志、整车刷写日志的默认存储位置。
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- ===== 5. DID 设置 ===== -->
+                        <div class="settings-section" data-settings-panel="did-settings">
+                          <div class="settings-card">
+                            <div class="settings-card__header">
+                              <span class="settings-card__title">
+                                <i class="fa-solid fa-list-check"></i>单件刷写读取 DID 配置
+                              </span>
+                            </div>
+                            <div class="settings-card__body">
+                              <div class="settings-table-wrap">
+                                <table class="settings-table">
+                                  <thead>
+                                    <tr>
+                                      <th style="width: 60px" class="is-center">序号</th>
+                                      <th>DID 描述</th>
+                                      <th>DID (HEX)</th>
+                                      <th style="width: 100px" class="is-center">操作</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody id="did-settings-tbody">
+                                    <!-- JS 渲染 -->
+                                  </tbody>
+                                </table>
+                              </div>
+                              <div class="settings-table-actions">
+                                <button class="settings-btn settings-btn--primary" type="button" id="btn-add-did">
+                                  <i class="fa-solid fa-plus"></i>添加 DID
+                                </button>
+                              </div>
+                              <div class="settings-hint" style="margin-top: 10px">
+                                <i class="fa-solid fa-circle-info"></i>
+                                默认的前三项 DID 为系统固定配置，无法删除；点击“添加”可新增自定义读取项。
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+
+
+                <!-- OBD设置 -->
+                <div
+                  class="workspace-window is-hidden"
+                  data-window="obd-settings"
+                  style="left: 110px; top: 66px; width: 980px; height: 540px"
+                >
+                  <div class="window-header">
+                    <div class="window-title">
+                      <i class="fa-solid fa-plug"></i>通讯设置
+                    </div>
+                    <div class="window-controls">
+                      <button class="window-mini" data-action="minimize-window">
+                        <i class="fa-solid fa-window-minimize"></i>
+                      </button>
+                      <button class="window-mini" data-action="maximize-window">
+                        <i class="fa-regular fa-square"></i>
+                      </button>
+                      <button class="window-mini is-danger" data-action="close-window">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="window-content window-content--settings" id="obd-settings-root">
+                    <div class="settings-shell">
+                      <div class="obd-settings-tabs" role="tablist" aria-label="OBD设置页签">
+                        <button
+                          class="obd-settings-tab is-active"
+                          type="button"
+                          data-obd-tab="obd-main"
+                          role="tab"
+                          aria-selected="true"
+                        >
+                          OBD设置
+                        </button>
+                        <button
+                          class="obd-settings-tab"
+                          type="button"
+                          data-obd-tab="obd-address"
+                          role="tab"
+                          aria-selected="false"
+                        >
+                          地址设置
+                        </button>
+                      </div>
+                      <div class="settings-content settings-content--single">
+                        <div class="obd-settings-panel is-active" data-obd-panel="obd-main" role="tabpanel">
+                        <div class="settings-card">
+                          <div class="settings-card__header">
+                            <span class="settings-card__title">
+                              <i class="fa-solid fa-diagram-project"></i>标准定义
+                            </span>
+                          </div>
+                          <div class="settings-card__body">
+                            <div class="settings-obd-diagram-card">
+                              <img
+                                class="settings-obd-diagram-card__image"
+                                src="assets/svg/obd-standard-definition.svg"
+                                alt="标准OBD定义图"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="settings-card">
+                          <div class="settings-card__header">
+                            <span class="settings-card__title">
+                              <i class="fa-solid fa-sliders"></i>运行参数
+                            </span>
+                            <div class="settings-card__actions settings-card__actions--obd">
+                              <button class="settings-inline-btn" type="button" data-obd-edit-toggle>
+                                编辑
+                              </button>
+                              <button class="settings-inline-btn settings-inline-btn--primary" type="button" id="btn-save-obd">
+                                保存
+                              </button>
+                              <button class="settings-inline-btn" type="button" id="btn-cancel-obd-edit">
+                                取消
+                              </button>
+                            </div>
+                          </div>
+                          <div class="settings-card__body">
+                            <div class="settings-dual-panel settings-dual-panel--obd-runtime">
+                              <div class="settings-dual-panel__col">
+                                <div class="settings-dual-panel__heading">CAN 运行参数</div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">标准配置</span>
+                                  <div class="settings-form-value">
+                                    <select class="settings-select" id="obd-can-profile" data-obd-editable="true">
+                                      <option value="ISO 15765-4 CAN (11bit / 500 kbps)" selected>ISO 15765-4 CAN (11bit / 500 kbps)</option>
+                                      <option value="ISO 15765-4 CAN (29bit / 500 kbps)">ISO 15765-4 CAN (29bit / 500 kbps)</option>
+                                      <option value="ISO 15765-4 CAN (11bit / 250 kbps)">ISO 15765-4 CAN (11bit / 250 kbps)</option>
+                                      <option value="ISO 15765-4 CAN (29bit / 250 kbps)">ISO 15765-4 CAN (29bit / 250 kbps)</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">帧类型</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field" id="obd-can-frame-display">11bit</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">标准波特率</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field" id="obd-can-baud-display">500 kbps</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">采样点</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-sample-point" data-obd-editable="true" type="text" value="80%" placeholder="例如 80%" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">Tq</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-tq" data-obd-editable="true" type="text" value="0.125 us" placeholder="例如 0.125 us" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">时间量</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-time-quanta" data-obd-editable="true" type="text" value="16" placeholder="总 Time Quanta" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">预定标器</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-prescaler" data-obd-editable="true" type="text" value="1" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">位定时段1</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-tseg1" data-obd-editable="true" type="text" value="11" placeholder="TSEG1" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">位定时段2</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-tseg2" data-obd-editable="true" type="text" value="4" placeholder="TSEG2" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">同步跳转宽度</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-can-sjw" data-obd-editable="true" type="text" value="1" placeholder="SJW" />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="settings-dual-panel__col">
+                                <div class="settings-dual-panel__heading">以太网运行参数</div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">物理层</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field">100BASE-TX</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">诊断承载</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field">DoIP</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">VLAN模式</span>
+                                  <div class="settings-form-value">
+                                    <select class="settings-select" id="obd-eth-vlan-mode" data-obd-editable="true">
+                                      <option value="untagged">未打标签</option>
+                                      <option value="802.1q" selected>802.1Q VLAN</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row" id="row-obd-eth-vlan-id">
+                                  <span class="settings-form-label">VLAN ID</span>
+                                  <div class="settings-form-value">
+                                    <input class="settings-path-input" id="obd-eth-vlan-id" data-obd-editable="true" type="text" value="2" placeholder="例如 2 / 100 / 由 OEM 提供" />
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">UDP发现端口</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field">13400</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">TCP传输端口</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field">13400</div>
+                                  </div>
+                                </div>
+                                <div class="settings-form-row">
+                                  <span class="settings-form-label">路由激活</span>
+                                  <div class="settings-form-value">
+                                    <div class="settings-static-field">必须执行 Routing Activation</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="settings-hint">
+                              <i class="fa-solid fa-circle-info"></i>
+                              OBD2 CAN 运行参数由 ISO 15765-4 标准变体驱动，并包含 CAN 数据链路层位时序参数；以太网区提供 VLAN 与 DoIP 连接前置参数，用于完整表达 Discovery → TCP → Routing Activation 流程。
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+                        <div class="obd-settings-panel" data-obd-panel="obd-address" role="tabpanel" aria-hidden="true">
+                          <div class="settings-card">
+                            <div class="settings-card__header">
+                              <span class="settings-card__title">
+                                <i class="fa-solid fa-location-dot"></i>地址设置
+                              </span>
+                              <div class="settings-card__actions settings-card__actions--obd">
+                                <button class="settings-inline-btn" type="button" data-obd-address-edit-toggle>
+                                  编辑
+                                </button>
+                                <button class="settings-inline-btn settings-inline-btn--primary" type="button" id="btn-save-obd-address">
+                                  保存
+                                </button>
+                                <button class="settings-inline-btn" type="button" id="btn-cancel-obd-address-edit">
+                                  取消
+                                </button>
+                              </div>
+                            </div>
+                            <div class="settings-card__body">
+                              <div class="settings-sub-title">Tester 地址（统一刷写工具）</div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">Tester 逻辑地址</span>
+                                <div class="settings-form-value">
+                                  <input
+                                    class="settings-path-input"
+                                    id="tester-logical"
+                                    data-obd-address-editable="true"
+                                    type="text"
+                                    value="0x0E80"
+                                    placeholder="4 位十六进制，例如 0E00"
+                                  />
+                                </div>
+                              </div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">Tester 静态IP地址</span>
+                                <div class="settings-form-value">
+                                  <input
+                                    class="settings-path-input"
+                                    id="tester-ip"
+                                    data-obd-address-editable="true"
+                                    type="text"
+                                    value="172.16.2.1"
+                                    placeholder="例如 172.16.2.1"
+                                  />
+                                </div>
+                              </div>
+
+                              <div class="settings-sub-title" style="margin-top: 14px">网关地址</div>
+                              <div class="settings-dual-panel">
+                                <div class="settings-dual-panel__col">
+                                  <div class="settings-dual-panel__heading">以太网参数</div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">网关逻辑地址</span>
+                                    <div class="settings-form-value">
+                                      <input
+                                        class="settings-path-input"
+                                        id="gateway-logical"
+                                        data-obd-address-editable="true"
+                                        type="text"
+                                        value="0x1000"
+                                        placeholder="4 位十六进制，例如 1000"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">网关 IP 地址</span>
+                                    <div class="settings-form-value">
+                                      <input
+                                        class="settings-path-input"
+                                        id="gateway-ip"
+                                        data-obd-address-editable="true"
+                                        type="text"
+                                        value="172.16.2.30"
+                                        placeholder="例如 172.16.2.30"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="settings-dual-panel__col">
+                                  <div class="settings-dual-panel__heading">CAN 参数</div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">请求地址</span>
+                                    <div class="settings-form-value">
+                                      <input
+                                        class="settings-path-input"
+                                        id="gateway-can-req"
+                                        data-obd-address-editable="true"
+                                        type="text"
+                                        value="0x761"
+                                        placeholder="例如 0x761"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">响应地址</span>
+                                    <div class="settings-form-value">
+                                      <input
+                                        class="settings-path-input"
+                                        id="gateway-can-res"
+                                        data-obd-address-editable="true"
+                                        type="text"
+                                        value="0x7A1"
+                                        placeholder="例如 0x7A1"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="settings-form-row">
+                                <span class="settings-form-label">安全算法 DLL</span>
+                                <div class="settings-form-value">
+                                  <div class="settings-radio-group">
+                                    <label class="settings-radio">
+                                      <input type="radio" name="gateway-dll-mode" value="default" data-obd-address-editable="true" checked />默认文件
+                                    </label>
+                                    <label class="settings-radio">
+                                      <input type="radio" name="gateway-dll-mode" value="custom" data-obd-address-editable="true" />自选DLL文件
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="settings-form-row" id="row-gateway-dll-default">
+                                <span class="settings-form-label">默认安全算法 DLL</span>
+                                <div class="settings-form-value">
+                                  <select class="settings-select" id="sel-gateway-dll-default" data-obd-address-editable="true">
+                                    <option value="gateway_default.dll" selected>gateway_default.dll</option>
+                                    <option value="gateway_diag.dll">gateway_diag.dll</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="settings-form-row is-hidden" id="row-gateway-dll-custom">
+                                <span class="settings-form-label">自选安全算法 DLL</span>
+                                <div class="settings-form-value">
+                                  <button class="settings-btn" type="button" data-pick-dll="gateway">
+                                    <i class="fa-solid fa-file-import"></i>选择DLL
+                                  </button>
+                                  <span class="settings-file-label" id="lbl-gateway-dll-file">未选择</span>
+                                  <input type="file" accept=".dll" hidden id="input-gateway-dll-file" />
+                                </div>
+                              </div>
+
+                              <div class="settings-sub-title" style="margin-top: 14px">网关脚本配置</div>
+                              <div class="settings-dual-panel">
+                                <div class="settings-dual-panel__col">
+                                  <div class="settings-dual-panel__heading">打开直连通道</div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">诊断流程</span>
+                                    <div class="settings-form-value">
+                                      <div class="settings-radio-group">
+                                        <label class="settings-radio">
+                                          <input type="radio" name="open-flow-mode" value="default" data-obd-address-editable="true" checked />默认流程
+                                        </label>
+                                        <label class="settings-radio">
+                                          <input type="radio" name="open-flow-mode" value="tb2" data-obd-address-editable="true" />自选流程
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row" id="row-open-default-flow">
+                                    <span class="settings-form-label">默认流程</span>
+                                    <div class="settings-form-value">
+                                      <select class="settings-select" id="sel-open-default-flow" data-obd-address-editable="true">
+                                        <option value="TB2标准流程 A" selected>TB2标准流程 A</option>
+                                        <option value="TB2标准流程 B">TB2标准流程 B</option>
+                                        <option value="TB2增强流程 C">TB2增强流程 C</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row is-hidden" id="row-open-tb2-flow">
+                                    <span class="settings-form-label">TB2 文件</span>
+                                    <div class="settings-form-value">
+                                      <button class="settings-btn" type="button" data-pick-tb2="open">
+                                        <i class="fa-solid fa-file-import"></i>选择文件
+                                      </button>
+                                      <span class="settings-file-label" id="lbl-open-tb2-file">未选择</span>
+                                      <input type="file" accept=".tb2" hidden id="input-open-tb2-file" />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="settings-dual-panel__col">
+                                  <div class="settings-dual-panel__heading">关闭直连通道</div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">诊断流程</span>
+                                    <div class="settings-form-value">
+                                      <div class="settings-radio-group">
+                                        <label class="settings-radio">
+                                          <input type="radio" name="close-flow-mode" value="default" data-obd-address-editable="true" checked />默认流程
+                                        </label>
+                                        <label class="settings-radio">
+                                          <input type="radio" name="close-flow-mode" value="tb2" data-obd-address-editable="true" />自选流程
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row" id="row-close-default-flow">
+                                    <span class="settings-form-label">默认流程</span>
+                                    <div class="settings-form-value">
+                                      <select class="settings-select" id="sel-close-default-flow" data-obd-address-editable="true">
+                                        <option value="TB2标准流程 A" selected>TB2标准流程 A</option>
+                                        <option value="TB2标准流程 B">TB2标准流程 B</option>
+                                        <option value="TB2增强流程 C">TB2增强流程 C</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row is-hidden" id="row-close-tb2-flow">
+                                    <span class="settings-form-label">TB2 文件</span>
+                                    <div class="settings-form-value">
+                                      <button class="settings-btn" type="button" data-pick-tb2="close">
+                                        <i class="fa-solid fa-file-import"></i>选择文件
+                                      </button>
+                                      <span class="settings-file-label" id="lbl-close-tb2-file">未选择</span>
+                                      <input type="file" accept=".tb2" hidden id="input-close-tb2-file" />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="settings-dual-panel__col">
+                                  <div class="settings-dual-panel__heading">
+                                    <span>网关增强OBD认证</span>
+                                    <input type="checkbox" id="chk-gateway-auth-enable" data-obd-address-editable="true" checked />
+                                  </div>
+                                  <div class="settings-form-row">
+                                    <span class="settings-form-label">诊断流程</span>
+                                    <div class="settings-form-value">
+                                      <div class="settings-radio-group">
+                                        <label class="settings-radio">
+                                          <input type="radio" name="auth-flow-mode" value="default" data-obd-address-editable="true" checked />默认流程
+                                        </label>
+                                        <label class="settings-radio">
+                                          <input type="radio" name="auth-flow-mode" value="tb2" data-obd-address-editable="true" />自选流程
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row" id="row-auth-default-flow">
+                                    <span class="settings-form-label">默认流程</span>
+                                    <div class="settings-form-value">
+                                      <select class="settings-select" id="sel-auth-default-flow" data-obd-address-editable="true">
+                                        <option value="TB2标准流程 A" selected>TB2标准流程 A</option>
+                                        <option value="TB2标准流程 B">TB2标准流程 B</option>
+                                        <option value="TB2增强流程 C">TB2增强流程 C</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="settings-form-row is-hidden" id="row-auth-tb2-flow">
+                                    <span class="settings-form-label">TB2 文件</span>
+                                    <div class="settings-form-value">
+                                      <button class="settings-btn" type="button" data-pick-tb2="auth">
+                                        <i class="fa-solid fa-file-import"></i>选择文件
+                                      </button>
+                                      <span class="settings-file-label" id="lbl-auth-tb2-file">未选择</span>
+                                      <input type="file" accept=".tb2" hidden id="input-auth-tb2-file" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="settings-hint">
+                                <i class="fa-solid fa-circle-info"></i>
+                                Tester 需配置逻辑地址和 IP 地址；网关支持逻辑地址、IP 及 DLL 文件配置。打开/关闭直连通道与网关增强OBD认证各自独立配置诊断流程。
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="resize-handle"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-change-password">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">修改密码</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label>当前密码</label>
+            <input class="input" type="password" id="pwd-current" placeholder="请输入当前密码" />
+          </div>
+          <div class="field">
+            <label>新密码</label>
+            <input class="input" type="password" id="pwd-new" placeholder="请输入新密码" />
+          </div>
+          <div class="field">
+            <label>确认密码</label>
+            <input class="input" type="password" id="pwd-confirm" placeholder="再次输入新密码" />
+          </div>
+          <div class="modal-error" id="pwd-error"></div>
+          <div class="password-hint">
+            <div>密码格式提示固定展示在下方：</div>
+            <ul>
+              <li>长度：8-14 个字符</li>
+              <li>不能包含 4 位连续相同的字符，如 0000 或 AAAA</li>
+              <li>不能包含 4 位连续递增或递减的数字或字母，如 1234 或 4321 或 ABCD 或 DCBA</li>
+              <li>包含大小写字母、数字、特殊字符里任意 3 种组合</li>
+              <li>不允许有空格、中文</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="cancel-change-password">取消</button>
+          <button class="btn btn--primary" data-action="submit-change-password">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-save-as">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">另存为</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label>文件路径</label>
+            <input class="input" id="save-as-path" value="D:\\GWM\\Projects\\GDTCfg.gn" />
+          </div>
+          <div class="field">
+            <label>文件类型</label>
+            <input class="input" value=".gn" disabled />
+          </div>
+          <div class="helper">此工程文件可被此工具的任何账号打开和使用。</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="close-modal">取消</button>
+          <button class="btn btn--primary" data-action="confirm-save-as">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-save-confirm">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">确认保存</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          需要保存当前工程文件吗？
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="skip-save-logout">取消</button>
+          <button class="btn btn--primary" data-action="confirm-save-logout">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-new-project">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">新建工程</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          新建工程并保存此工程？
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="cancel-new-project">否</button>
+          <button class="btn btn--primary" data-action="confirm-new-project">是</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-gbf-sync">
+      <div class="modal-card modal-card--xl">
+        <div class="modal-header">
+          <div class="modal-title">从云端同步文件包</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body modal-body--wide">
+          <div class="gbf-sync">
+            <div class="gbf-sync__path">
+              <label>下载路径</label>
+              <div class="gbf-sync__path-row">
+                <input class="input" id="gbf-sync-path" value="D:\\GWM\\swfiledown" />
+                <button class="btn btn--ghost btn--sm" data-action="gbf-open-sync-path" type="button">
+                  浏览
+                </button>
+              </div>
+            </div>
+
+            <div class="gbf-sync-tabs">
+              <button class="gbf-sync-tab is-active" data-action="gbf-switch-sync-tab" data-sync-tab="ecu" type="button">
+                ECU文件
+              </button>
+              <button class="gbf-sync-tab" data-action="gbf-switch-sync-tab" data-sync-tab="vehicle" type="button">
+                整车文件
+              </button>
+            </div>
+
+            <div class="gbf-sync-panel is-active" id="gbf-sync-panel-ecu">
+              <div class="gbf-sync-grid">
+                <div class="field">
+                  <label>文件类型</label>
+                  <select class="select" id="gbf-sync-ecu-file-type">
+                    <option>原始文件</option>
+                    <option>GBF文件</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>项目编码</label>
+                  <select class="select">
+                    <option>GWM-EV-A2</option>
+                    <option>GWM-ICE-B1</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>ECU</label>
+                  <select class="select">
+                    <option>CEM</option>
+                    <option>ZCU</option>
+                    <option>HUT</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>供应商</label>
+                  <select class="select">
+                    <option>AAPCA</option>
+                    <option>CAXSO</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>分组号</label>
+                  <select class="select">
+                    <option>G01</option>
+                    <option>G02</option>
+                  </select>
+                </div>
+                <div class="field gbf-sync-grid__actions">
+                  <label>操作</label>
+                  <div class="gbf-inline-actions">
+                    <button class="btn btn--ghost btn--sm" data-action="gbf-fetch-version" type="button">
+                      获取版本
+                    </button>
+                    <button class="btn btn--ghost btn--sm" data-action="gbf-reset-version" type="button">
+                      清空
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="gbf-sync-result" id="gbf-sync-ecu-result"></div>
+            </div>
+
+            <div class="gbf-sync-panel" id="gbf-sync-panel-vehicle">
+              <div class="gbf-sync-grid">
+                <div class="field">
+                  <label>文件类型</label>
+                  <select class="select" id="gbf-sync-vehicle-file-type">
+                    <option>原始文件</option>
+                    <option>GBF文件</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>项目编码</label>
+                  <select class="select">
+                    <option>GWM-EV-A2</option>
+                    <option>GWM-ICE-B1</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>VIN</label>
+                  <input class="input" id="gbf-vehicle-vin" value="LGWFFUA55NZ012345" />
+                </div>
+                <div class="field">
+                  <label>基线版本</label>
+                  <input class="input" id="gbf-vehicle-baseline" value="25-03-Istep-300" />
+                </div>
+                <div class="field gbf-sync-grid__actions">
+                  <label>操作</label>
+                  <div class="gbf-inline-actions">
+                    <button class="btn btn--ghost btn--sm" data-action="gbf-fetch-vehicle-package" type="button">
+                      立即下载
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="gbf-sync-result" id="gbf-sync-vehicle-result"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="close-modal">取消</button>
+          <button class="btn btn--primary" data-action="gbf-download-selected">下载选中版本</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal is-hidden" id="modal-gbf-package">
+      <div class="modal-card modal-card--lg">
+        <div class="modal-header">
+          <div class="modal-title">整车打包</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body modal-body--wide">
+          <div class="field">
+            <label>输出路径</label>
+            <div class="gbf-sync__path-row">
+              <input class="input" id="gbf-package-path" value="D:\\GWM\\Packages\\vehicleSw.zip" />
+              <button class="btn btn--ghost btn--sm" data-action="gbf-open-package-path" type="button">
+                浏览
+              </button>
+            </div>
+          </div>
+
+          <div class="gbf-package-layout">
+            <div class="gbf-package-tree">
+              <div class="gbf-pane__title">目录结构</div>
+              <div class="gbf-package-tree__body" id="gbf-package-tree"></div>
+            </div>
+            <div class="gbf-package-notes">
+              <div class="gbf-note-card">
+                <div class="gbf-note-card__title">生成说明</div>
+                <p>根据您勾选的 `.gbf` 文件，系统将按照左侧结构自动生成整车基线版本，并输出 `vehicleSw.zip` 与描述文件。</p>
+                <ul>
+                  <li>仅 `.gbf` 文件可参与整车打包。</li>
+                  <li>默认使用第一个选中文件所在路径。</li>
+                  <li>描述文件与压缩包一并输出。</li>
+                </ul>
+              </div>
+              <div class="gbf-note-card gbf-note-card--muted">
+                <div class="gbf-note-card__title">当前选择</div>
+                <div id="gbf-package-count">已选择 0 个 GBF 文件</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="close-modal">取消</button>
+          <button class="btn btn--primary" data-action="gbf-generate-package">生成整车GBF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DID 添加弹窗 -->
+    <div class="modal is-hidden" id="modal-add-did">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">添加 DID 记录</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-form-item">
+            <label style="display:block; margin-bottom:4px; font-weight:500;">DID 描述</label>
+            <input class="settings-path-input" type="text" id="did-desc-input" placeholder="例如：应用状态" style="width:100%" />
+          </div>
+          <div class="modal-form-item">
+            <label style="display:block; margin-bottom:4px; font-weight:500;">DID (4位16进制)</label>
+            <input class="settings-path-input" type="text" id="did-val-input" placeholder="例如：F190" maxlength="4" style="text-transform: uppercase; font-family: monospace; width:100%" />
+          </div>
+          <div id="did-error-msg" style="color: #e74c3c; font-size: 11px; margin-top: 5px; display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="settings-btn" data-action="close-modal" type="button">取消</button>
+          <button class="settings-btn settings-btn--primary" id="btn-submit-did" type="button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通讯保持设置弹窗 -->
+    <div class="modal is-hidden" id="modal-comm-hold-settings">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title">通讯保持设置</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-form-item">
+            <label style="display:block; margin-bottom:4px; font-weight:500;">TP 周期 (ms)</label>
+            <input class="settings-path-input" type="number" id="comm-hold-cycle" value="2000" style="width:100%" />
+          </div>
+          <div class="modal-form-item">
+            <label style="display:block; margin-bottom:4px; font-weight:500;">TP 类型</label>
+            <select class="settings-path-input" id="comm-hold-type" style="width:100%">
+              <option value="功能寻址" selected>功能寻址 (Functional)</option>
+              <option value="物理寻址">物理寻址 (Physical)</option>
+            </select>
+          </div>
+          <div class="modal-form-item">
+            <label style="display:block; margin-bottom:4px; font-weight:500;">TP 数据</label>
+            <select class="settings-path-input" id="comm-hold-data" style="width:100%">
+              <option value="3E80" selected>3E 80</option>
+              <option value="3E00">3E 00</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="settings-btn" data-action="close-modal" type="button">取消</button>
+          <button class="settings-btn settings-btn--primary" id="btn-submit-comm-hold" type="button">保存设置</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 信号选择模态框 -->
+    <div class="modal is-hidden" id="modal-signal-select">
+      <div class="modal-card" style="width: 620px; max-width: 90vw;">
+        <div class="modal-header">
+          <div class="modal-title">信号选择</div>
+          <button class="modal-close" data-action="close-modal" type="button">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="modal-body" style="padding: 15px;">
+          <div class="signal-select-modal-body">
+            <div class="signal-select-search">
+              <input type="text" class="input" id="signal-search-input" placeholder="输入 ID 或帧名称进行搜索..." />
+              <button class="signal-select-search__btn" id="signal-search-btn" title="搜索" type="button">
+                <i class="fa-solid fa-binoculars"></i>
+              </button>
+            </div>
+            
+            <div class="signal-select-tree-container" id="signal-tree-container">
+              <!-- 动态渲染树结构 -->
+            </div>
+            
+            <div class="signal-select-details">
+              <div class="signal-select-detail-row">
+                <div class="signal-select-detail-label">帧名称:</div>
+                <div class="signal-select-detail-val" id="signal-detail-name">ECUs</div>
+              </div>
+              <div class="signal-select-detail-row">
+                <div class="signal-select-detail-label">开始位:</div>
+                <div class="signal-select-detail-val" id="signal-detail-start-bit">--</div>
+              </div>
+              <div class="signal-select-detail-row">
+                <div class="signal-select-detail-label">注释:</div>
+                <div class="signal-select-detail-val" id="signal-detail-comment">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn--ghost" data-action="close-modal" type="button">取消</button>
+          <button class="btn btn--primary" id="btn-confirm-signal-select" type="button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/js/mock.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/console-can.js"></script>
+    <script src="assets/js/console-eth.js"></script>
+    <script src="assets/js/console-diagram.js"></script>
+    <script src="assets/js/console-trace.js"></script>
+    <script src="assets/js/console-chart.js"></script>
+    <script src="assets/js/console-record.js"></script>
+    <script src="assets/js/console-playback.js"></script>
+    <script src="assets/js/gbf-prototype.js"></script>
+    <script src="assets/js/flash-config-ecu-sa.js"></script>
+    <script src="assets/js/flash-config-ecu-strategy.js"></script>
+    <script src="assets/js/flash-config-ecu.js"></script>
+    <script src="assets/js/flash-config-architecture.js"></script>
+    <script src="assets/js/flash-config-parallel.js"></script>
+    <script src="assets/js/flash-config-serial.js"></script>
+    <script src="assets/js/flash-config-sequence.js"></script>
+    <script src="assets/js/flash-config.js"></script>
+    <script src="assets/js/pdx-check.js"></script>
+    <script src="assets/js/single-flash.js"></script>
+    <script src="assets/js/vehicle-flash.js"></script>
+    <script src="assets/js/settings.js"></script>
+    <script src="assets/js/settings-obd.js"></script>
+    <script src="assets/js/settings-obd-address.js"></script>
+    <script src="assets/js/basic-diag.js"></script>
+    <script src="assets/js/quick-diag.js"></script>
+    <script src="assets/js/obd-diag.js"></script>
+  </body>
+</html>

@@ -1,0 +1,924 @@
+/* ======================================================
+   quick-diag.css - 快捷诊断界面样式
+   方案B：顶部快捷按钮 + 功能列表/报文双栏
+   ====================================================== */
+
+.window-content--quick-diag {
+  padding: 0;
+  overflow: hidden;
+  background: #e9edf2;
+  gap: 0;
+}
+#quick-diag-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ========== Shell (左右分栏) ========== */
+.quick-diag-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  font-size: 13px;
+  color: #132238;
+}
+.quick-diag-shell.is-tree-collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+.quick-diag-shell.is-tree-collapsed .quick-diag-tree,
+.quick-diag-shell.is-tree-collapsed .quick-diag-tree-toolbar {
+  display: none;
+}
+.quick-diag-shell.is-tree-collapsed .quick-diag-toggle-pane {
+  right: 50%;
+  transform: translate(50%, -50%);
+}
+
+/* ========== 左侧 ECU树 (带复选框) ========== */
+.quick-diag-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #b9c3cf;
+  border-radius: 4px;
+  background: #fff;
+  position: relative;
+  overflow: visible;
+  margin: 6px 6px 6px 0;
+}
+.quick-diag-left .quick-diag-tree {
+  overflow-x: hidden;
+}
+
+.quick-diag-tree-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+}
+.quick-diag-tree-toolbar__import {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid #94a8bf;
+  border-radius: 3px;
+  background: #e6edf4;
+  color: #24415d;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.quick-diag-tree-toolbar__import:hover {
+  background: rgba(47, 107, 255, 0.1);
+  border-color: rgba(47, 107, 255, 0.4);
+  color: #2f6bff;
+}
+.quick-diag-tree-toolbar__import i {
+  font-size: 11px;
+}
+.quick-diag-tree-toolbar__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.quick-diag-tree-toolbar__title i {
+  color: #2f6bff;
+  font-size: 11px;
+}
+
+.quick-diag-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+}
+
+/* -- 树节点通用 -- */
+.quick-diag-tree-group {}
+.quick-diag-tree-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+.quick-diag-tree-node:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.quick-diag-tree-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex: 0 0 22px;
+  width: 22px;
+  min-height: 28px;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  font-family: Consolas, "Courier New", monospace;
+  color: #1f2d3d;
+}
+.quick-diag-tree-toggle:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.quick-diag-tree-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 6px;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #132238;
+  text-align: left;
+}
+.quick-diag-tree-label:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.quick-diag-tree-label i {
+  width: 14px;
+  font-size: 12px;
+  text-align: center;
+  flex: 0 0 auto;
+  color: #4d5b6c;
+}
+.quick-diag-tree-label i.fa-road { color: #d9534f; }
+.quick-diag-tree-label i.fa-network-wired { color: #27ae60; }
+.quick-diag-tree-label i.fa-link { color: #8e44ad; }
+
+.quick-diag-tree-label__baud {
+  color: #8a9bb0;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+/* -- 复选框样式 -- */
+.quick-diag-tree-check {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2f6bff;
+  flex: 0 0 auto;
+}
+
+/* -- 子节点容器 -- */
+.quick-diag-tree-children {
+  display: flex;
+  flex-direction: column;
+  margin-left: 22px;
+  padding-bottom: 2px;
+}
+.quick-diag-tree-children.is-collapsed {
+  display: none;
+}
+
+.quick-diag-tree-child {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 6px 2px 8px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #132238;
+  text-align: left;
+  gap: 6px;
+  position: relative;
+}
+.quick-diag-tree-child:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.quick-diag-tree-child i {
+  width: 14px;
+  font-size: 12px;
+  text-align: center;
+  flex: 0 0 auto;
+  color: #4d5b6c;
+}
+
+/* -- 折叠/展开按钮 -- */
+.quick-diag-toggle-pane {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  right: -9px;
+  transform: translateY(-50%);
+  width: 14px;
+  min-width: 14px;
+  height: 44px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(198, 207, 224, 0.96);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  color: #314155;
+  cursor: pointer;
+  z-index: 2;
+}
+.quick-diag-toggle-pane:hover {
+  border-color: rgba(47, 107, 255, 0.4);
+  background: #fff;
+}
+.quick-diag-toggle-pane i {
+  font-size: 9px;
+}
+
+/* ========== 右侧主区域 ========== */
+.quick-diag-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #b9c3cf;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+  margin: 6px 6px 6px 0;
+}
+
+/* ===== 顶部快捷按钮栏 ===== */
+.quick-diag-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #c8d1dc;
+  background: linear-gradient(180deg, #f7f9fd, #edf0f5);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.quick-diag-topbar__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4d5f76;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.quick-diag-topbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 32px;
+  border: 1px solid #94a8bf;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fff, #f0f3f7);
+  color: #1d2d3f;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+.quick-diag-topbar__btn:hover {
+  border-color: #2f6bff;
+  color: #2f6bff;
+  background: linear-gradient(180deg, #f0f4ff, #e6edff);
+  box-shadow: 0 2px 6px rgba(47, 107, 255, 0.12);
+}
+.quick-diag-topbar__btn:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+.quick-diag-topbar__btn i {
+  font-size: 13px;
+}
+.quick-diag-topbar__btn--read i { color: #2f6bff; }
+.quick-diag-topbar__btn--version i { color: #27ae60; }
+.quick-diag-topbar__btn--clear i { color: #e67e22; }
+.quick-diag-topbar__btn--exec {
+  border-color: #2f6bff;
+  background: #2f6bff;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(47, 107, 255, 0.25);
+}
+.quick-diag-topbar__btn--exec:hover {
+  background: #1a5ae0;
+  color: #fff;
+  border-color: #1a5ae0;
+  box-shadow: 0 3px 10px rgba(47, 107, 255, 0.35);
+}
+.quick-diag-topbar__btn--exec i { color: #fff; }
+.quick-diag-topbar__center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== 内容双栏区域（功能列表 + 报文） ===== */
+.quick-diag-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- 左：功能列表面板 --- */
+.quick-diag-func-panel {
+  width: 320px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #c8d1dc;
+  min-height: 0;
+}
+.quick-diag-func-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff4);
+  border-bottom: 1px solid #dde3ea;
+  flex-shrink: 0;
+}
+.quick-diag-func-header__title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quick-diag-func-header__title i {
+  color: #2f6bff;
+  font-size: 12px;
+}
+.quick-diag-func-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.quick-diag-func-header__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: 24px;
+  border: 1px solid #bcc6d1;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 11px;
+  color: #4d5f76;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+}
+.quick-diag-func-header__btn:hover {
+  border-color: #2f6bff;
+  color: #2f6bff;
+  background: #f0f4ff;
+}
+.quick-diag-func-header__btn i {
+  font-size: 11px;
+}
+
+.quick-diag-func-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.quick-diag-func-list {
+  padding: 4px 0;
+}
+
+/* -- 功能条目 -- */
+.quick-diag-func-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.45);
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+}
+.quick-diag-func-item:last-child {
+  border-bottom: none;
+}
+.quick-diag-func-item:hover {
+  background: rgba(47, 107, 255, 0.04);
+}
+.quick-diag-func-item.is-selected {
+  background: rgba(47, 107, 255, 0.08);
+  border-left: 3px solid #2f6bff;
+  padding-left: 9px;
+}
+
+.quick-diag-func-item__check {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2f6bff;
+  flex: 0 0 auto;
+}
+
+.quick-diag-func-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  flex: 0 0 auto;
+  font-size: 14px;
+}
+.quick-diag-func-item__icon--config {
+  background: rgba(47, 107, 255, 0.1);
+  color: #2f6bff;
+}
+.quick-diag-func-item__icon--secoc {
+  background: rgba(220, 38, 127, 0.1);
+  color: #dc267f;
+}
+.quick-diag-func-item__icon--immo {
+  background: rgba(254, 176, 25, 0.12);
+  color: #d48806;
+}
+.quick-diag-func-item__icon--obd {
+  background: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+}
+.quick-diag-func-item__icon--reset {
+  background: rgba(230, 126, 34, 0.1);
+  color: #e67e22;
+}
+.quick-diag-func-item__icon--fill {
+  background: rgba(142, 68, 173, 0.1);
+  color: #8e44ad;
+}
+.quick-diag-func-item__icon--tls {
+  background: rgba(44, 62, 80, 0.1);
+  color: #2c3e50;
+}
+.quick-diag-func-item__icon--custom {
+  background: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+}
+
+.quick-diag-func-item__info {
+  flex: 1;
+  min-width: 0;
+}
+.quick-diag-func-item__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d2d3f;
+  margin-bottom: 1px;
+}
+.quick-diag-func-item__desc {
+  font-size: 11px;
+  color: #8a9bb0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quick-diag-func-item__del {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: #bcc6d1;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+.quick-diag-func-item:hover .quick-diag-func-item__del {
+  display: flex;
+}
+.quick-diag-func-item__del:hover {
+  background: #fef2f2;
+  color: #d04030;
+}
+
+/* --- 右：报文区域 --- */
+.quick-diag-msg-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.quick-diag-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff4);
+  border-bottom: 1px solid #dde3ea;
+  flex-shrink: 0;
+}
+.quick-diag-msg-header__title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.quick-diag-msg-header__title i {
+  color: #2f6bff;
+  font-size: 12px;
+}
+.quick-diag-msg-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.quick-diag-msg-header__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  height: 24px;
+  border: 1px solid #bcc6d1;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 11px;
+  color: #4d5f76;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+}
+.quick-diag-msg-header__btn:hover {
+  border-color: #2f6bff;
+  color: #2f6bff;
+  background: #f0f4ff;
+}
+
+.quick-diag-msg-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  background: #fff;
+}
+.quick-diag-msg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.quick-diag-msg-table thead {
+  position: sticky;
+  top: 0;
+  background: #f4f6f8;
+  z-index: 1;
+}
+.quick-diag-msg-table th {
+  padding: 5px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #4d5f76;
+  border-bottom: 1px solid #c8d1dc;
+  white-space: nowrap;
+  font-size: 11.5px;
+}
+.quick-diag-msg-table td {
+  padding: 4px 10px;
+  border-bottom: 1px solid #eef1f5;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.quick-diag-msg-table tr.is-tx td { color: #2f6bff; }
+.quick-diag-msg-table tr.is-rx td { color: #27ae60; }
+.quick-diag-msg-table tr.is-err td { color: #e11d48; }
+
+.quick-diag-msg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  color: #8a9bb0;
+  gap: 8px;
+}
+.quick-diag-msg-empty i {
+  font-size: 32px;
+  color: #c8d1dc;
+}
+.quick-diag-msg-empty span {
+  font-size: 13px;
+}
+
+/* ========== 弹窗 (Modal) 与高级交互样式 ========== */
+.qd-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.qd-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.qd-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+.qd-modal-container {
+  position: relative;
+  width: 480px;
+  max-width: 90vw;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1;
+}
+.qd-modal.is-open .qd-modal-container {
+  transform: scale(1);
+}
+.qd-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+.qd-modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.qd-modal-title i {
+  color: #2f6bff;
+}
+.qd-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.qd-modal-close:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* -- 模态框主体 -- */
+.qd-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+.qd-form-group {
+  margin-bottom: 16px;
+}
+.qd-form-group:last-child {
+  margin-bottom: 0;
+}
+.qd-form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.qd-form-input, .qd-form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.15s;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.qd-form-textarea {
+  height: 80px;
+  resize: none;
+}
+.qd-form-input:focus, .qd-form-textarea:focus {
+  border-color: #2f6bff;
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.15), inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.qd-form-input:disabled, .qd-form-textarea:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* -- 拖拽上传区域 -- */
+.qd-drag-area {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.15s;
+  margin-bottom: 16px;
+}
+.qd-drag-area:hover:not(.is-disabled) {
+  border-color: #2f6bff;
+  background: rgba(47, 107, 255, 0.03);
+}
+.qd-drag-area.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.qd-drag-icon {
+  font-size: 32px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  transition: color 0.15s;
+}
+.qd-drag-area:hover .qd-drag-icon {
+  color: #2f6bff;
+}
+.qd-drag-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 4px;
+}
+.qd-drag-hint {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* -- 进度条 -- */
+.qd-progress-box {
+  margin-top: 14px;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+.qd-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #475569;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.qd-progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.qd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2f6bff, #4e82ff);
+  width: 0;
+  border-radius: 999px;
+  transition: width 0.1s ease;
+}
+
+/* -- 图标与配色选择器 -- */
+.qd-icon-selector {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+.qd-icon-option {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s;
+}
+.qd-icon-option--config { background: rgba(47, 107, 255, 0.08); color: #2f6bff; }
+.qd-icon-option--secoc { background: rgba(220, 38, 127, 0.08); color: #dc267f; }
+.qd-icon-option--immo { background: rgba(254, 176, 25, 0.08); color: #d48806; }
+.qd-icon-option--obd { background: rgba(39, 174, 96, 0.08); color: #27ae60; }
+.qd-icon-option--reset { background: rgba(230, 126, 34, 0.08); color: #e67e22; }
+.qd-icon-option--fill { background: rgba(142, 68, 173, 0.08); color: #8e44ad; }
+.qd-icon-option--tls { background: rgba(44, 62, 80, 0.08); color: #2c3e50; }
+.qd-icon-option--custom { background: rgba(108, 117, 125, 0.08); color: #6c757d; }
+
+.qd-icon-option:hover {
+  transform: translateY(-2px);
+}
+.qd-icon-option.is-active {
+  border-color: #0f172a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* -- 模态框底部按钮 -- */
+.qd-modal-footer {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.qd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 34px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.qd-btn--secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+.qd-btn--secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+.qd-btn--primary {
+  background: #2f6bff;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(47, 107, 255, 0.2);
+}
+.qd-btn--primary:hover:not(:disabled) {
+  background: #1a5ae0;
+}
+.qd-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

@@ -1,0 +1,2058 @@
+.window-content--basic-diag {
+  padding: 0;
+  overflow: hidden;
+  background: #e9edf2;
+  gap: 0;
+}
+#basic-diag-root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ========== Shell ========== */
+.basic-diag-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  font-size: 13px;
+  color: #132238;
+}
+.basic-diag-shell.is-tree-collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+.basic-diag-shell.is-tree-collapsed .basic-diag-tree,
+.basic-diag-shell.is-tree-collapsed .basic-diag-tree-toolbar {
+  display: none;
+}
+.basic-diag-shell.is-tree-collapsed .basic-diag-toggle-pane {
+  right: 50%;
+  transform: translate(50%, -50%);
+}
+
+/* ========== Left Sidebar (Bus/ECU Tree) ========== */
+.basic-diag-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #b9c3cf;
+  border-radius: 4px;
+  background: #fff;
+  position: relative;
+  overflow: visible;
+  margin: 6px 6px 6px 0;
+}
+.basic-diag-left .basic-diag-tree {
+  overflow-x: hidden;
+}
+
+.basic-diag-tree-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 22px 6px 10px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+}
+.basic-diag-tree-toolbar__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #26384a;
+}
+
+.basic-diag-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+}
+
+.basic-diag-tree-group {}
+.basic-diag-tree-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+.basic-diag-tree-node:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.basic-diag-tree-node.is-active .basic-diag-tree-label {
+  background: rgba(47, 107, 255, 0.1);
+}
+
+.basic-diag-tree-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex: 0 0 24px;
+  width: 24px;
+  min-height: 28px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  font-family: Consolas, "Courier New", monospace;
+  color: #1f2d3d;
+}
+.basic-diag-tree-toggle:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.basic-diag-tree-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 6px;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #132238;
+  text-align: left;
+}
+.basic-diag-tree-label:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.basic-diag-tree-label i {
+  width: 14px;
+  font-size: 12px;
+  text-align: center;
+  flex: 0 0 auto;
+  color: #4d5b6c;
+}
+.basic-diag-tree-label i.fa-road { color: #d9534f; }
+.basic-diag-tree-label i.fa-network-wired { color: #27ae60; }
+.basic-diag-tree-label i.fa-link { color: #8e44ad; }
+
+.basic-diag-tree-label__baud {
+  color: #8a9bb0;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.basic-diag-tree-children {
+  display: flex;
+  flex-direction: column;
+  margin-left: 32px;
+  padding-bottom: 4px;
+}
+.basic-diag-tree-children.is-collapsed {
+  display: none;
+}
+
+.basic-diag-tree-child {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 6px 2px 12px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #132238;
+  text-align: left;
+  gap: 6px;
+  position: relative;
+}
+.basic-diag-tree-child:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.basic-diag-tree-child.is-active {
+  background: rgba(47, 107, 255, 0.1);
+  font-weight: 500;
+}
+.basic-diag-tree-child i {
+  width: 14px;
+  font-size: 12px;
+  text-align: center;
+  flex: 0 0 auto;
+  color: #4d5b6c;
+}
+
+/* -- Toggle Pane Button -- */
+.basic-diag-toggle-pane {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  right: -9px;
+  transform: translateY(-50%);
+  width: 14px;
+  min-width: 14px;
+  height: 44px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(198, 207, 224, 0.96);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  color: #314155;
+  cursor: pointer;
+  z-index: 2;
+}
+.basic-diag-toggle-pane:hover {
+  border-color: rgba(47, 107, 255, 0.4);
+  background: #fff;
+}
+.basic-diag-toggle-pane i {
+  font-size: 9px;
+}
+
+/* ========== Right Main Area ========== */
+.basic-diag-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #b9c3cf;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+  margin: 6px 6px 6px 0;
+}
+
+/* -- Address Bar -- */
+.basic-diag-addr-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.basic-diag-addr-bar__group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.basic-diag-addr-bar__group > span {
+  font-size: 12px;
+  color: #4d5f76;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.basic-diag-addr-bar__group > input,
+.basic-diag-addr-bar__group > select {
+  font-size: 12px;
+  padding: 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #fff;
+  height: 26px;
+  color: #1d2d3f;
+}
+.basic-diag-addr-bar__group > input {
+  width: 90px;
+}
+.basic-diag-addr-bar__group > input[readonly] {
+  background: #f4f6f8;
+  color: #3a4a5e;
+}
+.basic-diag-addr-bar__ecu-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1d2d3f;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-addr-bar__ecu-name i {
+  color: #2f6bff;
+}
+
+/* -- Tabs (服务 / PDX校验) -- */
+.basic-diag-tabs {
+  display: flex;
+  border-bottom: 1px solid #c8d1dc;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff4);
+  flex-shrink: 0;
+}
+.basic-diag-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4d5f76;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-tab:hover {
+  color: #2f6bff;
+}
+.basic-diag-tab.is-active {
+  color: #2f6bff;
+  border-bottom-color: #2f6bff;
+  font-weight: 600;
+  background: rgba(47, 107, 255, 0.04);
+}
+
+/* -- Tab Content Area -- */
+.basic-diag-tab-body {
+  flex: 1;
+  overflow: hidden;
+  display: none;
+  min-height: 0;
+}
+.basic-diag-tab-body.is-active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== Service Tab (方案A: 左右分栏) ========== */
+.basic-diag-svc-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* -- Service List (left within service tab) -- */
+.basic-diag-svc-list {
+  width: 260px;
+  min-width: 260px;
+  border-right: 1px solid #c8d1dc;
+  overflow-y: auto;
+  background: #fff;
+  padding: 6px 0;
+}
+.basic-diag-svc-item {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: #132238;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 30px;
+  line-height: 1.3;
+}
+.basic-diag-svc-item:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.basic-diag-svc-item.is-active {
+  background: rgba(47, 107, 255, 0.1);
+  border-left-color: #2f6bff;
+  font-weight: 600;
+  color: #1a3a6e;
+}
+.basic-diag-svc-item__sid {
+  display: inline-block;
+  background: #eef2f7;
+  color: #2f6bff;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-right: 6px;
+  min-width: 24px;
+  text-align: center;
+}
+.basic-diag-svc-item.is-active .basic-diag-svc-item__sid {
+  background: #2f6bff;
+  color: #fff;
+}
+.basic-diag-svc-item__sid--custom {
+  min-width: 42px;
+}
+
+/* -- Service Right Area (content left + log right) -- */
+.basic-diag-svc-right {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+.basic-diag-svc-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+.basic-diag-svc-content--custom {
+  background: #fff;
+}
+
+/* -- Param Panel -- */
+.basic-diag-param {
+  padding: 10px 14px;
+  border-bottom: 1px solid #c8d1dc;
+  background: rgba(247, 249, 253, 0.9);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 220px;
+}
+.basic-diag-param__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #26384a;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.basic-diag-param__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.basic-diag-param__label {
+  font-size: 12px;
+  color: #4d5f76;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+/* Radio group for sub-functions */
+.basic-diag-radio-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.basic-diag-radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #132238;
+  cursor: pointer;
+}
+.basic-diag-radio-group input[type="radio"] {
+  margin: 0;
+}
+
+/* DID checkbox list */
+.basic-diag-did-list {
+  max-height: 130px;
+  overflow-y: auto;
+  border: 1px solid #c8d1dc;
+  border-radius: 4px;
+  background: #fff;
+  padding: 4px;
+}
+.basic-diag-did-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  min-height: 26px;
+}
+.basic-diag-did-item:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+.basic-diag-did-item input[type="checkbox"] {
+  margin: 0;
+}
+.basic-diag-did-item__id {
+  font-family: Consolas, "Courier New", monospace;
+  color: #2f6bff;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 44px;
+}
+
+/* -- Request Bar -- */
+.basic-diag-req-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #c8d1dc;
+  background: #fff;
+  flex-shrink: 0;
+}
+.basic-diag-req-bar--custom {
+  border-bottom: none;
+}
+.basic-diag-req-bar__input {
+  flex: 1;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  padding: 0 10px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  height: 30px;
+  color: #1d2d3f;
+}
+.basic-diag-req-bar__input:focus {
+  outline: none;
+  border-color: #2f6bff;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+.basic-diag-req-bar__btn {
+  padding: 0 16px;
+  height: 30px;
+  border: 1px solid #94a8bf;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.basic-diag-req-bar__btn--send {
+  background: #e6edf4;
+  color: #24415d;
+  border-color: #94a8bf;
+}
+.basic-diag-req-bar__btn--send:hover {
+  background: #dae3ed;
+}
+.basic-diag-req-bar__chk {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #4d5f76;
+  white-space: nowrap;
+}
+.basic-diag-req-bar__chk input {
+  margin: 0;
+}
+
+/* -- Response Area -- */
+.basic-diag-resp {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px;
+  background: #fff;
+  min-height: 80px;
+}
+.basic-diag-resp__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #26384a;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-resp-tree {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.basic-diag-resp-tree__node {
+  padding-left: 16px;
+  position: relative;
+}
+.basic-diag-resp-tree__node::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #dde3ea;
+}
+.basic-diag-resp-tree__leaf {
+  display: flex;
+  gap: 14px;
+  padding: 2px 0;
+}
+.basic-diag-resp-tree__key {
+  color: #2f6bff;
+  min-width: 160px;
+  font-weight: 500;
+}
+.basic-diag-resp-tree__val {
+  color: #132238;
+}
+.basic-diag-resp-raw {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: #f4f6f8;
+  border: 1px solid #dde3ea;
+  border-radius: 3px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  color: #3a4a5e;
+  word-break: break-all;
+}
+.basic-diag-resp-empty {
+  color: #8a9bb0;
+  font-size: 13px;
+  text-align: center;
+  padding: 40px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* -- Log Area (right side) -- */
+.basic-diag-log {
+  width: 280px;
+  min-width: 220px;
+  border-left: 1px solid #c8d1dc;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.basic-diag-log__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 12px;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff4);
+  border-bottom: 1px solid #dde3ea;
+  flex-shrink: 0;
+}
+.basic-diag-log__header span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-log__clear {
+  border: 1px solid #bcc6d1;
+  border-radius: 3px;
+  background: #fff;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #4d5f76;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.basic-diag-log__clear:hover {
+  background: #fef2f2;
+  border-color: #e11d48;
+  color: #e11d48;
+}
+.basic-diag-log__body {
+  flex: 1;
+  overflow-y: auto;
+}
+.basic-diag-log table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.basic-diag-log thead {
+  position: sticky;
+  top: 0;
+  background: #f4f6f8;
+  z-index: 1;
+}
+.basic-diag-log th {
+  padding: 4px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #4d5f76;
+  border-bottom: 1px solid #c8d1dc;
+  white-space: nowrap;
+}
+.basic-diag-log td {
+  padding: 4px 10px;
+  border-bottom: 1px solid #eef1f5;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.basic-diag-log tr.is-tx td { color: #2f6bff; }
+.basic-diag-log tr.is-rx td { color: #27ae60; }
+.basic-diag-log tr.is-err td { color: #e11d48; }
+
+/* ========== PDX Tab ========== */
+.basic-diag-pdx {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+.basic-diag-pdx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: linear-gradient(180deg, #f4f6f8, #dfe5eb);
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.basic-diag-pdx-header__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-pdx-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid #2f6bff;
+  border-radius: 3px;
+  background: rgba(47, 107, 255, 0.08);
+  color: #2f6bff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.basic-diag-pdx-export-btn:hover {
+  background: rgba(47, 107, 255, 0.15);
+}
+.basic-diag-pdx-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.basic-diag-pdx-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.basic-diag-pdx-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, #f4f6f8, #dfe5eb);
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.basic-diag-pdx-title span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-pdx-btn {
+  min-width: 54px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid #94a8bf;
+  background: #e6edf4;
+  color: #24415d;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.basic-diag-pdx-btn:hover {
+  background: #dae3ed;
+}
+.basic-diag-pdx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  border: 1px solid #c8d1dc;
+}
+.basic-diag-pdx-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #4d5f76;
+  border-bottom: 1px solid #c8d1dc;
+  background: #f4f6f8;
+  white-space: nowrap;
+}
+.basic-diag-pdx-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eef1f5;
+  color: #132238;
+  word-break: break-all;
+}
+.basic-diag-pdx-table--trace td {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  word-break: break-all;
+  vertical-align: top;
+}
+.basic-diag-pdx-table--trace tr.is-tx td { color: #2456c8; }
+.basic-diag-pdx-table--trace tr.is-rx td { color: #1a7a44; }
+.basic-diag-pdx-dir {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: Consolas, monospace;
+}
+.basic-diag-pdx-dir--tx {
+  background: #dbeafe;
+  color: #2456c8;
+}
+.basic-diag-pdx-dir--rx {
+  background: #dcfce7;
+  color: #1a7a44;
+}
+.basic-diag-pdx-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.basic-diag-pdx-status.is-pass { background: #dff0d8; color: #2d6a2e; }
+.basic-diag-pdx-status.is-fail { background: #f2dede; color: #a94442; }
+.basic-diag-pdx-status.is-pending { background: #f4f6f8; color: #8a9bb0; }
+.basic-diag-pdx-status.is-present { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+.basic-diag-pdx-status.is-absent { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+.basic-diag-pdx-status.is-extra { background: #fef9c3; color: #d97706; border: 1px solid #fef08a; }
+
+/* DTC details row click styling */
+.basic-diag-pdx-table tbody tr[data-role="bd-pdx-dtc-row"]:hover {
+  filter: brightness(0.96);
+  box-shadow: inset 2px 0 0 #2f6bff;
+  transition: all 0.15s ease;
+}
+
+@keyframes pdxModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.pdx-config-modal-card, .pdx-dtc-modal-card {
+  animation: pdxModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* DID value with pass/fail flag (matches pdx-check style) */
+.basic-diag-pdx-did-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-pdx-did-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.basic-diag-pdx-did-flag.is-pass {
+  background: #dff0d8;
+  color: #2d6a2e;
+}
+.basic-diag-pdx-did-flag.is-fail {
+  background: #f2dede;
+  color: #a94442;
+}
+.basic-diag-pdx-empty {
+  color: #8a9bb0;
+  text-align: center;
+  padding: 30px 0;
+  font-size: 13px;
+}
+
+/* -- Tree Toolbar Import Button -- */
+.basic-diag-tree-toolbar__import {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid #94a8bf;
+  border-radius: 3px;
+  background: #e6edf4;
+  color: #24415d;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.basic-diag-tree-toolbar__import:hover {
+  background: rgba(47, 107, 255, 0.1);
+  border-color: rgba(47, 107, 255, 0.4);
+  color: #2f6bff;
+}
+.basic-diag-tree-toolbar__import i {
+  font-size: 11px;
+}
+
+
+/* -- No ECU selected placeholder -- */
+.basic-diag-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #8a9bb0;
+  font-size: 14px;
+  gap: 8px;
+}
+.basic-diag-placeholder i {
+  font-size: 18px;
+}
+
+/* -- Address Bar Spacer & Bus Tag -- */
+.basic-diag-addr-bar__spacer {
+  flex: 1;
+}
+.basic-diag-addr-bar__bus-tag {
+  color: #8a9bb0;
+  font-size: 11px;
+}
+
+/* ========== Security Algorithm Button ========== */
+.basic-diag-sec-algo-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid #94a8bf;
+  border-radius: 3px;
+  background: #fff;
+  color: #24415d;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.basic-diag-sec-algo-btn:hover {
+  background: rgba(47, 107, 255, 0.06);
+  border-color: rgba(47, 107, 255, 0.4);
+}
+.basic-diag-sec-algo-btn.is-active {
+  background: rgba(47, 107, 255, 0.1);
+  border-color: #2f6bff;
+  color: #2f6bff;
+}
+.basic-diag-sec-algo-btn i {
+  font-size: 12px;
+}
+
+/* ========== Security Algorithm Dialog ========== */
+.basic-diag-sec-algo-dialog {
+  position: absolute;
+  top: 42px;
+  right: 10px;
+  width: 320px;
+  z-index: 20;
+  border: 1px solid #b9c3cf;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+}
+.basic-diag-sec-algo-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #c8d1dc;
+  background: linear-gradient(180deg, #f4f6f8, #dfe5eb);
+  border-radius: 6px 6px 0 0;
+  cursor: move;
+  user-select: none;
+}
+.basic-diag-sec-algo-dialog__header span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #26384a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.basic-diag-sec-algo-dialog__header span i {
+  color: #2f6bff;
+}
+.basic-diag-sec-algo-dialog__close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+.basic-diag-sec-algo-dialog__close:hover {
+  background: #fef2f2;
+  color: #e11d48;
+}
+.basic-diag-sec-algo-dialog__body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.basic-diag-sec-algo-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.basic-diag-sec-algo-form-row label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4d5f76;
+}
+.basic-diag-sec-algo-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #fff;
+  color: #1d2d3f;
+  font-size: 12px;
+  font-family: Consolas, "Courier New", monospace;
+  box-sizing: border-box;
+}
+.basic-diag-sec-algo-input:focus {
+  outline: none;
+  border-color: #2f6bff;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.12);
+}
+.basic-diag-sec-algo-input[readonly] {
+  background: #f4f6f8;
+  color: #3a4a5e;
+  cursor: default;
+}
+.basic-diag-sec-algo-select {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #fff;
+  color: #1d2d3f;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+.basic-diag-sec-algo-select:focus {
+  outline: none;
+  border-color: #2f6bff;
+}
+.basic-diag-sec-algo-file-row {
+  display: flex;
+  gap: 4px;
+}
+.basic-diag-sec-algo-file-row .basic-diag-sec-algo-input {
+  flex: 1;
+}
+.basic-diag-sec-algo-file-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #f4f6f8;
+  color: #4d5f76;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+.basic-diag-sec-algo-file-btn:hover {
+  background: rgba(47, 107, 255, 0.06);
+  border-color: rgba(47, 107, 255, 0.4);
+  color: #2f6bff;
+}
+.basic-diag-sec-algo-dialog__footer {
+  padding: 8px 12px;
+  border-top: 1px solid #dde3ea;
+  display: flex;
+  justify-content: flex-end;
+}
+.basic-diag-sec-algo-send {
+  height: 30px;
+  padding: 0 16px;
+  border: 1px solid #94a8bf;
+  border-radius: 3px;
+  background: #e6edf4;
+  color: #24415d;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.basic-diag-sec-algo-send:hover {
+  background: #dae3ed;
+  border-color: #7e94ab;
+}
+
+/* Right area needs relative for absolute dialog */
+.basic-diag-right {
+  position: relative;
+}
+
+/* -- Switch protocol button -- */
+.basic-diag-switch-btn {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  margin-right: 6px;
+  border: 1px solid rgba(47, 107, 255, 0.24);
+  border-radius: 3px;
+  color: #2f6bff;
+  background: rgba(47, 107, 255, 0.06);
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.basic-diag-switch-btn:hover {
+  background: rgba(47, 107, 255, 0.15);
+  border-color: rgba(47, 107, 255, 0.5);
+}
+
+/* -- Comm Tab -- */
+.basic-diag-comm-layout {
+  flex: 1;
+  padding: 16px;
+  background: #fbfcfd;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.basic-diag-comm-card {
+  background: #ffffff;
+  border: 1px solid #e1e6eb;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.basic-diag-comm-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2c3f;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf1f5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.basic-diag-comm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+.basic-diag-comm-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.basic-diag-comm-item span {
+  font-size: 12px;
+  color: #627285;
+  font-weight: 500;
+}
+
+.basic-diag-comm-input,
+.basic-diag-comm-select {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cdd5df;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1a2c3f;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.basic-diag-comm-input:focus,
+.basic-diag-comm-select:focus {
+  border-color: #2f6bff;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  .basic-diag-comm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.basic-diag-comm-hold-btn {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #f4f6f8;
+  color: #4d5f76;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.basic-diag-comm-hold-btn:hover {
+  background: rgba(47, 107, 255, 0.06);
+  border-color: rgba(47, 107, 255, 0.4);
+  color: #2f6bff;
+}
+
+/* ========== Flow Panel (指令序列) ========== */
+.basic-diag-svc-upper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.basic-diag-svc-splitter {
+  flex: 0 0 6px;
+  background: #e8ecf1;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #d4dbe4;
+  border-bottom: 1px solid #d4dbe4;
+  transition: background 0.15s;
+  z-index: 2;
+}
+.basic-diag-svc-splitter:hover,
+.basic-diag-svc-splitter.is-dragging {
+  background: rgba(47, 107, 255, 0.15);
+}
+.basic-diag-svc-splitter__dots {
+  width: 24px;
+  height: 2px;
+  border-radius: 1px;
+  background: #b0bcc9;
+}
+
+.basic-diag-svc-lower {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  height: auto;
+}
+
+.basic-diag-flow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+.basic-diag-flow-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e1e6eb;
+  background: #f7f9fc;
+  flex-shrink: 0;
+}
+
+.basic-diag-flow-toolbar__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #24415d;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.basic-diag-flow-btn {
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #f4f6f8;
+  color: #4d5f76;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+.basic-diag-flow-btn:hover {
+  background: rgba(47, 107, 255, 0.06);
+  border-color: rgba(47, 107, 255, 0.4);
+  color: #2f6bff;
+}
+.basic-diag-flow-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.basic-diag-flow-btn--primary {
+  background: #2f6bff;
+  border-color: #2f6bff;
+  color: #fff;
+}
+.basic-diag-flow-btn--primary:hover {
+  background: #1a5ae0;
+}
+.basic-diag-flow-btn--danger {
+  color: #d9534f;
+}
+.basic-diag-flow-btn--danger:hover {
+  background: rgba(217, 83, 79, 0.08);
+  border-color: rgba(217, 83, 79, 0.4);
+}
+
+.basic-diag-flow-interval {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 11px;
+  color: #627285;
+}
+.basic-diag-flow-interval input {
+  width: 56px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  font-size: 11px;
+  text-align: center;
+  color: #1a2c3f;
+}
+
+.basic-diag-flow-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.basic-diag-flow-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.basic-diag-flow-table th {
+  position: sticky;
+  top: 0;
+  background: #f0f3f7;
+  color: #4d5f76;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid #dde3ea;
+  z-index: 1;
+}
+.basic-diag-flow-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #edf1f5;
+  color: #1a2c3f;
+  vertical-align: middle;
+}
+.basic-diag-flow-table tr:hover {
+  background: rgba(47, 107, 255, 0.04);
+}
+.basic-diag-flow-table tr.is-running {
+  background: rgba(47, 107, 255, 0.1);
+}
+.basic-diag-flow-table tr.is-dragging {
+  opacity: 0.5;
+}
+.basic-diag-flow-table .flow-drag-handle {
+  cursor: grab;
+  color: #b0bcc9;
+  padding: 0 4px;
+}
+.basic-diag-flow-table .flow-drag-handle:active {
+  cursor: grabbing;
+}
+.basic-diag-flow-table .flow-check {
+  width: 14px;
+  height: 14px;
+}
+.basic-diag-flow-table .flow-hex {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11px;
+}
+.basic-diag-flow-table .flow-resp {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11px;
+  color: #627285;
+}
+.basic-diag-flow-table .flow-resp.is-ok {
+  color: #5cb85c;
+}
+.basic-diag-flow-table .flow-resp.is-err {
+  color: #d9534f;
+}
+.basic-diag-flow-delete {
+  border: none;
+  background: transparent;
+  color: #b0bcc9;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.basic-diag-flow-delete:hover {
+  color: #d9534f;
+}
+
+.basic-diag-flow-empty {
+  text-align: center;
+  color: #b0bcc9;
+  padding: 24px 12px;
+  font-size: 12px;
+}
+
+/* -- Flow table row selection highlight -- */
+.basic-diag-flow-table tr.is-selected {
+  background: rgba(47, 107, 255, 0.08) !important;
+  border-left: 3px solid #2f6bff;
+}
+
+/* -- Flow left-bar action button premium effects -- */
+.basic-diag-flow-left-bar {
+  box-shadow: inset -1px 0 0 0 #e1e6eb;
+}
+.basic-diag-flow-action-btn:hover {
+  transform: scale(1.18);
+  filter: drop-shadow(0 2px 4px rgba(47, 107, 255, 0.2));
+}
+.basic-diag-flow-action-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   导入PDX 模态配置弹窗 (高保真还原哥哥提供的截图样式)
+   ========================================================================== */
+.pdx-import-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2200; /* 高于一切工作区窗口 */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.pdx-import-modal-backdrop.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pdx-import-card {
+  width: 850px;
+  background: #ffffff;
+  border: 1px solid #94a8bf;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.pdx-import-header {
+  height: 38px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.pdx-import-title {
+  font-size: 13.5px;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.pdx-import-close-x {
+  border: 1px solid #a0aec0;
+  background: #ffffff;
+  cursor: pointer;
+  color: #4a5568;
+  font-size: 13px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.pdx-import-close-x:hover {
+  background: #f56565;
+  color: #ffffff;
+  border-color: #f56565;
+}
+
+.pdx-import-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+}
+
+.pdx-import-section {
+  border: 1px solid #cbd5e0;
+  background: #ffffff;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdx-import-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid #cbd5e0;
+  padding-bottom: 4px;
+}
+
+.pdx-import-section-title {
+  font-size: 12.5px;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.pdx-import-btn-choose {
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid #94a8bf;
+  background: #edf2f7;
+  color: #2d3748;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+
+.pdx-import-btn-choose:hover {
+  background: #e2e8f0;
+}
+
+.pdx-import-tip-banner {
+  background: #edf2f7;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #4a5568;
+}
+
+.pdx-import-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.pdx-import-table th {
+  background: #edf2f7;
+  border: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2d3748;
+  text-align: left;
+}
+
+.pdx-import-table td {
+  border: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #2d3748;
+}
+
+.pdx-import-table-empty {
+  text-align: center;
+  color: #718096;
+  font-style: italic;
+  padding: 10px 8px !important;
+}
+
+/* 状态标签样式 */
+.pdx-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.pdx-status-badge.is-pending {
+  color: #dd6b20;
+}
+
+.pdx-status-badge.is-success {
+  color: #38a169;
+}
+
+/* ==========================================================================
+   CANoe/Vector 风格 UDS 参数解析树样式
+   ========================================================================== */
+.basic-diag-canoe-tree {
+  font-family: Consolas, "Lucida Console", Courier, monospace;
+  font-size: 12px;
+  color: #000000;
+  padding: 8px 12px;
+  background: #ffffff;
+  user-select: none;
+  border: 1px solid #cbd5e0;
+  margin-top: 6px;
+}
+
+.canoe-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-weight: bold;
+}
+
+.canoe-tree-toggle {
+  color: #718096;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.canoe-tree-node-hex {
+  color: #2b3a4a;
+}
+
+.canoe-tree-children {
+  padding-left: 18px;
+  border-left: 1px dotted #a0aec0;
+  margin-left: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.canoe-tree-leaf {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+}
+
+.canoe-tree-leaf.is-interactive {
+  background: rgba(47, 107, 255, 0.04);
+  border: 1px dashed rgba(47, 107, 255, 0.25);
+  box-sizing: border-box;
+}
+
+.canoe-tree-param-name {
+  width: 200px;
+  color: #2d3748;
+}
+
+.canoe-tree-param-val {
+  width: 60px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.canoe-tree-select {
+  height: 20px;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  border: 1px solid #cbd5e0;
+  background: #ffffff;
+  outline: none;
+  color: #2d3748;
+  padding: 0 2px;
+}
+
+
+/* ========== PDX Tab Splitter & UDS Panels ========== */
+.basic-diag-pdx-splitter {
+  height: 8px;
+  background: #f1f5f9;
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  user-select: none;
+  z-index: 10;
+}
+.basic-diag-pdx-splitter:hover, .basic-diag-pdx-splitter.is-dragging {
+  background: #cbd5e1;
+}
+.basic-diag-pdx-splitter__dots {
+  width: 24px;
+  height: 4px;
+  border-top: 2px dotted #94a3b8;
+  border-bottom: 2px dotted #94a3b8;
+}
+
+/* UDS故障诊断大面板 */
+.basic-diag-pdx-uds-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #f8fafc;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.basic-diag-pdx-uds-toolbar__btn {
+  height: 24px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #94a8bf;
+  background: #e6edf4;
+  color: #24415d;
+  transition: all 0.15s ease;
+}
+.basic-diag-pdx-uds-toolbar__btn:hover {
+  background: #dae3ed;
+}
+.basic-diag-pdx-uds-toolbar__btn--primary {
+  background: #2f6bff;
+  color: #fff;
+  border: none;
+  box-shadow: 0 1px 3px rgba(47,107,255,0.2);
+}
+.basic-diag-pdx-uds-toolbar__btn--primary:hover {
+  background: #1d4ed8;
+}
+.basic-diag-pdx-uds-toolbar__btn--danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  box-shadow: 0 1px 3px rgba(239,68,68,0.2);
+}
+.basic-diag-pdx-uds-toolbar__btn--danger:hover {
+  background: #b91c1c;
+}
+
+/* UDS 列表选中行高亮 */
+.basic-diag-pdx-table tbody tr.is-selected {
+  background-color: #f0f9ff !important; /* sky-50 */
+  box-shadow: inset 3px 0 0 #0284c7; /* 左侧蓝色重点指示线 */
+}
+.basic-diag-pdx-table tbody tr.is-selected td {
+  color: #0369a1 !important;
+  font-weight: 600;
+}
+
+/* UDS 快照/扩展选项卡 */
+.basic-diag-pdx-uds-tabs {
+  display: flex;
+  border-bottom: 1px solid #cbd5e1;
+  background: #f8fafc;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.basic-diag-pdx-uds-tab-btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.basic-diag-pdx-uds-tab-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+.basic-diag-pdx-uds-tab-btn.is-active {
+  color: #2f6bff;
+  border-bottom-color: #2f6bff;
+  background: #fff;
+}
+.basic-diag-pdx-uds-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  padding: 10px;
+}
+
+/* ========== PDX Export Report Rebuild Styles ========== */
+/* 报告 Tab 栏 */
+.pdx-report-tabs {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  background: #f8fafc;
+  margin: 12px 0;
+  border-radius: 4px;
+}
+.pdx-report-tab-btn {
+  flex: 1;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.pdx-report-tab-btn:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+.pdx-report-tab-btn.is-active {
+  color: #2f6bff;
+  border-bottom-color: #2f6bff;
+  background: #fff;
+}
+
+/* 批量操作微型按钮 */
+.pdx-report-header-bulk-btn {
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.12s;
+  display: inline-block;
+  vertical-align: middle;
+}
+.pdx-report-header-bulk-btn--pass:hover {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+}
+.pdx-report-header-bulk-btn--fail:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+/* 备注输入框 */
+.pdx-report-note-input {
+  transition: all 0.15s;
+}
+.pdx-report-note-input:focus {
+  border-color: #2f6bff !important;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.12);
+  background: #fbfcfe;
+}
+
+/* Tab 隐藏和打印自适应机制 */
+@media screen {
+  .pdx-report-section.is-hidden-tab {
+    display: none !important;
+  }
+}
+@media print {
+  .pdx-report-section {
+    display: block !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+  .pdx-report-tabs {
+    display: none !important;
+  }
+  .pdx-report-note-input {
+    display: none !important;
+  }
+  .print-only {
+    display: inline-block !important;
+  }
+}
+
+/* 报告表头导出按钮定制 */
+.pdx-report-export-header-btn:hover:not([disabled]) {
+  background-color: #1d4ed8 !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25) !important;
+}
+.pdx-report-export-header-btn[disabled] {
+  background-color: #94a3b8 !important;
+  border-color: #cbd5e1 !important;
+  color: #f1f5f9 !important;
+  cursor: not-allowed !important;
+  opacity: 0.55 !important;
+}
+
+/* DTC 折叠展开交互与打印样式 */
+.uds-dtc-header-trigger:hover table {
+  border-color: #2f6bff !important;
+}
+@media print {
+  .uds-dtc-details-wrapper {
+    display: flex !important;
+  }
+  .uds-toggle-icon {
+    display: none !important;
+  }
+}
+
+/* ========== PDX 显示框水平与垂直拖拽分割条 ========== */
+.basic-diag-pdx-vsplitter, .basic-diag-svc-vsplitter {
+  width: 8px;
+  background: #f1f5f9;
+  border-left: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  user-select: none;
+  z-index: 10;
+}
+.basic-diag-pdx-vsplitter:hover, .basic-diag-pdx-vsplitter.is-dragging,
+.basic-diag-svc-vsplitter:hover, .basic-diag-svc-vsplitter.is-dragging {
+  background: #cbd5e1;
+}
+.basic-diag-pdx-vsplitter__dots, .basic-diag-svc-vsplitter__dots {
+  width: 4px;
+  height: 24px;
+  border-left: 2px dotted #94a3b8;
+  border-right: 2px dotted #94a3b8;
+}
+
+.basic-diag-pdx-uds-splitter {
+  height: 8px;
+  background: #f1f5f9;
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  user-select: none;
+  z-index: 10;
+  margin: 4px 0;
+}
+.basic-diag-pdx-uds-splitter:hover, .basic-diag-pdx-uds-splitter.is-dragging {
+  background: #cbd5e1;
+}
+.basic-diag-pdx-uds-splitter__dots {
+  width: 24px;
+  height: 4px;
+  border-top: 2px dotted #94a3b8;
+  border-bottom: 2px dotted #94a3b8;
+}
+
+

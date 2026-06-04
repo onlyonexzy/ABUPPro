@@ -1,0 +1,1027 @@
+.window-content--vehicle-flash {
+  padding: 0;
+  overflow: hidden;
+  background: #e9edf2;
+}
+
+#vehicle-flash-root {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+}
+
+.vehicle-flash-shell {
+  height: 100%;
+  min-height: 0;
+}
+
+.vehicle-flash-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 10px;
+  background: #e9edf2;
+}
+
+.vehicle-flash-layout.is-tree-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.vehicle-flash-left,
+.vehicle-flash-right {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #bcc6d1;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.vehicle-flash-left {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vehicle-flash-pane__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+}
+
+.vehicle-flash-layout.is-tree-collapsed .vehicle-flash-pane__actions,
+.vehicle-flash-layout.is-tree-collapsed .flash-config-tree {
+  display: none;
+}
+
+.vehicle-flash-right {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+  padding: 8px;
+  height: 100%;
+  background: #eef2f6;
+}
+
+.vehicle-flash-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #bcc6d1;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.vehicle-flash-toolbar .flash-config-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vehicle-flash-log-split {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-flash-log-split__top,
+.vehicle-flash-log-split__bottom {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.vehicle-flash-log-split__top {
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-flash-log-split__top > .flash-config-sheet--main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.vehicle-flash-log-split__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  background: #eef2f6;
+}
+
+.vehicle-flash-split {
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(180px, calc(var(--vehicle-flash-split-ratio, 0.42) * 100%)) 12px minmax(180px, calc((1 - var(--vehicle-flash-split-ratio, 0.42)) * 100% - 12px));
+  gap: 0;
+}
+
+.vehicle-flash-execution-sheet,
+.vehicle-flash-split__packages {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.vehicle-flash-sheet-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 12px;
+}
+
+.vehicle-flash-split__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  background: #eef2f6;
+}
+
+.vehicle-flash-split__grip {
+  width: 56px;
+  height: 2px;
+  background: #aeb9c8;
+}
+
+.vehicle-flash-sequence {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.vehicle-flash-sequence--parallel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  overflow: visible;
+}
+
+.vehicle-flash-step {
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid #d8dee7;
+  background: #f8fafc;
+}
+
+.vehicle-flash-step--group {
+  min-width: 0;
+}
+
+.vehicle-flash-step__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vehicle-flash-step__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border: 1px solid #94a8bf;
+  border-radius: 2px;
+  background: #e6edf4;
+  color: #24415d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.vehicle-flash-step__head strong {
+  color: #1d2d3f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vehicle-flash-step__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vehicle-flash-step__group-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.vehicle-flash-step__bus {
+  width: 100%;
+  border: 1px solid #d8dee7;
+  background: #ffffff;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vehicle-flash-step__bus:hover {
+  background: rgba(47, 107, 255, 0.04);
+}
+
+.vehicle-flash-step__bus.is-active {
+  border-color: #94a8bf;
+  background: #e6edf4;
+}
+
+.vehicle-flash-step__bus-name {
+  margin-bottom: 6px;
+  color: #1d2d3f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vehicle-flash-step__pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border: 1px solid #c8d0db;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #32455b;
+  font-size: 12px;
+}
+
+.vehicle-flash-step__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  color: #5c6b7b;
+  font-size: 12px;
+}
+
+.vehicle-flash-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid #d8dde5;
+  background: #ffffff;
+}
+
+.vehicle-flash-right .flash-config-sheet--main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-flash-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #ffffff;
+}
+
+.vehicle-flash-col-order {
+  width: 58px;
+}
+
+.vehicle-flash-col-ecu {
+  width: 220px;
+}
+
+.vehicle-flash-col-current-version {
+  width: 170px;
+}
+
+.vehicle-flash-col-mode {
+  width: 100px;
+}
+
+.vehicle-flash-table th,
+.vehicle-flash-table td {
+  border: 1px solid #e3e7ee;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #25364a;
+}
+
+.vehicle-flash-table th {
+  background: #f1f3f6;
+  font-weight: 600;
+  text-align: left;
+}
+
+.vehicle-flash-table--two-level .vehicle-flash-parent-row td {
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.vehicle-flash-group-row td {
+  background: #eef2f6;
+  color: #314861;
+  font-weight: 700;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.vehicle-flash-bus-row td {
+  background: #f5f7fa;
+  color: #3c526c;
+  font-weight: 600;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.vehicle-flash-child-wrap-row td {
+  padding: 6px 12px 10px 32px;
+  background: #ffffff;
+}
+
+.vehicle-flash-child-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 4px 12px;
+  border-left: 2px solid #cbd5e1;
+}
+
+.vehicle-flash-child-inline {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+
+.vehicle-flash-child-inline:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.vehicle-flash-child-inline__index {
+  flex: 0 0 78px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border-right: 1px solid #e2e8f0;
+}
+
+.vehicle-flash-child-inline__item {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e2e8f0;
+}
+
+.vehicle-flash-child-inline__item:last-child {
+  border-right: 0;
+}
+
+.vehicle-flash-child-inline__item--progress {
+  flex: 1.5 1 0;
+}
+
+.vehicle-flash-child-inline__label {
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 11px;
+  color: #475569;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.vehicle-flash-child-inline__value {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  min-width: 0;
+  font-size: 11px;
+  color: #1e293b;
+  font-weight: 500;
+  flex: 1;
+}
+
+.vehicle-flash-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.vehicle-flash-progress__track {
+  height: 7px;
+  border: 1px solid #d0d7e2;
+  border-radius: 999px;
+  background: #f2f5f9;
+  overflow: hidden;
+}
+
+.vehicle-flash-progress__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #6f97c0, #3d6f9f);
+  transition: width 0.14s linear;
+}
+
+.vehicle-flash-progress__label {
+  min-width: 34px;
+  font-size: 11px;
+  color: #42566d;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+  .vehicle-flash-child-inline {
+    flex-wrap: wrap;
+  }
+
+  .vehicle-flash-child-inline__index {
+    flex: 0 0 100%;
+    justify-content: flex-start;
+    border-right: 0;
+    border-bottom: 1px solid #e6ebf2;
+  }
+
+  .vehicle-flash-child-inline__item {
+    flex: 0 0 100%;
+    border-right: 0;
+    border-bottom: 1px solid #e6ebf2;
+  }
+
+  .vehicle-flash-child-inline__item:last-child {
+    border-bottom: 0;
+  }
+}
+
+.vehicle-flash-progress.is-done .vehicle-flash-progress__fill {
+  background: linear-gradient(90deg, #6ba56b, #4f8c4f);
+}
+
+.vehicle-flash-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.22);
+  z-index: 20;
+}
+
+.vehicle-flash-dialog {
+  width: min(760px, 100%);
+  max-height: min(680px, 100%);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid #bcc6d1;
+  border-radius: 2px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+}
+
+.vehicle-flash-dialog__head,
+.vehicle-flash-dialog__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #c8d1dc;
+  background: linear-gradient(180deg, #f4f6f8, #dfe5eb);
+}
+
+.vehicle-flash-dialog__head strong {
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vehicle-flash-dialog__foot {
+  justify-content: flex-end;
+  border-top: 1px solid #c8d1dc;
+  border-bottom: 0;
+}
+
+.vehicle-flash-dialog__close {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #bcc6d1;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #32455b;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.vehicle-flash-dialog__body {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  background: #eef2f6;
+}
+
+.vehicle-flash-dialog-group {
+  border: 1px solid #bcc6d1;
+  background: #ffffff;
+}
+
+.vehicle-flash-dialog-group__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #dde3ea;
+}
+
+.vehicle-flash-dialog-group__title {
+  color: #1d2d3f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vehicle-flash-dialog-group__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.vehicle-flash-dialog-group__field .flash-config-input {
+  width: 72px;
+}
+
+.vehicle-flash-dialog-group__ecus {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.vehicle-flash-dialog-ecu {
+  display: grid;
+  grid-template-columns: 18px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #d8dee7;
+  background: #f8fafc;
+}
+
+.vehicle-flash-dialog-ecu.is-dragging {
+  opacity: 0.58;
+}
+
+.vehicle-flash-dialog-ecu.is-drop-target {
+  border-color: #2f6bff;
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.vehicle-flash-dialog-ecu__grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6a7a8e;
+  font-size: 12px;
+  cursor: grab;
+}
+
+.vehicle-flash-dialog-ecu__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.vehicle-flash-dialog-ecu__field .flash-config-input {
+  width: 72px;
+}
+
+.vehicle-flash-dialog-ecu__info {
+  min-width: 0;
+}
+
+/* --- Script config sections --- */
+
+.vf-parallel-script {
+  border: 1px solid #bcc6d1;
+  background: #ffffff;
+}
+
+.vf-parallel-script__head {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #dde3ea;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff3);
+}
+
+.vf-parallel-script__head strong {
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vf-parallel-script__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+}
+
+.vf-parallel-script__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vf-parallel-script__label {
+  color: #4d5f76;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vf-parallel-script__select {
+  min-width: 180px;
+}
+
+.vf-parallel-script__file-btn {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Step orchestration section --- */
+
+.vf-parallel-section {
+  border: 1px solid #bcc6d1;
+  background: #ffffff;
+}
+
+.vf-parallel-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #dde3ea;
+  background: linear-gradient(180deg, #f4f6f8, #eaeff3);
+}
+
+.vf-parallel-section__head strong {
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vf-parallel-step-board {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.vf-parallel-step-col {
+  flex: 1 1 260px;
+  min-width: 260px;
+  max-width: 420px;
+  border: 1px solid #d0d8e2;
+  border-radius: 3px;
+  background: #f6f8fb;
+}
+
+.vf-parallel-step-col__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #d8dee7;
+  background: #eaeff5;
+}
+
+.vf-parallel-step-col__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border: 1px solid #94a8bf;
+  border-radius: 2px;
+  background: #dde6f0;
+  color: #24415d;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vf-parallel-step-col__sub {
+  color: #5c6b7b;
+  font-size: 11px;
+}
+
+.vf-parallel-step-col__body {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* Arrow between step columns */
+
+.vf-parallel-step-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  color: #7a8ca0;
+  font-size: 14px;
+  align-self: stretch;
+}
+
+/* --- Bus card inside step column --- */
+
+.vf-parallel-bus-card {
+  border: 1px solid #c8d1dc;
+  border-radius: 2px;
+  background: #ffffff;
+}
+
+.vf-parallel-bus-card__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #e0e6ed;
+  background: #f3f5f8;
+}
+
+.vf-parallel-bus-card__head i {
+  color: #5c6b7b;
+  font-size: 11px;
+}
+
+.vf-parallel-bus-card__head strong {
+  flex: 1 1 auto;
+  color: #1d2d3f;
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vf-parallel-bus-card__protocol {
+  color: #6a7a8e;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.vf-parallel-bus-card__step-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: #4d5f76;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.vf-parallel-bus-card__step-input .flash-config-input {
+  width: 48px;
+}
+
+.vf-parallel-bus-card__ecus {
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+}
+
+/* --- ECU item inside bus card --- */
+
+.vf-parallel-ecu-item {
+  display: grid;
+  grid-template-columns: 18px minmax(60px, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #e0e6ed;
+  border-radius: 2px;
+  background: #fafbfd;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.vf-parallel-ecu-item.is-dragging {
+  opacity: 0.5;
+}
+
+.vf-parallel-ecu-item.is-drop-target {
+  border-color: #2f6bff;
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.vf-parallel-ecu-item.is-fa-stopped {
+  border-color: #d4a07a;
+  background: #fef8f3;
+}
+
+.vf-parallel-ecu-item__grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #8e9bb0;
+  font-size: 11px;
+  cursor: grab;
+}
+
+.vf-parallel-ecu-item__name {
+  color: #1d2d3f;
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vf-parallel-ecu-item__code {
+  color: #6a7a8e;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.vf-parallel-ecu-item__fa {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vf-parallel-ecu-item__fa input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.vf-parallel-ecu-item__fa span {
+  color: #6a7a8e;
+  font-size: 10px;
+}
+
+/* --- Hint / empty --- */
+
+.vf-parallel-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid #e0e6ed;
+  color: #5c6b7b;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.vf-parallel-hint i {
+  margin-top: 2px;
+  color: #7a8ca0;
+}
+
+.vf-parallel-empty {
+  padding: 20px;
+  text-align: center;
+  color: #8e9bb0;
+  font-size: 12px;
+}
+
+/* --- Danger button variant for global FA toggle --- */
+
+.flash-config-action-btn.is-danger {
+  border-color: #c0392b;
+  background: linear-gradient(180deg, #e74c3c, #c0392b);
+  color: #ffffff;
+}
+
+.flash-config-action-btn.is-danger:hover {
+  background: linear-gradient(180deg, #c0392b, #a93226);
+}
+
+@media (max-width: 1080px) {
+  .vehicle-flash-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 840px) {
+  .vehicle-flash-sequence {
+    flex-direction: column;
+  }
+
+  .vehicle-flash-sequence--parallel {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-flash-step__arrow {
+    display: none;
+  }
+
+  .vehicle-flash-dialog {
+    width: 100%;
+    max-height: 100%;
+  }
+
+  .vehicle-flash-dialog-group__head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vf-parallel-step-board {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vf-parallel-step-col {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .vf-parallel-step-arrow {
+    transform: rotate(90deg);
+    flex: 0 0 24px;
+  }
+
+  .vf-parallel-section__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ===== Execution order bus card (simplified, no ECU list) ===== */
+
+.vf-exec-bus-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d8dee7;
+  border-radius: 4px;
+  background: #fff;
+  color: #1d2d3f;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.vf-exec-bus-card:hover {
+  background: rgba(47, 107, 255, 0.04);
+}
+
+.vf-exec-bus-card.is-active {
+  border-color: #4e7de6;
+  background: #e8eefa;
+}
+
+.vf-exec-bus-card i {
+  color: #5c7a9a;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.vf-exec-bus-card strong {
+  font-weight: 600;
+  flex: 1;
+}
+
+.vf-exec-bus-card__protocol {
+  color: #7a8c9e;
+  font-size: 11px;
+  flex-shrink: 0;
+}

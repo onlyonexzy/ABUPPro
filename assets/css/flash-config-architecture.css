@@ -1,0 +1,221 @@
+/* ===== Parallel Settings Dialog ===== */
+.arch-dialog-backdrop { z-index: 600; }
+.arch-dialog {
+  width: calc(100% - 24px); max-width: 1280px; max-height: calc(100% - 24px);
+  background: #f8fbff; border-radius: 14px; border: 1px solid #d4e0f2;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 8px 32px rgba(37,99,235,.12);
+}
+.arch-dialog-head {
+  padding: 14px 20px; border-bottom: 1px solid #d9e2f0; background: #fff;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.arch-dialog-head h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.arch-dialog-head p { margin: 4px 0 0; color: #667085; font-size: 12px; }
+.arch-dialog-actions { display: flex; gap: 8px; }
+.arch-dialog-body {
+  flex: 1; min-height: 0; padding: 12px;
+  display: grid; grid-template-columns: 60% 40%; gap: 12px;
+}
+
+/* --- Panel --- */
+.arch-panel {
+  background: #fff; border: 1px solid #d9e2f0; border-radius: 12px;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.arch-panel-header {
+  padding: 10px 14px; border-bottom: 1px solid #d9e2f0;
+  display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.arch-panel-header h4 { margin: 0; font-size: 14px; font-weight: 700; }
+.arch-panel-header span { font-size: 12px; color: #667085; }
+.arch-panel-content {
+  padding: 12px; overflow-y: auto; flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: 0;
+}
+
+/* --- Hint banner --- */
+.arch-hint-banner {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 10px;
+  background: linear-gradient(135deg,#eff6ff 0%,#f0fdf4 100%);
+  border: 1px solid #bfdbfe; border-radius: 8px; font-size: 12px; color: #334155; flex-shrink: 0;
+}
+.arch-hint-banner i { color: #2563eb; font-size: 14px; }
+.arch-hint-banner strong { color: #2563eb; }
+
+/* --- Add bar --- */
+.arch-add-bar {
+  display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0;
+}
+.arch-add-bar input {
+  flex: 1; border: 1px solid #c9d7ef; border-radius: 8px;
+  padding: 7px 10px; font-size: 13px; outline: none; transition: border-color .2s;
+}
+.arch-add-bar input:focus { border-color: #2563eb; }
+.arch-add-bar button {
+  padding: 6px 14px; border: 1px solid #2563eb; border-radius: 8px;
+  background: #2563eb; color: #fff; font-size: 13px; cursor: pointer;
+  white-space: nowrap; transition: background .2s;
+}
+.arch-add-bar button:hover { background: #1d4ed8; }
+
+/* --- Step list --- */
+.arch-step-list { display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 0; overflow-y: auto; }
+
+/* --- Serial arrow between steps --- */
+.arch-serial-arrow {
+  display: flex; align-items: center; justify-content: center; padding: 4px 0;
+  color: #f59e0b; font-size: 11px; gap: 6px; user-select: none; flex-shrink: 0;
+}
+.arch-serial-arrow i { font-size: 12px; }
+
+/* --- Step card (并行组) --- */
+.arch-step-card {
+  border: 2px solid #d6e3f5; border-radius: 12px; background: #fff;
+  transition: box-shadow .2s, border-color .2s; flex-shrink: 0;
+}
+.arch-step-card.is-dragging-step { opacity: .5; border-style: dashed; }
+.arch-step-card.is-drag-over-step { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,.2); }
+
+.arch-step-head {
+  padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid #ebf1fb; cursor: grab; user-select: none; gap: 8px;
+  background: #f8faff; border-radius: 10px 10px 0 0;
+}
+.arch-step-head:active { cursor: grabbing; }
+.arch-step-head-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.arch-step-head-left .arch-grip { color: #94a3b8; font-size: 12px; flex-shrink: 0; }
+.arch-step-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 2px 8px; border-radius: 6px; background: #f59e0b; color: #fff;
+  font-size: 11px; font-weight: 700; flex-shrink: 0; white-space: nowrap;
+}
+.arch-step-name {
+  font-size: 13px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.arch-step-head-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.arch-step-meta { font-size: 11px; color: #667085; white-space: nowrap; }
+
+/* --- Add segment bar inside step --- */
+.arch-add-seg-bar {
+  display: flex; gap: 6px; padding: 6px 10px; border-bottom: 1px solid #f0f4fb;
+}
+.arch-add-seg-bar input {
+  flex: 1; border: 1px solid #d9e2f0; border-radius: 6px;
+  padding: 4px 8px; font-size: 12px; outline: none;
+}
+.arch-add-seg-bar input:focus { border-color: #2563eb; }
+.arch-add-seg-bar button {
+  padding: 3px 10px; border: 1px solid #2563eb; border-radius: 6px;
+  background: #2563eb; color: #fff; font-size: 11px; cursor: pointer; white-space: nowrap;
+}
+
+/* --- Segment (网段) inside step --- */
+.arch-step-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+.arch-seg-card {
+  border: 1px solid #e0e7ff; border-radius: 10px; background: #fafbff;
+  transition: border-color .2s, box-shadow .2s;
+}
+.arch-seg-card.is-drag-over-seg { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,.12); }
+
+.arch-seg-head {
+  padding: 6px 10px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid #eef2fb; gap: 6px;
+}
+.arch-seg-head-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.arch-seg-badge {
+  display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 4px;
+  background: #2563eb; color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.arch-seg-name { font-size: 12px; font-weight: 600; }
+.arch-seg-head-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.arch-seg-meta { font-size: 10px; color: #667085; white-space: nowrap; }
+.arch-seg-parallel-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: 999px;
+  border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8;
+}
+
+/* --- ECU list inside segment --- */
+.arch-seg-ecus {
+  list-style: none; margin: 0; padding: 6px 8px; min-height: 32px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.arch-seg-ecu-item {
+  border: 1px solid #dbe7f6; border-radius: 6px; background: #fff;
+  padding: 4px 8px; display: flex; justify-content: space-between; align-items: center;
+  gap: 4px; cursor: grab; user-select: none;
+  transition: background .15s, border-color .15s, opacity .15s; font-size: 12px;
+}
+.arch-seg-ecu-item:active { cursor: grabbing; }
+.arch-seg-ecu-item.is-dragging { opacity: .4; border-style: dashed; }
+.arch-seg-ecu-item.is-drop-target { border-color: #2563eb; background: #eef4ff; }
+.arch-seg-ecu-item-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.arch-seg-ecu-item-left .arch-grip { color: #b0bec5; font-size: 10px; flex-shrink: 0; }
+.arch-seg-ecu-order {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 3px;
+  background: #e0e7ff; color: #3730a3; font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.arch-seg-ecu-name { font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arch-seg-ecu-bus { font-size: 10px; color: #667085; flex-shrink: 0; }
+
+/* --- Empty tip --- */
+.arch-empty-tip {
+  border: 1px dashed #bfd2ee; border-radius: 8px; text-align: center;
+  font-size: 12px; color: #94a3b8; padding: 10px;
+}
+
+/* --- Icon button --- */
+.arch-icon-btn {
+  width: 22px; height: 22px; border: 1px solid #c9d7ef; border-radius: 5px;
+  background: #fff; color: #475569; display: inline-flex; align-items: center;
+  justify-content: center; cursor: pointer; transition: background .15s; font-size: 11px;
+}
+.arch-icon-btn:hover { background: #eef4ff; border-color: #93b4e0; }
+.arch-icon-btn.is-danger:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+/* --- Right: ECU Pool --- */
+.arch-toolbar { margin-bottom: 10px; flex-shrink: 0; }
+.arch-toolbar input {
+  width: 100%; border: 1px solid #c9d7ef; border-radius: 8px;
+  padding: 8px 10px; font-size: 13px; outline: none; transition: border-color .2s;
+}
+.arch-toolbar input:focus { border-color: #2563eb; }
+.arch-ecu-pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 8px; overflow-y: auto; }
+.arch-ecu-card {
+  border: 1px solid #d9e2f0; border-radius: 10px; background: #fff;
+  padding: 8px 10px; cursor: grab; display: flex; align-items: center;
+  justify-content: space-between; gap: 6px; user-select: none;
+  transition: opacity .2s, background .15s;
+}
+.arch-ecu-card:active { cursor: grabbing; }
+.arch-ecu-card.is-assigned { opacity: .4; background: #f1f5f9; cursor: default; pointer-events: none; }
+.arch-ecu-card.is-dragging { opacity: .4; border-style: dashed; }
+.arch-ecu-card-info { min-width: 0; }
+.arch-ecu-card-info strong {
+  font-size: 12px; font-weight: 600; display: block;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.arch-type-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: 999px;
+  border: 1px solid #c7d7f2; background: #f4f8ff; color: #2b4d8f;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* --- Legend --- */
+.arch-legend {
+  display: flex; align-items: center; gap: 14px; padding: 8px 12px;
+  margin-top: auto; border-top: 1px solid #e5e7eb; font-size: 11px; color: #667085; flex-shrink: 0;
+}
+.arch-legend-item { display: flex; align-items: center; gap: 4px; }
+.arch-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.arch-legend-dot.is-serial-step { background: #f59e0b; }
+.arch-legend-dot.is-parallel-seg { background: #2563eb; }
+.arch-legend-dot.is-serial-ecu { background: #8b5cf6; }
+
+@media (max-width: 1180px) {
+  .arch-dialog-body { grid-template-columns: 1fr; }
+  .arch-ecu-pool { grid-template-columns: 1fr; }
+}

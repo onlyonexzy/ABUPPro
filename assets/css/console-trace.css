@@ -1,0 +1,561 @@
+/* ==========================================================
+   CONSOLE TRACE STYLESHEET - Vector CANoe Trace 风格高保真样式
+   ========================================================== */
+
+/* 撑满窗口内容区 */
+.window-content--trace-layout {
+  padding: 0 !important;
+  background: #f3f4f6 !important;
+  overflow: hidden;
+}
+
+/* 主容器布局 */
+.trace-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  color: #1f2937;
+}
+
+/* ==========================================
+   1. 左侧过滤器面板 (Filter Sidebar)
+   ========================================== */
+.trace-filter-panel {
+  width: 180px;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #c8d1dc;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* 左侧过滤器微型工具栏 */
+.trace-filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+/* 经典 Win32 紧凑按钮 */
+.trace-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #4b5563;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.1s ease;
+}
+
+.trace-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+.trace-btn:active {
+  background: #e5e7eb;
+}
+
+/* 工具栏分隔条 */
+.trace-toolbar-sep {
+  width: 1px;
+  height: 16px;
+  background: #d1d5db;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* 过滤器树形区域 */
+.trace-filter-tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  user-select: none;
+}
+
+.trace-tree-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.trace-tree-node {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  width: 100%;
+}
+
+.trace-tree-toggle {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.trace-tree-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  flex: 1;
+}
+
+.trace-tree-label input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: #2f6bff;
+}
+
+.trace-tree-label i {
+  font-size: 12px;
+}
+
+.trace-tree-children {
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.trace-tree-children.is-collapsed {
+  display: none;
+}
+
+.trace-tree-item {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+}
+
+.trace-tree-item .trace-tree-label {
+  font-weight: normal;
+  font-size: 12.5px;
+  color: #4b5563;
+}
+
+/* ==========================================
+   2. 拖拽分割条 (Splitter)
+   ========================================== */
+.trace-splitter {
+  width: 5px;
+  background: #e5e7eb;
+  cursor: col-resize;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  transition: background 0.15s;
+}
+
+.trace-splitter:hover {
+  background: #2f6bff;
+}
+
+/* ==========================================
+   3. 右侧 Trace 报文主面板
+   ========================================== */
+.trace-main-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* 右侧工具栏 */
+.trace-main-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex-shrink: 0;
+}
+
+/* 搜索框 */
+.trace-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 6px;
+  flex: 0 1 200px;
+  min-width: 140px;
+}
+
+.trace-search-box input {
+  width: 100%;
+  height: 24px;
+  padding: 0 24px 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 4px;
+  font-size: 12px;
+  outline: none;
+  background: #ffffff;
+  color: #1f2937;
+  transition: all 0.15s ease;
+}
+
+.trace-search-box input:focus {
+  border-color: #2f6bff;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+.trace-search-box .search-icon {
+  position: absolute;
+  right: 8px;
+  font-size: 11px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+/* AI 智能下拉菜单 */
+.trace-ai-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.trace-btn--ai {
+  background: rgba(47, 107, 255, 0.08) !important;
+  border: 1px solid rgba(47, 107, 255, 0.3) !important;
+  color: #2f6bff !important;
+  font-weight: bold !important;
+  padding: 0 8px !important;
+  width: auto !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  gap: 4px;
+}
+
+.trace-btn--ai:hover {
+  background: #2f6bff !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(47, 107, 255, 0.25);
+}
+
+.trace-ai-menu {
+  display: none;
+  position: absolute;
+  top: 26px;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #c8d1dc;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  min-width: 140px;
+  padding: 4px 0;
+}
+
+.trace-ai-menu.is-show {
+  display: block;
+}
+
+.trace-ai-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 12.5px;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.trace-ai-item:hover {
+  background: rgba(47, 107, 255, 0.08);
+  color: #2f6bff;
+}
+
+.trace-ai-item i {
+  font-size: 12px;
+}
+
+/* ==========================================
+   4. Trace 报文表格
+   ========================================== */
+.trace-table-wrap {
+  flex: 1;
+  overflow: auto;
+  background: #ffffff;
+}
+
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.trace-table th {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: bold;
+  color: #4b5563;
+  padding: 6px 8px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  white-space: nowrap;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  user-select: none;
+}
+
+.trace-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.trace-table tbody tr {
+  transition: background 0.05s ease;
+}
+
+/* Tx / Rx 不同色调区分，提供经典Trace易读性 */
+.trace-table tbody tr.is-tx {
+  color: #2f6bff;
+}
+
+.trace-table tbody tr.is-rx {
+  color: #10b981; /* 绿色亮调 */
+}
+
+.trace-table tbody tr.is-err {
+  color: #ef4444; /* 红色 */
+  background: #fef2f2 !important;
+}
+
+.trace-table tbody tr:hover td {
+  background: #f0f7ff !important;
+}
+
+/* ==========================================
+   5. AI 智能诊断分析报告毛玻璃弹窗 (AI Modal)
+   ========================================= */
+.trace-ai-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trace-ai-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.trace-ai-report-panel {
+  width: 760px;
+  max-width: 90vw;
+  height: 480px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.trace-ai-modal.is-active .trace-ai-report-panel {
+  transform: translateY(0);
+}
+
+/* 弹窗 Header */
+.trace-ai-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  background: linear-gradient(135deg, rgba(47, 107, 255, 0.05), rgba(47, 107, 255, 0.01));
+}
+
+.trace-ai-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.trace-ai-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.trace-ai-modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* 弹窗 Body */
+.trace-ai-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 智能卡片 */
+.trace-ai-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.trace-ai-card__title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trace-ai-card__content {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.trace-ai-card__content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+
+.trace-ai-card__content th,
+.trace-ai-card__content td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.trace-ai-card__content th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* 诊断意见徽章 */
+.trace-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.trace-ai-badge--success {
+  background: #e2fbf0;
+  color: #10b981;
+}
+
+.trace-ai-badge--warning {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.trace-ai-badge--danger {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+/* 弹窗 Footer */
+.trace-ai-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  justify-content: flex-end;
+  background: #f8fafc;
+}
+
+.trace-ai-modal-btn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.trace-ai-modal-btn--primary {
+  background: #2f6bff;
+  border: 1px solid #2f6bff;
+  color: #ffffff;
+}
+
+.trace-ai-modal-btn--primary:hover {
+  background: #1a5ae0;
+  border-color: #1a5ae0;
+  box-shadow: 0 2px 8px rgba(26, 90, 224, 0.3);
+}

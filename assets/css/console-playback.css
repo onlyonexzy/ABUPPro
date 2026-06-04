@@ -1,0 +1,271 @@
+/**
+ * console-playback.css - Vector CANoe Graphics/Playback 风格高保真回放样式
+ */
+
+/* 强制报文回放小窗口始终悬浮在最上层，不被任何最大化大窗口遮挡 */
+.workspace-window[data-window="message-playback"] {
+  z-index: 1005 !important;
+  resize: none !important;
+}
+
+/* ============================
+   高精度对齐 回放设置 Modal (Image 2)
+   ============================ */
+.playback-settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.playback-settings-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.playback-settings-card {
+  width: 500px;
+  height: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #a0aec0;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.playback-settings-header {
+  height: 30px;
+  background: #f3f3f3;
+  border-bottom: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0 12px;
+}
+
+.playback-settings-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #000;
+}
+
+.playback-settings-close {
+  border: none;
+  background: #e81123;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 14px;
+  width: 46px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+}
+
+.playback-settings-close:hover {
+  background: #f1707a;
+  color: #ffffff;
+}
+
+.playback-settings-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* 经典 Win32 复古框线 (Fieldset / Legend) 风格 */
+.playback-groupbox {
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 0;
+}
+
+.playback-groupbox legend {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #2d3748;
+  padding: 0 6px;
+}
+
+.playback-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playback-settings-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3748;
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.playback-settings-input {
+  height: 28px;
+  border: 1px solid #cbd5e0;
+  border-radius: 3px;
+  padding: 0 8px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  color: #2d3748;
+  flex: 1;
+}
+
+.playback-settings-input.is-readonly {
+  background: #edf2f7;
+  color: #4a5568;
+  cursor: default;
+}
+
+.playback-settings-btn-browse {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  color: #4a5568;
+}
+
+.playback-settings-btn-browse:hover {
+  background: #edf2f7;
+}
+
+/* 发送通道配置网格，左侧是复选框框线列表，右侧是发送接收复选 */
+.playback-channel-grid {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.playback-channel-list {
+  width: 200px;
+  height: 90px;
+  border: 1px solid #cbd5e0;
+  background: #fff;
+  border-radius: 3px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.playback-channel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: #2d3748;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+
+.playback-channel-item:hover {
+  background: #f1f5f9;
+}
+
+.playback-channel-item input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.playback-right-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  height: 90px;
+  flex: 1;
+}
+
+.playback-settings-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #2d3748;
+  cursor: pointer;
+}
+
+.playback-settings-checkbox-item input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.playback-settings-footer {
+  height: 44px;
+  background: #f0f0f0;
+  border-top: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px;
+  gap: 10px;
+}
+
+.playback-footer-btn {
+  height: 24px;
+  min-width: 75px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #8e8f8f;
+  background: #f0f0f0;
+  color: #000;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.playback-footer-btn:hover {
+  background: #e5f1fb;
+  border-color: #0078d7;
+}
+
+.playback-footer-btn--primary {
+  border: 1.5px solid #0078d7;
+  background: #f0f0f0;
+  position: relative;
+  font-weight: 500;
+}
+
+.playback-footer-btn--primary::after {
+  content: '';
+  position: absolute;
+  top: 1.5px;
+  left: 1.5px;
+  right: 1.5px;
+  bottom: 1.5px;
+  border: 1px dotted #000000;
+  pointer-events: none;
+}
+
+.playback-footer-btn--primary:hover {
+  background: #e5f1fb;
+  border-color: #0078d7;
+}

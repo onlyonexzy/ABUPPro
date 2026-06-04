@@ -1,0 +1,1826 @@
+.window-content--flash-config {
+  padding: 0;
+  overflow: hidden;
+  background: #e9edf2;
+}
+
+#single-flash-root {
+  height: 100%;
+  min-height: 0;
+}
+
+#flash-config-root {
+  position: relative;
+}
+
+#flash-config-root [data-role="remove-selected"],
+#flash-config-root [data-role="open-architecture-config"],
+#flash-config-root [data-role="open-parallel-config"],
+#flash-config-root .flash-config-pane__divider {
+  display: none !important;
+}
+
+.flash-config-shell {
+  height: 100%;
+}
+
+.flash-config-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 10px;
+  height: 100%;
+  padding: 10px;
+}
+
+.flash-config-layout.is-tree-collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
+.flash-config-pane {
+  min-height: 0;
+  border: 1px solid #b9c3cf;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.flash-config-pane--tree,
+.flash-config-pane--detail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.flash-config-pane--tree {
+  position: relative;
+}
+
+.flash-config-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+}
+
+.flash-config-tree-group {
+  overflow: hidden;
+}
+
+.flash-config-pane__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 22px 6px 6px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+}
+
+.flash-config-icon-btn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(216, 222, 233, 0.96);
+  border-radius: 4px;
+  background: #fff;
+  color: #243447;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.flash-config-icon-btn:hover {
+  background: rgba(47, 107, 255, 0.06);
+  border-color: rgba(47, 107, 255, 0.28);
+}
+
+.flash-config-icon-btn:focus-visible {
+  outline: 1px solid rgba(47, 107, 255, 0.4);
+  outline-offset: 1px;
+}
+
+.flash-config-icon-btn i {
+  font-size: 13px;
+}
+
+.flash-config-action-menu {
+  position: relative;
+}
+
+.flash-config-bus-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 72px;
+  padding: 4px;
+  border: 1px solid #c8d0db;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  z-index: 5;
+}
+
+.flash-config-bus-menu__item {
+  width: 100%;
+  min-height: 24px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #223247;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.flash-config-bus-menu__item:hover {
+  background: rgba(47, 107, 255, 0.08);
+}
+
+.flash-config-context-menu {
+  position: fixed;
+  z-index: 5000;
+  display: none;
+  min-width: 120px;
+  padding: 8px;
+  border: 1px solid #bcc6d1;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+.flash-config-context-menu.is-open {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.flash-config-context-menu__item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  color: #223247;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.flash-config-context-menu__item i {
+  width: 14px;
+  min-width: 14px;
+  color: #4f647a;
+  font-size: 12px;
+  text-align: center;
+}
+
+.flash-config-context-menu__item:hover {
+  background: #eef2f6;
+}
+
+.flash-config-pane__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  right: -9px;
+  transform: translateY(-50%);
+  width: 14px;
+  min-width: 14px;
+  height: 44px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(198, 207, 224, 0.96);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  color: #314155;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.flash-config-pane__toggle:hover {
+  border-color: rgba(47, 107, 255, 0.4);
+  background: #fff;
+}
+
+.flash-config-pane__toggle:focus-visible {
+  outline: 1px solid rgba(47, 107, 255, 0.4);
+  outline-offset: 1px;
+}
+
+.flash-config-pane__toggle i {
+  font-size: 9px;
+}
+
+.flash-config-tree-node,
+.flash-config-tree-child,
+.flash-config-tree-toggle,
+.flash-config-tree-label,
+.flash-config-ecu-card {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.flash-config-tree-node {
+  display: flex;
+  align-items: center;
+}
+
+.flash-config-tree-toggle,
+.flash-config-tree-label,
+.flash-config-tree-child {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 6px;
+}
+
+.flash-config-tree-toggle {
+  justify-content: center;
+  padding: 0;
+  flex: 0 0 24px;
+  width: 24px;
+  color: #1f2d3d;
+  font-size: 15px;
+  line-height: 1;
+  font-family: Consolas, "Courier New", monospace;
+}
+
+.flash-config-tree-children {
+  display: flex;
+  flex-direction: column;
+  margin-left: 32px;
+  padding-bottom: 4px;
+}
+
+.flash-config-tree-children.is-collapsed {
+  display: none;
+}
+
+.flash-config-tree-toggle:hover,
+.flash-config-tree-label:hover,
+.flash-config-tree-child:hover,
+.flash-config-ecu-card:hover {
+  background: rgba(47, 107, 255, 0.06);
+}
+
+.flash-config-tree-toggle:focus-visible,
+.flash-config-tree-label:focus-visible,
+.flash-config-tree-child:focus-visible,
+.flash-config-ecu-card:focus-visible {
+  outline: 1px solid rgba(47, 107, 255, 0.4);
+  outline-offset: -1px;
+}
+
+.flash-config-tree-node.is-active .flash-config-tree-label,
+.flash-config-tree-child.is-active {
+  background: rgba(47, 107, 255, 0.1);
+}
+
+.flash-config-tree-child.is-missing-file,
+.flash-config-tree-child.is-missing-file.is-active,
+.flash-config-tree-child.is-missing-file .flash-config-tree-label__text,
+.flash-config-tree-child.is-missing-file i {
+  color: #e11d48 !important;
+}
+
+.flash-config-tree-label {
+  min-width: 0;
+  flex: 1;
+  color: #132238;
+  font-size: 13px;
+}
+
+.flash-config-tree-child {
+  padding-left: 12px;
+  position: relative;
+  color: #132238;
+  font-size: 13px;
+}
+
+.flash-config-tree-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 3px;
+  border: 1px solid #c6cfdb;
+  border-radius: 2px;
+  background: #f4f6f9;
+  color: #3a4a5e;
+  font-size: 11px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.flash-config-tree-label__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.flash-config-tree-label__inner--with-tag {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.flash-config-tree-label__text {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flash-config-tree-label__inner i {
+  width: 12px;
+  color: #4d5b6c;
+  font-size: 12px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.flash-config-tree-label__inner span {
+  min-width: 0;
+}
+
+.flash-config-tree-tag {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 10px;
+  min-height: 3px;
+  padding: 0 2px;
+  border-radius: 999px;
+  font-size: 5px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+.flash-config-tree-tag--mirror {
+  border: 1px solid rgba(47, 107, 255, 0.32);
+  color: #2f6bff;
+  background: rgba(47, 107, 255, 0.1);
+}
+
+.flash-config-tree-tag--origin {
+  border: 1px solid rgba(220, 120, 0, 0.32);
+  color: #b85c00;
+  background: rgba(220, 120, 0, 0.1);
+}
+
+.flash-config-switch-btn {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  margin-right: 2px;
+  border-color: rgba(47, 107, 255, 0.24);
+  color: #2f6bff;
+  background: rgba(47, 107, 255, 0.06);
+  font-size: 9px;
+}
+
+.flash-config-switch-btn:hover {
+  background: rgba(47, 107, 255, 0.15);
+  border-color: rgba(47, 107, 255, 0.5);
+}
+
+.flash-config-tree-node[draggable="true"],
+.flash-config-tree-child[draggable="true"] {
+  user-select: none;
+}
+
+.flash-config-tree-node.is-dragging,
+.flash-config-tree-child.is-dragging {
+  opacity: 0.58;
+}
+
+.flash-config-tree-node.is-drop-before,
+.flash-config-tree-child.is-drop-before {
+  box-shadow: inset 0 2px 0 #2f6bff;
+}
+
+.flash-config-tree-node.is-drop-after,
+.flash-config-tree-child.is-drop-after {
+  box-shadow: inset 0 -2px 0 #2f6bff;
+}
+
+.flash-config-tree-node.is-drop-inside .flash-config-tree-label,
+.flash-config-tree-children.is-drop-inside,
+.flash-config-tree-dropzone.is-drop-inside {
+  background: rgba(47, 107, 255, 0.08);
+}
+
+.flash-config-tree-dropzone {
+  min-height: 12px;
+  border-radius: 2px;
+}
+
+.flash-config-inline-badge,
+.flash-config-protocol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #c8d0db;
+}
+
+.flash-config-inline-badge {
+  background: #f3f5f7;
+  color: #44526a;
+}
+
+.flash-config-protocol {
+  color: #24415d;
+  background: #eef2f6;
+}
+
+.flash-config-protocol.is-can {
+  color: #24415d;
+  background: #eef2f6;
+}
+
+.flash-config-protocol.is-canfd {
+  color: #24415d;
+  background: #eef2f6;
+}
+
+.flash-config-protocol.is-ethernet {
+  color: #24415d;
+  background: #eef2f6;
+}
+
+.flash-config-protocol.is-lin {
+  color: #24415d;
+  background: #eef2f6;
+}
+
+.flash-config-pane--detail {
+  position: relative;
+  padding: 8px;
+  background: #eef2f6;
+  overflow: auto;
+}
+
+.flash-config-detail-head {
+  display: block;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid #c3ccd7;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #f8f9fb, #e7ecf1);
+}
+
+.flash-config-detail-head__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flash-config-detail-head__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.flash-config-detail-kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 0 6px;
+  border: 1px solid #c2cad5;
+  border-radius: 2px;
+  background: #f7f9fb;
+  color: #42556c;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.flash-config-detail-head h2 {
+  margin: 0;
+  color: #1d2d3f;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.flash-config-detail-head p {
+  margin: 0;
+  max-width: 760px;
+  color: #5c6b7b;
+  line-height: 1.5;
+  font-size: 12px;
+}
+
+.flash-config-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.flash-config-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+
+.flash-config-tab {
+  min-width: 88px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid #bcc6d1;
+  border-bottom: none;
+  border-radius: 2px 2px 0 0;
+  background: linear-gradient(180deg, #eef2f6, #dbe2ea);
+  color: #33475c;
+  font-size: 12px;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+.flash-config-tab:hover {
+  background: linear-gradient(180deg, #f4f7fa, #e2e8ef);
+}
+
+.flash-config-tab.is-active {
+  background: #ffffff;
+  color: #1d2d3f;
+  position: relative;
+  top: 1px;
+}
+
+.flash-config-tab:focus-visible {
+  outline: 1px solid rgba(47, 107, 255, 0.4);
+  outline-offset: 1px;
+}
+
+.flash-config-detail-body {
+  min-height: 0;
+}
+
+.flash-config-panel-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.flash-config-panel-toolbar__hint {
+  color: #5e6d80;
+  font-size: 12px;
+}
+
+.flash-config-panel-toolbar__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.flash-config-action-btn {
+  min-width: 54px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid #bcc6d1;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #32455b;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.flash-config-action-btn.is-primary {
+  background: #e6edf4;
+  border-color: #94a8bf;
+  color: #24415d;
+}
+
+.flash-config-form-grid {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.flash-config-form-item {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.flash-config-form-item strong {
+  color: #1d2d3f;
+  font-weight: 500;
+}
+
+.flash-config-input,
+.flash-config-select {
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #1d2d3f;
+  font-size: 12px;
+}
+
+.flash-config-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1d2d3f;
+  font-size: 12px;
+}
+
+.flash-config-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+}
+
+.flash-config-checkbox.is-disabled {
+  opacity: 0.7;
+}
+
+.flash-config-summary {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.flash-config-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.flash-config-summary-card {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #d8dee7;
+  background: #f8fafc;
+}
+
+.flash-config-summary-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: #66768b;
+  font-size: 11px;
+}
+
+.flash-config-summary-card strong {
+  display: block;
+  color: #213448;
+  font-size: 12px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.flash-config-summary-text {
+  color: #44556c;
+  font-size: 12px;
+}
+
+.flash-config-error-list {
+  display: grid;
+  gap: 6px;
+}
+
+.flash-config-error-item {
+  padding: 6px 8px;
+  border: 1px solid #e1c4c4;
+  background: #fff6f6;
+  color: #8a3b3b;
+  font-size: 12px;
+}
+
+.flash-config-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.flash-config-sheet {
+  min-height: 0;
+  border: 1px solid #bcc6d1;
+  border-radius: 2px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.flash-config-sheet--main {
+  min-height: calc(100% - 2px);
+}
+
+.flash-config-sheet__title {
+  padding: 6px 10px;
+  border-bottom: 1px solid #c8d1dc;
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(180deg, #f4f6f8, #dfe5eb);
+}
+
+.flash-config-sheet__title--with-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flash-config-sheet__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.flash-config-ecu-sheet__body {
+  display: grid;
+}
+
+.flash-config-ecu-subsection {
+  border-top: 1px solid #d8e0e8;
+}
+
+.flash-config-ecu-subsection__title {
+  padding: 8px 12px 0;
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flash-config-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0;
+}
+
+.flash-config-static-field {
+  min-height: 26px;
+  padding: 4px 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #1d2d3f;
+  line-height: 16px;
+}
+
+.flash-config-sa-list {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  font-family: inherit;
+}
+
+.flash-config-sa-list button,
+.flash-config-sa-list input,
+.flash-config-sa-list select,
+.flash-config-sa-list .flash-config-static-field,
+.flash-config-sa-list .flash-config-sa-item__head strong,
+.flash-config-sa-list .flash-config-sa-field span {
+  font-family: inherit;
+}
+
+.flash-config-sa-item {
+  border: 1px solid #d5dde7;
+  background: #f8fafc;
+}
+
+.flash-config-sa-item__head {
+  padding: 6px 10px;
+  border-bottom: 1px solid #d5dde7;
+  background: linear-gradient(180deg, #f7f9fb, #e8edf3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flash-config-sa-item__head strong {
+  color: #26384a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flash-config-sa-item__level {
+  font-size: 11px;
+  color: #607086;
+  background: #dde3ec;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: Consolas, monospace;
+}
+
+.flash-config-sa-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.flash-config-sa-body>.flash-config-form-item {
+  padding: 5px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.flash-config-sa-body>.flash-config-form-item:last-child {
+  border-bottom: none;
+}
+
+.flash-config-sa-body .flash-config-strategy-flow {
+  padding: 4px 0;
+}
+
+/* ── A区：诊断流程 ── */
+
+.flash-config-strategy-flow {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.flash-config-strategy-flow-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.flash-config-input:disabled,
+.flash-config-select:disabled,
+.flash-config-strategy-radio input:disabled {
+  cursor: not-allowed;
+}
+
+.flash-config-input:disabled,
+.flash-config-select:disabled {
+  background: #f5f7fa;
+  color: #6b7b90;
+}
+
+.flash-config-strategy-flow-select {
+  max-width: 350px;
+}
+
+.flash-config-strategy-file-label {
+  color: #607086;
+  font-size: 12px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flash-config-strategy-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #26384a;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.flash-config-strategy-validation {
+  min-height: 28px;
+  padding: 6px 8px;
+  border: 1px solid #d3dbe5;
+  border-radius: 3px;
+  background: #f7f9fb;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.flash-config-strategy-validation.is-success {
+  border-color: #b7d6be;
+  background: #f4fbf5;
+  color: #356146;
+}
+
+.flash-config-strategy-validation.is-warning {
+  border-color: #e2d29a;
+  background: #fff9e8;
+  color: #7b6425;
+}
+
+.flash-config-strategy-validation.is-error {
+  border-color: #e2b4b4;
+  background: #fff3f3;
+  color: #8b4141;
+}
+
+/* ── B区：刷写包队列 ── */
+
+.flash-config-strategy-queue {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px;
+  gap: 0;
+}
+
+.flash-config-strategy-card {
+  border: 1px solid #bcc6d1;
+  border-radius: 6px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.flash-config-strategy-card.is-primary {
+  border-color: #94a8bf;
+  background: linear-gradient(180deg, #fafdff, #f2f6fb);
+}
+
+.flash-config-strategy-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid #e3e8ee;
+  background: linear-gradient(180deg, #f8f9fb, #eef2f6);
+}
+
+.flash-config-strategy-card__order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid #9eabbc;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2d4158;
+  font-size: 12px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.flash-config-strategy-card__name {
+  flex: 1;
+  min-width: 0;
+  color: #1d2d3f;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flash-config-strategy-card__duplicate-btn {
+  padding: 0 8px;
+  height: 22px;
+  line-height: 20px;
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+
+.flash-config-strategy-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: #e6edf4;
+  border: 1px solid #94a8bf;
+  color: #24415d;
+  font-size: 11px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.flash-config-strategy-card__actions {
+  display: flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.flash-config-strategy-card__remove-btn {
+  color: #8b4141;
+  border-color: #e2b4b4;
+}
+
+.flash-config-strategy-card__remove-btn:hover {
+  background: #fff3f3;
+}
+
+.flash-config-strategy-card__info {
+  padding: 6px 12px;
+  display: grid;
+  gap: 3px;
+  border-bottom: 1px solid #e3e8ee;
+}
+
+.flash-config-strategy-card__info-main {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.flash-config-strategy-card__info-main span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #1d2d3f;
+  font-size: 12px;
+  min-width: 0;
+}
+
+.flash-config-strategy-card__info-main strong,
+.flash-config-strategy-card__info-tags strong {
+  color: #2a3f57;
+  font-weight: 700;
+}
+
+.flash-config-strategy-card__info-tags {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.flash-config-strategy-card__info-tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #607086;
+  font-size: 12px;
+  min-width: 0;
+}
+
+.flash-config-strategy-card__fields {
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.flash-config-strategy-card__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.flash-config-strategy-card__field .flash-config-input {
+  width: 80px;
+}
+
+.flash-config-strategy-connector {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+  color: #2a4d86;
+  font-size: 14px;
+}
+
+/* ── C区：循环策略 ── */
+
+.flash-config-strategy-loop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.flash-config-strategy-loop__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4d5f76;
+  font-size: 12px;
+}
+
+.flash-config-strategy-loop__field .flash-config-input {
+  width: 80px;
+}
+
+.flash-config-strategy-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #d3dbe5;
+  border-radius: 4px;
+  background: #f7f9fb;
+  color: #45607d;
+  font-size: 12px;
+}
+
+.flash-config-strategy-preview i {
+  color: #1f67c2;
+}
+
+.flash-config-strategy-loop__actions {
+  margin-left: auto;
+}
+
+/* ── 通用：加载、提示 ── */
+
+.flash-config-strategy-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #d4dbe5;
+  background: #f8fafc;
+  color: #45607d;
+  font-size: 12px;
+}
+
+.flash-config-strategy-hint {
+  color: #607086;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.flash-config-strategy-hint.is-muted {
+  color: #7b8796;
+}
+
+.flash-config-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.flash-config-info-item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  border-bottom: 1px solid #dde3ea;
+  background: #ffffff;
+}
+
+.flash-config-info-item span,
+.flash-config-ecu-card span,
+.flash-config-ecu-card em,
+.flash-config-ecu-card i {
+  display: block;
+  color: #65758d;
+}
+
+.flash-config-info-item span {
+  margin: 0;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: #f3f5f8;
+  border-right: 1px solid #dde3ea;
+}
+
+.flash-config-info-item strong {
+  display: block;
+  color: #1d2d3f;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+  padding: 6px 8px;
+  font-weight: 500;
+}
+
+.flash-config-ecu-list {
+  display: grid;
+  gap: 0;
+  padding: 0;
+}
+
+.flash-config-ecu-card {
+  padding: 8px 10px;
+  border-bottom: 1px solid #dde3ea;
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.flash-config-ecu-card strong {
+  display: block;
+  color: #1d2d3f;
+  font-size: 12px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.flash-config-ecu-card span,
+.flash-config-ecu-card em,
+.flash-config-ecu-card i {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.flash-config-ecu-card em,
+.flash-config-ecu-card i {
+  font-style: normal;
+}
+
+.flash-config-empty {
+  padding: 12px 10px;
+  color: #5f6f81;
+  font-size: 12px;
+  background: #ffffff;
+}
+
+/* ── 单件刷写窗口 ── */
+
+.single-flash-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 10px;
+  background: #e9edf2;
+}
+
+.single-flash-left,
+.single-flash-right,
+.single-flash-right-wrap {
+  border: 1px solid #bcc6d1;
+  border-radius: 2px;
+  background: #ffffff;
+  min-height: 0;
+  min-width: 0;
+}
+
+.single-flash-left {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  position: relative;
+}
+
+.single-flash-tree {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 8px;
+  background: #fff;
+}
+
+.single-flash-shell.is-tree-collapsed {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+
+.single-flash-shell.is-tree-collapsed .single-flash-tree {
+  display: none;
+}
+
+.single-flash-right {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
+  background: #eef2f6;
+  position: relative;
+  overflow: hidden;
+}
+
+.single-flash-right-wrap {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.single-flash-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #c8d1dc;
+  background: #ffffff;
+}
+
+.single-flash-toolbar .flash-config-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.single-flash-main {
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.single-flash-log-split {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.single-flash-log-split__top,
+.single-flash-log-split__bottom {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.single-flash-content,
+.single-flash-log-sheet {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.single-flash-content {
+  overflow: hidden;
+  padding: 8px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.single-flash-content>.flash-config-sheet {
+  min-height: 0;
+}
+
+.single-flash-log-sheet {
+  overflow: hidden;
+}
+
+.single-flash-log-split__divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  background: #eef2f6;
+}
+
+.single-flash-log-split__grip {
+  width: 56px;
+  height: 2px;
+  background: #aeb9c8;
+}
+
+.single-flash-version-head {
+  display: grid;
+  gap: 8px;
+  background: #ffffff !important;
+  border-color: #d8dee7 !important;
+}
+
+.single-flash-version-head__title {
+  color: #1d2d3f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.single-flash-version-head__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.single-flash-version-head__item {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #d8dee7;
+  background: #f8fafc;
+}
+
+.single-flash-version-head__item span {
+  display: block;
+  margin-bottom: 4px;
+  color: #66768b;
+  font-size: 11px;
+}
+
+.single-flash-did-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 6px;
+}
+
+.single-flash-did-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.single-flash-did-table th,
+.single-flash-did-table td {
+  padding: 6px 10px;
+  border: 1px solid #d8dee7;
+  text-align: left;
+}
+
+.single-flash-did-table th {
+  background: #f0f3f7;
+  color: #3c4d60;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.single-flash-did-table td:first-child {
+  color: #66768b;
+  white-space: nowrap;
+}
+
+.single-flash-did-table td:nth-child(2),
+.single-flash-did-table td:nth-child(3),
+.single-flash-did-table td:nth-child(4) {
+  font-weight: 600;
+  color: #1d2d3f;
+}
+
+.single-flash-version-head__item strong {
+  display: block;
+  color: #213448;
+  font-size: 12px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.single-flash-comm {
+  margin: 2px 0 4px;
+  border: 1px dashed #d8dee7;
+  border-radius: 2px;
+  background: #ffffff;
+  padding: 2px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.single-flash-comm__items {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.single-flash-comm__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.single-flash-comm__label {
+  color: #66768b;
+  font-size: 10px;
+}
+
+.single-flash-comm__value {
+  color: #1d2d3f;
+  font-size: 11px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.single-flash-comm__value.is-error {
+  color: #f5222d !important;
+}
+
+.single-flash-comm__actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+.single-flash-table-wrap {
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.single-flash-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.single-flash-col-order {
+  width: 48px;
+}
+
+.single-flash-col-name {
+  width: 22%;
+}
+
+.single-flash-col-vendor {
+  width: 10%;
+}
+
+.single-flash-col-type {
+  width: 8%;
+}
+
+.single-flash-col-soft,
+.single-flash-col-hard {
+  width: 12%;
+}
+
+.single-flash-col-size {
+  width: 7%;
+}
+
+.single-flash-col-count,
+.single-flash-col-interval {
+  width: 7%;
+}
+
+.single-flash-col-progress {
+  width: 15%;
+}
+
+.single-flash-table th,
+.single-flash-table td {
+  border: 1px solid #dde3ea;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #1d2d3f;
+}
+
+.single-flash-table th {
+  background: #f3f5f8;
+  font-weight: 600;
+}
+
+.single-flash-progress {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.single-flash-progress__run {
+  min-width: 52px;
+  font-size: 11px;
+  color: #42566d;
+  white-space: nowrap;
+}
+
+.single-flash-progress__track {
+  height: 8px;
+  border: 1px solid #c8d1dc;
+  border-radius: 999px;
+  background: #eef2f6;
+  overflow: hidden;
+}
+
+.single-flash-progress__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #6f97c0, #3d6f9f);
+  transition: width 0.14s linear;
+}
+
+.single-flash-progress__label {
+  min-width: 34px;
+  font-size: 11px;
+  color: #42566d;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.single-flash-progress.is-done .single-flash-progress__fill {
+  background: linear-gradient(90deg, #6ba56b, #4f8c4f);
+}
+
+.single-flash-log-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 10px 10px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.single-flash-log-tabs {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.single-flash-log-tabs .flash-config-action-btn {
+  min-width: 74px;
+}
+
+.single-flash-log-row {
+  display: grid;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 6px 8px;
+  border: 1px solid #d9e0e8;
+  background: #fbfcfd;
+  font-size: 12px;
+  color: #2b3d52;
+}
+
+.single-flash-log-row--raw {
+  grid-template-columns: 92px 44px 110px 82px 56px minmax(220px, 1fr) 180px;
+}
+
+.single-flash-log-row--diag {
+  grid-template-columns: 92px 44px 66px minmax(220px, 1.2fr) minmax(180px, 1fr) 56px;
+}
+
+.single-flash-log-row__time,
+.single-flash-log-row__meta,
+.single-flash-log-row__id,
+.single-flash-log-row__dlc,
+.single-flash-log-row__service,
+.single-flash-log-row__status {
+  color: #506277;
+}
+
+.single-flash-log-row__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid #c7d0db;
+  border-radius: 2px;
+  background: #f2f5f8;
+  color: #24415d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.single-flash-log-row__payload,
+.single-flash-log-row__summary,
+.single-flash-log-row__desc {
+  min-width: 0;
+  color: #1d2d3f;
+  font-family: Consolas, "Courier New", monospace;
+  word-break: break-all;
+}
+
+.single-flash-log-row__summary,
+.single-flash-log-row__desc {
+  font-family: inherit;
+}
+
+.single-flash-empty {
+  color: #607086;
+  font-size: 12px;
+  text-align: center;
+  padding: 18px 10px;
+}
+
+@media (max-width: 1080px) {
+  .flash-config-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .flash-config-detail-grid,
+  .flash-config-info-grid,
+  .flash-config-summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .flash-config-sa-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flash-config-strategy-card__fields {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .single-flash-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: 240px minmax(0, 1fr);
+  }
+
+  .single-flash-shell.is-tree-collapsed {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 840px) {
+  .flash-config-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .flash-config-layout.is-tree-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .flash-config-pane--tree {
+    max-height: 320px;
+  }
+
+  .flash-config-detail-head {
+    flex-direction: column;
+  }
+
+  .flash-config-detail-badges {
+    justify-content: flex-start;
+  }
+
+  .single-flash-version-head__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.flash-config-layout.is-tree-collapsed .flash-config-pane__actions,
+.flash-config-layout.is-tree-collapsed .flash-config-tree {
+  display: none;
+}
+
+.flash-config-layout.is-tree-collapsed .flash-config-pane--tree {
+  overflow: visible;
+}
+
+.flash-config-pane__divider {
+  display: block;
+  width: 1px;
+  height: 16px;
+  background: rgba(216, 222, 233, 0.96);
+  flex-shrink: 0;
+}
+
+.pc-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 600;
+  background: rgba(20, 30, 48, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pc-dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: calc(100% - 24px);
+  max-width: 1200px;
+  max-height: calc(100% - 24px);
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(20, 30, 48, 0.22);
+  overflow: hidden;
+}
+
+.pc-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72);
+  background: rgba(247, 249, 253, 0.9);
+}
+
+.pc-dialog__head strong {
+  font-size: 15px;
+  color: #1a2633;
+}
+
+.pc-dialog__head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pc-dialog__body {
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}

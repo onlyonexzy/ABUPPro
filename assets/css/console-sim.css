@@ -1,0 +1,1631 @@
+/* ==========================================================
+   CONSOLE SIM PANEL - CAN & ETH 仿真发送面板现代高级样式
+   风格: 匹配"基础诊断"现代页面设计 (圆角、微发光、CSS变量系统)
+   前缀: .console-sim- / .sim-
+   字体: 整体增大 2px, 更加清晰易读
+   ========================================================== */
+
+/* ==========================================================
+   1. 仿真面板容器
+   ========================================================== */
+.console-sim-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  overflow: hidden;
+  font-family: var(--font), sans-serif;
+  font-size: 14px; /* 从 12px 增大到 14px */
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.console-sim-panel.is-hidden {
+  display: none;
+}
+
+/* ==========================================================
+   2. 标题栏
+   ========================================================== */
+.console-sim-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px; /* 增加内边距 */
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 36px;
+}
+
+.console-sim-title__icon {
+  font-size: 15px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.console-sim-title__text {
+  font-size: 14px; /* 从 12px 增大 */
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================
+   3. 工具栏
+   ========================================================== */
+.console-sim-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+
+/* --- 工具栏按钮 --- */
+.console-sim-toolbar__btn {
+  width: 28px; /* 从 24px 变大 */
+  height: 28px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px; /* 从 12px 变大 */
+  cursor: pointer;
+  border-radius: 6px; /* Windows直角改精美圆角 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.console-sim-toolbar__btn:hover {
+  background: rgba(47, 107, 255, 0.08);
+  border-color: rgba(47, 107, 255, 0.2);
+  color: var(--accent);
+}
+
+.console-sim-toolbar__btn:active {
+  transform: scale(0.92);
+}
+
+.console-sim-toolbar__btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- 工具栏按钮颜色微调 --- */
+.console-sim-toolbar__btn--add     { color: #1dbf73; } /* 高级绿 */
+.console-sim-toolbar__btn--copy    { color: var(--accent); } /* 品牌蓝 */
+.console-sim-toolbar__btn--delete  { color: var(--danger); } /* 高级红 */
+.console-sim-toolbar__btn--play    { color: #1dbf73; }
+.console-sim-toolbar__btn--stop    { color: var(--text-muted); }
+.console-sim-toolbar__btn--color   { color: var(--accent-2); }
+.console-sim-toolbar__btn--settings { color: var(--text-muted); }
+.console-sim-toolbar__btn--up     { color: var(--text-muted); }
+.console-sim-toolbar__btn--down   { color: var(--text-muted); }
+
+/* --- 分隔线 --- */
+.console-sim-toolbar__sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
+/* --- 右侧默认周期区域 --- */
+.console-sim-toolbar__cycle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.console-sim-toolbar__cycle-label {
+  font-size: 13px; /* 从 11px 增大 */
+  color: var(--text-muted);
+}
+
+.console-sim-toolbar__cycle-input {
+  width: 60px; /* 宽度略微拓宽 */
+  height: 24px; /* 从 20px 增大 */
+  border: 1px solid var(--border);
+  border-radius: 6px; /* 圆角化 */
+  padding: 0 6px;
+  font-size: 13px;
+  font-family: "Consolas", "Courier New", monospace;
+  text-align: right;
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.console-sim-toolbar__cycle-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+  outline: none;
+}
+
+.console-sim-toolbar__cycle-unit {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================
+   4. 报文列表表格区域（上方）
+   ========================================================== */
+.console-sim-upper {
+  flex: 1;
+  overflow: auto;
+  min-height: 80px;
+  background: var(--surface);
+}
+
+.console-sim-table-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.console-sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 14px; /* 增大 */
+}
+
+/* 表头 */
+.console-sim-table th {
+  background: var(--surface-3); /* 使用基础诊断暖灰背景 */
+  border-bottom: 2px solid var(--border);
+  font-size: 13px; /* 从 11px 增大 */
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 8px 10px; /* 增加行距 */
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* 表格单元格 */
+.console-sim-table td {
+  border-bottom: 1px solid var(--surface-2);
+  font-size: 14px; /* 从 12px 增大 */
+  padding: 8px 10px; /* 增加内边距更显呼吸感 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  transition: background 0.15s;
+  vertical-align: middle;
+}
+
+/* Hover 行 */
+.console-sim-table tbody tr:hover td {
+  background: rgba(47, 107, 255, 0.04);
+}
+
+/* 选中行 (适配基础诊断序列高亮风格) */
+.console-sim-table tbody tr.is-selected td {
+  background: rgba(47, 107, 255, 0.08) !important;
+}
+
+/* 给选中行的第一列增加一个极富质感的左高亮边条 */
+.console-sim-table tbody tr.is-selected td:first-child {
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+/* --- 发送状态列 --- */
+.sim-col-send {
+  width: 50px;
+  text-align: center;
+}
+
+/* --- 发送按钮 --- */
+.sim-send-btn {
+  width: 24px; /* 增大 */
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 6px; /* 换成精美圆角 */
+  background: var(--surface);
+  color: #1dbf73;
+  font-size: 11px; /* 增大 */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sim-send-btn:hover {
+  background: rgba(29, 191, 115, 0.08);
+  border-color: rgba(29, 191, 115, 0.3);
+  transform: scale(1.08);
+}
+
+.sim-send-btn.is-sending {
+  color: var(--danger);
+  border-color: rgba(224, 82, 82, 0.2);
+}
+
+.sim-send-btn.is-sending:hover {
+  background: rgba(224, 82, 82, 0.08);
+  border-color: rgba(224, 82, 82, 0.4);
+}
+
+/* ==========================================================
+   5. 上下分割线 (水平 resizer)
+   ========================================================== */
+.console-sim-splitter {
+  height: 6px; /* 略微缩窄，更显精致 */
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.console-sim-splitter:hover,
+.console-sim-splitter.is-dragging {
+  background: rgba(47, 107, 255, 0.15);
+}
+
+.console-sim-splitter__bar {
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border);
+}
+
+.console-sim-splitter:hover .console-sim-splitter__bar {
+  background: var(--accent);
+}
+
+/* ==========================================================
+   6. 下方数据编辑区
+   ========================================================== */
+.console-sim-lower {
+  min-height: 120px;
+  overflow: auto;
+  background: var(--surface);
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* ----------------------------------------------------------
+   6a. CAN Data 网格 (CAN 特有)
+   ---------------------------------------------------------- */
+.console-sim-data-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-family: "Consolas", "Courier New", monospace;
+}
+
+.console-sim-data-grid th {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--surface-3);
+  font-size: 13px; /* 增大 */
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.console-sim-data-grid th:first-child {
+  text-align: left;
+  padding-left: 12px;
+}
+
+.console-sim-data-grid td {
+  border-bottom: 1px solid var(--surface-2);
+  border-right: 1px solid var(--surface-2);
+  padding: 6px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.console-sim-data-grid td:first-child {
+  text-align: left;
+  padding-left: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-2);
+}
+
+.console-sim-data__input {
+  width: 100%;
+  height: 26px; /* 增大 */
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  text-align: center;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px; /* 增大 */
+  font-weight: 600;
+  color: #1dbf73; /* 使用高级绿 */
+  padding: 2px;
+  outline: none;
+  transition: all 0.15s;
+}
+
+.console-sim-data__input:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.console-sim-data__input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+/* 禁用单元格 */
+.console-sim-data__cell--disabled {
+  background: var(--surface-2);
+  color: var(--text-muted) !important;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* ----------------------------------------------------------
+   6b. ETH 网络参数区域 (ETH 特有)
+   ---------------------------------------------------------- */
+.sim-net-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.sim-net-params__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-net-params__group-title {
+  font-size: 13px; /* 从 11px 增大 */
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.sim-net-params__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sim-net-params__label {
+  font-size: 13px; /* 增大 */
+  color: var(--text);
+  min-width: 68px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.sim-net-params__input {
+  height: 26px; /* 从 20px 增大 */
+  border: 1px solid var(--border);
+  border-radius: 6px; /* 换圆角 */
+  padding: 0 8px;
+  font-size: 13px;
+  font-family: "Consolas", "Courier New", monospace;
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.sim-net-params__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+  outline: none;
+}
+
+/* ----------------------------------------------------------
+   6c. ETH 协议头编辑区 (ETH 特有)
+   ---------------------------------------------------------- */
+.sim-protocol-header {
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
+  background: var(--surface);
+}
+
+.sim-protocol-header__title {
+  font-size: 13px; /* 从 11px 增大 */
+  font-weight: 700;
+  color: var(--accent); /* 使用主题蓝高亮协议名称 */
+  padding: 0 14px 6px;
+  border-bottom: 1px solid var(--surface-2);
+  margin-bottom: 8px;
+}
+
+.sim-protocol-header__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px; /* 加大间距 */
+  padding: 0 14px;
+}
+
+.sim-protocol-header__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-protocol-header__field label {
+  font-size: 13px; /* 从 11px 增大 */
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.sim-protocol-header__field input,
+.sim-protocol-header__field select {
+  height: 26px; /* 增大 */
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 13px;
+  font-family: "Consolas", "Courier New", monospace;
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.sim-protocol-header__field input:focus,
+.sim-protocol-header__field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+  outline: none;
+}
+
+/* ----------------------------------------------------------
+   6d. ETH Payload HEX 编辑器 (ETH 特有)
+   ---------------------------------------------------------- */
+.sim-payload-editor {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+/* Payload 工具栏 */
+.sim-payload-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sim-payload-toolbar__info {
+  font-size: 13px; /* 增大 */
+  color: var(--text-muted);
+}
+
+.sim-payload-toolbar__info strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.sim-payload-toolbar__toggle {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px; /* 圆角 */
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font), sans-serif;
+  transition: all 0.2s;
+}
+
+.sim-payload-toolbar__toggle:hover:not(:disabled) {
+  background: rgba(47, 107, 255, 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sim-payload-toolbar__toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Payload HexDump 网格 */
+.sim-payload-grid {
+  display: table;
+  border-collapse: collapse;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px; /* 增大 */
+  width: 100%;
+}
+
+.sim-payload-grid__header {
+  display: table-row;
+  background: var(--surface-3);
+}
+
+.sim-payload-grid__header-cell {
+  display: table-cell;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border);
+  border-right: 1px solid var(--border);
+  user-select: none;
+}
+
+.sim-payload-grid__row {
+  display: table-row;
+}
+
+.sim-payload-grid__row:hover .sim-payload-grid__cell,
+.sim-payload-grid__row:hover .sim-payload-grid__offset,
+.sim-payload-grid__row:hover .sim-payload-grid__ascii {
+  background: rgba(47, 107, 255, 0.03);
+}
+
+/* Offset 列 */
+.sim-payload-grid__offset {
+  display: table-cell;
+  width: 70px; /* 拓宽 */
+  padding: 6px 8px;
+  font-size: 13px; /* 从 11px 增大 */
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: right;
+  vertical-align: middle;
+  background: var(--surface-2);
+  user-select: none;
+}
+
+/* HEX 单元格 */
+.sim-payload-grid__cell {
+  display: table-cell;
+  width: 40px; /* 拓宽 */
+  padding: 4px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--surface-2);
+  vertical-align: middle;
+}
+
+.sim-payload-grid__hex-input {
+  width: 100%;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  text-align: center;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px; /* 增大 */
+  font-weight: 600;
+  color: #1dbf73; /* 经典绿 */
+  padding: 2px 0;
+  outline: none;
+  transition: all 0.15s;
+}
+
+.sim-payload-grid__hex-input:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.sim-payload-grid__hex-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+/* ASCII 列 */
+.sim-payload-grid__ascii {
+  display: table-cell;
+  padding: 4px 12px;
+  font-size: 14px; /* 从 12px 增大 */
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  border-left: 2px solid var(--border);
+  vertical-align: middle;
+  letter-spacing: 2px; /* 稍微扩大间距 */
+  white-space: pre;
+}
+
+/* ==========================================================
+   7. 表格中内嵌控件样式 (大方得体化)
+   ========================================================== */
+
+/* 触发器下拉框 */
+.sim-trigger-select {
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px; /* 从 11px 增大 */
+  font-family: var(--font), sans-serif;
+  color: var(--text);
+  padding: 0 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  max-width: 100%;
+}
+
+.sim-trigger-select:hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.sim-trigger-select:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+/* ID 输入框与 CAN 输入框 */
+.sim-id-input,
+.console-sim-hex-input,
+.console-sim-text-input {
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-family: "Consolas", "Courier New", monospace;
+  color: var(--text);
+  padding: 0 6px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s;
+  vertical-align: middle;
+}
+
+.sim-id-input:hover,
+.console-sim-hex-input:hover,
+.console-sim-text-input:hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.sim-id-input:focus,
+.console-sim-hex-input:focus,
+.console-sim-text-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.155);
+}
+
+/* 数据长度下拉框与 CAN 下拉框 */
+.sim-len-select,
+.console-sim-select {
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-family: var(--font), sans-serif;
+  color: var(--text);
+  padding: 0 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  vertical-align: middle;
+}
+
+.sim-len-select:hover,
+.console-sim-select:hover {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.sim-len-select:focus,
+.console-sim-select:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.155);
+}
+
+/* ==========================================================
+   8. 自定义滚动条
+   ========================================================== */
+.console-sim-panel ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.console-sim-panel ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.console-sim-panel ::-webkit-scrollbar-thumb {
+  background: var(--border); /* 使用主边框暖灰作滚动条 */
+  border-radius: 3px;
+}
+
+.console-sim-panel ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ==========================================================
+   9. 辅助样式 / 通用修饰
+   ========================================================== */
+
+/* 等宽字体修饰符 */
+.console-sim-mono {
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px;
+}
+
+/* 绿色 HEX 值文字 */
+.console-sim-hex {
+  color: #1dbf73;
+  font-family: "Consolas", "Courier New", monospace;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   10. 自定义触发器复合弹窗样式 (完全复刻截图)
+   ========================================================== */
+.sim-trigger-cell-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.sim-trigger-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  padding: 0 8px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s;
+  box-sizing: border-box;
+}
+
+.sim-trigger-dropdown-btn:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+
+.sim-trigger-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  transform: none; /* 彻底清除居中 transform，防止其在 table 布局中产生错位 */
+  margin-top: 4px; /* 与按钮保留 4px 间隙 */
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid #b9c3cf; /* 使用更精致的灰色边框 */
+  border-radius: 6px; /* 使用 6px 圆角，与系统的现代风格契合 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* 使用更精致平滑的模糊阴影 */
+  padding: 10px 12px;
+  z-index: 999;
+  text-align: left;
+  box-sizing: border-box;
+  color: #000000;
+  font-family: var(--font), sans-serif;
+  font-size: 12px;
+}
+
+.sim-trigger-popover.is-hidden {
+  display: none;
+}
+
+.sim-trigger-popover__cols {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.sim-trigger-popover__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sim-trigger-popover__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: normal;
+  color: #000000;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sim-trigger-popover__label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: #0078d4;
+}
+
+.sim-trigger-popover__sub-label {
+  font-size: 12px;
+  color: #000000;
+  margin-top: 2px;
+}
+
+.sim-trigger-popover__val-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+}
+
+.sim-trigger-popover__ctrl-label {
+  font-size: 12px;
+  color: #000000;
+}
+
+.sim-trigger-popover__key-input {
+  width: 45px;
+  height: 20px;
+  border: 1px solid #a0a0a0;
+  border-radius: 0px;
+  text-align: center;
+  font-size: 12px;
+  background: #e0e0e0;
+  color: #000000;
+  text-transform: uppercase;
+  font-family: "Consolas", monospace;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sim-trigger-popover__key-input:disabled {
+  background: #f0f0f0 !important;
+  color: #808080 !important;
+  border-color: #d0d0d0 !important;
+  cursor: not-allowed;
+}
+
+.sim-trigger-popover__cycle-input {
+  width: 85px;
+  height: 20px;
+  border: 1px solid #a0a0a0;
+  border-radius: 0px;
+  text-align: right;
+  padding-right: 2px;
+  font-size: 12px;
+  background: #ffffff;
+  color: #000000;
+  font-family: "Consolas", monospace;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sim-trigger-popover__cycle-input:focus,
+.sim-trigger-popover__key-input:focus {
+  border-color: #0078d4;
+}
+
+.sim-trigger-popover__cycle-input:disabled {
+  background: #f0f0f0 !important;
+  color: #808080 !important;
+  border-color: #d0d0d0 !important;
+  cursor: not-allowed;
+}
+
+/* Spinner style always visible */
+.sim-trigger-popover__cycle-input::-webkit-inner-spin-button,
+.sim-trigger-popover__cycle-input::-webkit-outer-spin-button {
+  opacity: 1 !important;
+  cursor: pointer;
+}
+
+.sim-trigger-popover__slider-row {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.sim-trigger-popover__slider {
+  width: 100%;
+  height: 2px;
+  background: #0078d4;
+  outline: none;
+  margin: 6px 0 2px 0;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+/* Chrome, Safari, Opera and Edge slider styling */
+.sim-trigger-popover__slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: #0078d4;
+}
+
+.sim-trigger-popover__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 6px;
+  height: 12px;
+  border: 1px solid #0078d4;
+  border-radius: 0px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: -5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.sim-trigger-popover__slider:disabled {
+  background: #d0d0d0 !important;
+  cursor: not-allowed;
+}
+
+.sim-trigger-popover__slider:disabled::-webkit-slider-runnable-track {
+  background: #d0d0d0 !important;
+}
+
+.sim-trigger-popover__slider:disabled::-webkit-slider-thumb {
+  border-color: #d0d0d0 !important;
+  background: #f0f0f0 !important;
+  cursor: not-allowed;
+}
+
+/* Ticks style matching screenshot with dense gray lines */
+.sim-trigger-popover__ticks {
+  width: 100%;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, #a0a0a0, #a0a0a0 1px, transparent 1px, transparent 4px);
+  opacity: 0.8;
+  margin-top: 1px;
+}
+
+/* ==========================================================
+   11. Wireshark-style Hex Editor for ETH (完全复刻Wireshark)
+   ========================================================== */
+.wireshark-hex-dump {
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #000000;
+  background: #ffffff;
+  padding: 10px;
+  border: 1px solid #d0d0d0;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.wireshark-row {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 22px;
+  margin-bottom: 2px;
+}
+
+.wireshark-row:hover {
+  background-color: #f2f7ff !important;
+}
+
+.wireshark-offset {
+  color: #8c8c8c;
+  width: 50px;
+  user-select: none;
+  margin-right: 12px;
+  font-weight: normal;
+}
+
+.wireshark-bytes {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.sim-hex-byte {
+  width: 22px;
+  text-align: center;
+  margin-right: 4px;
+  display: inline-block;
+  padding: 1px 0;
+  font-weight: 500;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.sim-hex-byte-input {
+  width: 22px;
+  height: 18px;
+  border: 1px dashed #1dbf73;
+  border-radius: 2px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1dbf73;
+  background: #ffffff;
+  padding: 0;
+  outline: none;
+  transition: all 0.15s;
+  margin-right: 4px;
+  font-family: "Consolas", monospace;
+  box-sizing: border-box;
+}
+
+.sim-hex-byte-input:focus {
+  border: 1px solid #1dbf73;
+  background-color: #eafaf1;
+}
+
+/* Spacer/divider between the two 8-byte halves of a row */
+.wireshark-divider {
+  width: 10px;
+  display: inline-block;
+  user-select: none;
+}
+
+.wireshark-ascii {
+  color: #000000;
+  font-family: "Consolas", monospace;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
+
+/* Layer backgrounds for Wireshark bytes */
+.sim-byte-mac {
+  background-color: #ffe4cc; /* Ethernet MAC - light orange */
+}
+.sim-byte-ip {
+  background-color: #d5f5e3; /* IPv4 IP - light green */
+}
+.sim-byte-udp {
+  background-color: #d4e6f1; /* UDP Header - light blue */
+}
+.sim-byte-app {
+  background-color: #ebdef0; /* DoIP/SOME/IP - light purple */
+}
+.sim-byte-payload {
+  background-color: #ffffff; /* UDS Payload - white */
+}
+
+/* --- Payload Import Wrap --- */
+.sim-payload-import-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 12px;
+}
+
+.sim-payload-import-input {
+  width: 480px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: "Consolas", monospace;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.sim-payload-import-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+.sim-payload-import-btn {
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sim-payload-import-btn:hover {
+  background: #1a5ae0;
+  border-color: #1a5ae0;
+  box-shadow: 0 2px 4px rgba(26, 90, 224, 0.2);
+}
+
+/* ==========================================================
+   12. 控制台左侧树形面板覆盖样式 (与基础诊断完全沿用)
+   ========================================================== */
+.console-tree-panel.basic-diag-left {
+  border: 1px solid #b9c3cf !important;
+  border-radius: 6px !important;
+  margin: 6px 0 6px 6px !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+  background: #ffffff !important;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-toolbar {
+  padding: 6px 12px !important;
+  border-bottom: 1px solid rgba(216, 222, 233, 0.72) !important;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree {
+  padding: 8px 6px !important;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-node:hover,
+.console-tree-panel.basic-diag-left .basic-diag-tree-child:hover {
+  background: rgba(47, 107, 255, 0.04) !important;
+  border-radius: 4px;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-node.is-active,
+.console-tree-panel.basic-diag-left .basic-diag-tree-child.is-active {
+  background: rgba(47, 107, 255, 0.08) !important;
+  font-weight: 600 !important;
+  color: #1a3a6e !important;
+  border-radius: 4px;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-label {
+  padding: 3px 6px !important;
+  font-size: 13px !important;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-child {
+  padding: 3px 6px 3px 20px !important;
+  font-size: 13px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.console-tree-panel.basic-diag-left .basic-diag-tree-toggle {
+  font-weight: bold !important;
+  color: #4a5568 !important;
+}
+
+/* 隐藏仿真左侧树形列表与分割线 */
+#console-tree-panel,
+#console-splitter {
+  display: none !important;
+}
+
+/* 仿真标题栏增强 */
+.console-sim-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  min-height: 40px;
+}
+
+.console-sim-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.console-sim-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* DBC名称标签样式 */
+.console-sim-dbc-name {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(223, 165, 73, 0.12);
+  color: #dfa549;
+  border: 1px solid rgba(223, 165, 73, 0.25);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.console-sim-dbc-name.no-dbc {
+  background: var(--surface-3);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+/* 标题栏按钮通用样式 */
+.console-title-btn {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.console-title-btn:hover {
+  background: rgba(47, 107, 255, 0.08);
+  border-color: rgba(47, 107, 255, 0.2);
+  color: var(--accent);
+}
+
+.console-title-btn:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================
+   总线参数设置弹框 (Bus Settings Modal) 样式
+   ========================================================== */
+.bus-settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.bus-settings-card {
+  width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: busModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes busModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.bus-settings-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-2);
+}
+
+.bus-settings-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bus-settings-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.bus-settings-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+}
+
+.bus-settings-body {
+  padding: 16px 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.bus-settings-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  background: var(--surface-2);
+}
+
+.bus-settings-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.bus-settings-form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bus-settings-form-item.full-width {
+  grid-column: span 2;
+}
+
+.bus-settings-form-item label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.bus-settings-input,
+.bus-settings-select {
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.bus-settings-input:focus,
+.bus-settings-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.15);
+}
+
+.bus-settings-input:disabled,
+.bus-settings-select:disabled {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.bus-settings-btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.bus-settings-btn:hover {
+  background: var(--surface-2);
+}
+
+.bus-settings-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.bus-settings-btn.primary:hover {
+  background: #245be5;
+}
+
+/* ==========================================================
+   信号选择模态框特定样式 (Signal Select Modal Styles)
+   ========================================================== */
+.signal-select-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 480px;
+  min-width: 580px;
+  box-sizing: border-box;
+}
+
+.signal-select-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.signal-select-search .input {
+  flex: 1;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.signal-select-search__btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.signal-select-search__btn:hover {
+  background: var(--surface-3);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.signal-select-tree-container {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* 树节点样式 */
+.tree-node {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font), sans-serif;
+  font-size: 13px;
+}
+
+.tree-node-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.1s;
+}
+
+.tree-node-row:hover {
+  background: rgba(47, 107, 255, 0.04);
+}
+
+.tree-node-row.is-selected {
+  background: rgba(47, 107, 255, 0.09) !important;
+  font-weight: 500;
+  border-left: 2px solid var(--accent);
+}
+
+.tree-node-indent {
+  width: 18px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.tree-node-toggle {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+.tree-node-toggle:hover {
+  color: var(--text);
+}
+
+.tree-node-checkbox {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.tree-node-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.tree-node-icon.ecu { color: #5c7cfa; }
+.tree-node-icon.folder { color: #fcc419; }
+.tree-node-icon.message { color: #37b24d; }
+
+.tree-node-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.tree-node-id {
+  color: var(--text-muted);
+  font-family: "Consolas", monospace;
+  margin-left: auto;
+  padding-right: 8px;
+}
+
+.signal-select-details {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.signal-select-detail-row {
+  display: flex;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.signal-select-detail-label {
+  font-weight: 600;
+  color: var(--text);
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.signal-select-detail-val {
+  color: var(--text-muted);
+  flex: 1;
+}
+
+
+

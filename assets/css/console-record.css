@@ -1,0 +1,423 @@
+/**
+ * console-record.css - Vector CANoe Logging 风格高保真报文录制样式
+ */
+
+.window-content--record-layout {
+  padding: 0 !important;
+  background: #f7fafc;
+  overflow: hidden !important;
+  height: 100%;
+  user-select: none;
+}
+
+.record-layout {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.record-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.record-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e0;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.record-btn i {
+  font-size: 14px;
+}
+
+.record-btn:hover {
+  background: #edf2f7;
+  border-color: #a0aec0;
+  transform: translateY(-0.5px);
+}
+
+.record-btn:active {
+  background: #e2e8f0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  transform: translateY(0.5px);
+}
+
+.record-btn.is-disabled {
+  opacity: 0.4;
+  pointer-events: none !important;
+  cursor: not-allowed;
+}
+
+/* 录制中 Play 键闪烁红框 */
+.record-btn.is-recording {
+  border-color: #e53e3e;
+  background: #fff5f5;
+  box-shadow: 0 0 8px rgba(229, 62, 62, 0.4);
+}
+
+.record-btn.is-recording i {
+  color: #e53e3e !important;
+}
+
+.record-toolbar-sep {
+  width: 1px;
+  height: 22px;
+  background: #cbd5e0;
+  margin: 0 4px;
+}
+
+.record-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #718096;
+  font-family: 'Consolas', monospace;
+}
+
+.record-status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #cbd5e0;
+}
+
+.record-status-dot.is-recording {
+  background: #e53e3e;
+  box-shadow: 0 0 4px #e53e3e;
+  animation: record-blink 1s infinite alternate;
+}
+
+@keyframes record-blink {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+/* ============================
+   高精度对齐 Logging 配置 Modal
+   ============================ */
+.record-settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.record-settings-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.record-settings-card {
+  width: 580px;
+  height: 330px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #a0aec0;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.record-settings-header {
+  height: 36px;
+  background: #edf2f7;
+  border-bottom: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.record-settings-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.record-settings-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #718096;
+  font-size: 14px;
+}
+
+.record-settings-close:hover {
+  color: #d04030;
+}
+
+.record-settings-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.record-settings-desc {
+  font-size: 12.5px;
+  color: #718096;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.record-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.record-settings-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3748;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.record-settings-input {
+  height: 28px;
+  border: 1px solid #cbd5e0;
+  border-radius: 3px;
+  padding: 0 8px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  color: #2d3748;
+  flex: 1;
+}
+
+.record-settings-input:focus {
+  border-color: #2f6bff;
+}
+
+.record-settings-input.is-readonly {
+  background: #edf2f7;
+  color: #4a5568;
+  cursor: default;
+  border-color: #e2e8f0;
+}
+
+.record-settings-btn-browse {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  color: #4a5568;
+}
+
+.record-settings-btn-browse:hover {
+  background: #edf2f7;
+}
+
+/* 第三排复合列对齐 */
+.record-settings-complex-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.record-settings-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.record-settings-select {
+  height: 28px;
+  border: 1px solid #cbd5e0;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 13px;
+  background: #fff;
+  color: #2d3748;
+  outline: none;
+  width: 100%;
+}
+
+/* 带有灰色框线的后缀勾选栏，像素级复刻图2 */
+.record-settings-suffix-box {
+  width: 130px;
+  border: 1px solid #cbd5e0;
+  background: #fff;
+  padding: 6px 8px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.record-settings-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #2d3748;
+  cursor: pointer;
+}
+
+.record-settings-checkbox-item input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.record-settings-footer {
+  height: 44px;
+  background: #edf2f7;
+  border-top: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px;
+  gap: 8px;
+}
+
+.record-footer-btn {
+  height: 28px;
+  padding: 0 16px;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid #cbd5e0;
+  background: #fff;
+  color: #4a5568;
+}
+
+.record-footer-btn:hover {
+  background: #edf2f7;
+}
+
+.record-footer-btn--primary {
+  background: #2f6bff;
+  color: #fff;
+  border-color: #2f6bff;
+}
+
+.record-footer-btn--primary:hover {
+  background: #2456cc;
+}
+
+/* ============================
+   高颜值 Mock 文件管理器 Modal 弹窗
+   ============================ */
+.record-folder-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.record-folder-modal.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.record-folder-card {
+  width: 500px;
+  height: 360px;
+  background: #fff;
+  border: 1px solid #a0aec0;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.record-folder-header {
+  height: 36px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.record-folder-body {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.record-folder-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.record-folder-table th {
+  background: #edf2f7;
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 2px solid #cbd5e0;
+  color: #4a5568;
+}
+
+.record-folder-table td {
+  padding: 8px;
+  border-bottom: 1px solid #edf2f7;
+  color: #2d3748;
+}
+
+.record-folder-table tr:hover {
+  background: #f7fafc;
+}
+
+/* 强制报文录制小窗口始终悬浮在最上层，不被任何最大化大窗口遮挡 */
+.workspace-window[data-window="message-record"] {
+  z-index: 1005 !important;
+  resize: none !important;
+}

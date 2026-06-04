@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 380" role="img" aria-labelledby="title desc">
+  <title id="title">标准OBD定义图</title>
+  <desc id="desc">OBD2 16针接口标准定义，展示1到16号针脚及对应的以太网、CAN、电源和K线定义。</desc>
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .outer { fill: #ffffff; stroke: #2b3e55; stroke-width: 2.5; }
+      .pin-line { stroke: #2b3e55; stroke-width: 1.5; }
+      .pin-fill { fill: #ffffff; }
+      .pin-no { font: 700 30px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #202c3b; }
+      .pin-name { font: 600 17px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #26384d; }
+      .pin-name-small { font: 600 15px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #26384d; }
+      .caption { font: 600 20px "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #405165; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="380" />
+  <text class="caption" x="640" y="32" text-anchor="middle">标准 OBD 定义</text>
+
+  <polygon class="outer" points="40,70 1240,70 1195,320 85,320" />
+
+  <line class="pin-line" x1="40" y1="195" x2="1218" y2="195" />
+
+  <line class="pin-line" x1="190" y1="70" x2="190" y2="195" />
+  <line class="pin-line" x1="340" y1="70" x2="340" y2="195" />
+  <line class="pin-line" x1="490" y1="70" x2="490" y2="195" />
+  <line class="pin-line" x1="640" y1="70" x2="640" y2="195" />
+  <line class="pin-line" x1="790" y1="70" x2="790" y2="195" />
+  <line class="pin-line" x1="940" y1="70" x2="940" y2="195" />
+  <line class="pin-line" x1="1090" y1="70" x2="1090" y2="195" />
+
+  <line class="pin-line" x1="95" y1="320" x2="85" y2="195" />
+  <line class="pin-line" x1="235" y1="320" x2="231" y2="195" />
+  <line class="pin-line" x1="375" y1="320" x2="376" y2="195" />
+  <line class="pin-line" x1="515" y1="320" x2="522" y2="195" />
+  <line class="pin-line" x1="655" y1="320" x2="667" y2="195" />
+  <line class="pin-line" x1="795" y1="320" x2="813" y2="195" />
+  <line class="pin-line" x1="935" y1="320" x2="958" y2="195" />
+  <line class="pin-line" x1="1075" y1="320" x2="1104" y2="195" />
+
+  <g>
+    <text class="pin-name" x="115" y="105" text-anchor="middle">NA</text>
+    <text class="pin-no" x="115" y="165" text-anchor="middle">1</text>
+
+    <text class="pin-name" x="265" y="105" text-anchor="middle">PWM / VPN</text>
+    <text class="pin-no" x="265" y="165" text-anchor="middle">2</text>
+
+    <text class="pin-name" x="415" y="105" text-anchor="middle">Ethernet RX(+)</text>
+    <text class="pin-no" x="415" y="165" text-anchor="middle">3</text>
+
+    <text class="pin-name" x="565" y="105" text-anchor="middle">GND</text>
+    <text class="pin-no" x="565" y="165" text-anchor="middle">4</text>
+
+    <text class="pin-name" x="715" y="105" text-anchor="middle">GND</text>
+    <text class="pin-no" x="715" y="165" text-anchor="middle">5</text>
+
+    <text class="pin-name" x="865" y="105" text-anchor="middle">DG_CAN_H</text>
+    <text class="pin-no" x="865" y="165" text-anchor="middle">6</text>
+
+    <text class="pin-name" x="1015" y="105" text-anchor="middle">K_line</text>
+    <text class="pin-no" x="1015" y="165" text-anchor="middle">7</text>
+
+    <text class="pin-name-small" x="1165" y="98" text-anchor="middle">Ethernet activation line</text>
+    <text class="pin-name-small" x="1165" y="120" text-anchor="middle">pull-up</text>
+    <text class="pin-no" x="1165" y="165" text-anchor="middle">8</text>
+  </g>
+
+  <g>
+    <text class="pin-name" x="110" y="240" text-anchor="middle">NA</text>
+    <text class="pin-no" x="110" y="292" text-anchor="middle">9</text>
+
+    <text class="pin-name" x="250" y="240" text-anchor="middle">PWM</text>
+    <text class="pin-no" x="250" y="292" text-anchor="middle">10</text>
+
+    <text class="pin-name" x="390" y="240" text-anchor="middle">Ethernet RX(-)</text>
+    <text class="pin-no" x="390" y="292" text-anchor="middle">11</text>
+
+    <text class="pin-name" x="530" y="240" text-anchor="middle">Ethernet TX(+)</text>
+    <text class="pin-no" x="530" y="292" text-anchor="middle">12</text>
+
+    <text class="pin-name" x="670" y="240" text-anchor="middle">Ethernet TX(-)</text>
+    <text class="pin-no" x="670" y="292" text-anchor="middle">13</text>
+
+    <text class="pin-name" x="810" y="240" text-anchor="middle">DG_CAN_L</text>
+    <text class="pin-no" x="810" y="292" text-anchor="middle">14</text>
+
+    <text class="pin-name" x="950" y="240" text-anchor="middle">L_line</text>
+    <text class="pin-no" x="950" y="292" text-anchor="middle">15</text>
+
+    <text class="pin-name" x="1090" y="240" text-anchor="middle">KL30</text>
+    <text class="pin-no" x="1090" y="292" text-anchor="middle">16</text>
+  </g>
+</svg>

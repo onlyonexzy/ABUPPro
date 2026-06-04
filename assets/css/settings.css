@@ -1,0 +1,822 @@
+/* =============================================
+   SYSTEM SETTINGS - 统一刷写设置
+   ============================================= */
+
+.window-content--settings {
+  padding: 0;
+  overflow: hidden;
+  background: #e9edf2;
+}
+
+.settings-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.obd-settings-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 10px 0;
+  border-bottom: 1px solid #c8d1dc;
+  background: #eef2f7;
+  flex-shrink: 0;
+}
+
+.obd-settings-tab {
+  min-width: 92px;
+  height: 28px;
+  padding: 0 14px;
+  border: 1px solid #bcc8d6;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  margin-right: 4px;
+  background: linear-gradient(180deg, #f4f7fb 0%, #e6ecf4 100%);
+  color: #354a60;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.obd-settings-tab:hover {
+  background: linear-gradient(180deg, #f8fbff 0%, #edf3fa 100%);
+}
+
+.obd-settings-tab.is-active {
+  background: #ffffff;
+  color: #1a5c96;
+  font-weight: 600;
+}
+
+.obd-settings-panel {
+  display: none;
+}
+
+.obd-settings-panel.is-active {
+  display: block;
+}
+
+/* ---------- Top: Tab Bar ---------- */
+.settings-nav {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  border-bottom: 1px solid #c8d1dc;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.settings-nav__title {
+  display: none;
+}
+
+.settings-nav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: #495d74;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: center;
+  border-bottom: 2px solid transparent;
+  transition: all 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.settings-nav__item:hover {
+  background: #f2f6fa;
+  color: #1a5c96;
+}
+
+.settings-nav__item.is-active {
+  background: transparent;
+  color: #1a5c96;
+  font-weight: 600;
+  border-bottom-color: #1a5c96;
+}
+
+.settings-nav__item i {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+#flash-settings-root .flash-settings-tabsbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 0;
+  border-bottom: 1px solid #c8d1dc;
+  background: #eef2f7;
+}
+
+#flash-settings-root .settings-nav {
+  border-bottom: none;
+  background: transparent;
+  overflow: visible;
+}
+
+#flash-settings-root .settings-nav__item {
+  min-width: 84px;
+  height: 28px;
+  padding: 0 14px;
+  border: 1px solid #bcc8d6;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  margin-right: 4px;
+  background: linear-gradient(180deg, #f4f7fb 0%, #e6ecf4 100%);
+  color: #354a60;
+  font-size: 12px;
+}
+
+#flash-settings-root .settings-nav__item:hover {
+  background: linear-gradient(180deg, #f8fbff 0%, #edf3fa 100%);
+  color: #1a5c96;
+}
+
+#flash-settings-root .settings-nav__item.is-active {
+  background: #fff;
+  color: #1a5c96;
+  border-bottom-color: #fff;
+}
+
+/* ---------- Bottom: Content Area ---------- */
+.settings-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.settings-section {
+  display: none;
+}
+
+.settings-section.is-active {
+  display: block;
+}
+
+/* ---------- Section Card ---------- */
+.settings-card {
+  background: #fff;
+  border: 1px solid #c8d1dc;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.settings-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(247, 249, 253, 0.9);
+  border-bottom: 1px solid #e0e6ed;
+  font-size: 13px;
+  font-weight: 600;
+  color: #243447;
+}
+
+.settings-card__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-card__header i {
+  color: #4a88c0;
+  font-size: 14px;
+}
+
+.settings-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.settings-inline-btn {
+  min-width: 34px;
+  height: 24px;
+  padding: 0 12px;
+  border: 1px solid #9fb4c9;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ffffff, #edf2f7);
+  color: #28445e;
+  font-size: 12px;
+  line-height: 22px;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.settings-inline-btn:hover {
+  background: linear-gradient(180deg, #f8fbfe, #e6edf5);
+  border-color: #86a0b9;
+}
+
+.settings-inline-btn--primary {
+  background: linear-gradient(180deg, #ffffff, #edf2f7);
+  color: #28445e;
+}
+
+.settings-inline-btn[hidden] {
+  display: none;
+}
+
+.settings-card__body {
+  padding: 14px;
+}
+
+/* ---------- Form Row ---------- */
+.settings-form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #333;
+}
+
+.settings-form-row:last-child {
+  margin-bottom: 0;
+}
+
+.settings-form-label {
+  min-width: 120px;
+  font-weight: 500;
+  color: #495d74;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.settings-form-value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Radio Group ---------- */
+.settings-radio-group {
+  display: flex;
+  gap: 16px;
+}
+
+.settings-radio {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+}
+
+.settings-radio input[type="radio"] {
+  accent-color: #1a5c96;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* ---------- Subsection Title ---------- */
+.settings-sub-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a5c96;
+  padding: 8px 0 6px;
+  border-bottom: 1px dashed #d4dce6;
+  margin-bottom: 10px;
+}
+
+/* ---------- DID Table ---------- */
+.settings-table-wrap {
+  overflow-x: auto;
+}
+
+.settings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.settings-table th,
+.settings-table td {
+  padding: 7px 10px;
+  text-align: left;
+  border: 1px solid #dce2ea;
+}
+
+.settings-table th {
+  background: #f0f4f8;
+  color: #3a4f66;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.settings-table td {
+  background: #fff;
+  color: #333;
+}
+
+.settings-table td.is-center {
+  text-align: center;
+}
+
+.settings-table input[type="checkbox"] {
+  accent-color: #1a5c96;
+  cursor: pointer;
+}
+
+.settings-table__empty {
+  text-align: center;
+  color: #999;
+  padding: 20px 0;
+}
+
+/* ---------- Table Actions (Add / Delete) ---------- */
+.settings-table-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* ---------- Buttons ---------- */
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border: 1px solid #b8c4d0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fafafa, #eef1f5);
+  color: #3a4f66;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.settings-btn:hover {
+  background: linear-gradient(180deg, #f0f2f6, #e0e5eb);
+  border-color: #a0adb8;
+}
+
+.settings-btn--primary {
+  background: linear-gradient(180deg, #3d8cd4, #2a6fb0);
+  border-color: #2568a6;
+  color: #fff;
+}
+
+.settings-btn--primary:hover {
+  background: linear-gradient(180deg, #357cc0, #24619e);
+}
+
+.settings-btn--danger {
+  color: #c0392b;
+  border-color: #e0a8a2;
+}
+
+.settings-btn--danger:hover {
+  background: #fdf0ef;
+  border-color: #c0392b;
+}
+
+.settings-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-btn i {
+  font-size: 11px;
+}
+
+/* ---------- Version Info ---------- */
+.settings-version-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.settings-version-label {
+  min-width: 100px;
+  color: #495d74;
+  font-weight: 500;
+}
+
+.settings-version-val {
+  font-weight: 600;
+  color: #243447;
+}
+
+.settings-version-val--new {
+  color: #27ae60;
+}
+
+.settings-version-val--same {
+  color: #999;
+}
+
+/* ---------- Path Input ---------- */
+.settings-path-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.settings-path-input {
+  flex: 1;
+  padding: 5px 10px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  outline: none;
+}
+
+.settings-path-input:focus {
+  border-color: #1a5c96;
+  box-shadow: 0 0 0 2px rgba(26, 92, 150, 0.12);
+}
+
+.settings-path-input:read-only {
+  background: #f5f7fa;
+  color: #666;
+}
+
+/* ---------- Select ---------- */
+.settings-select {
+  padding: 5px 10px;
+  border: 1px solid #c8d1dc;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  min-width: 180px;
+}
+
+.settings-select:focus {
+  border-color: #1a5c96;
+  box-shadow: 0 0 0 2px rgba(26, 92, 150, 0.12);
+}
+
+.settings-section.is-editable:not(.is-editing) .settings-select {
+  background: #f5f7fa;
+  color: #555;
+  pointer-events: none;
+  border-color: #dde2ea;
+}
+
+/* ---------- File Label ---------- */
+.settings-file-label {
+  font-size: 12px;
+  color: #607086;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-file-label.has-file {
+  color: #1a5c96;
+  font-weight: 500;
+}
+
+/* ---------- Dual Panel (左右两栏) ---------- */
+.settings-dual-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.settings-dual-panel__col {
+  border: 1px solid #dce2ea;
+  border-radius: 4px;
+  padding: 12px 14px;
+  background: #fafbfd;
+}
+
+.settings-dual-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1a5c96;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e0e6ed;
+}
+
+.settings-dual-panel__heading input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #1a5c96;
+}
+
+.settings-dual-panel .settings-form-label {
+  min-width: 70px;
+}
+
+@media (max-width: 720px) {
+  .settings-dual-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Hidden helper ---------- */
+.settings-form-row.is-hidden {
+  display: none;
+}
+
+/* ---------- Hint / Note ---------- */
+.settings-hint {
+  font-size: 11px;
+  color: #888;
+  margin-top: 6px;
+}
+
+/* ---------- Section Toolbar (Edit Button) ---------- */
+.settings-section__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.settings-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  border: 1px solid #b8c4d0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fafafa, #eef1f5);
+  color: #3a4f66;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.settings-edit-btn:hover {
+  background: linear-gradient(180deg, #f0f2f6, #e0e5eb);
+  border-color: #a0adb8;
+}
+
+.settings-edit-btn.is-editing {
+  background: linear-gradient(180deg, #3d8cd4, #2a6fb0);
+  border-color: #2568a6;
+  color: #fff;
+}
+
+.settings-edit-btn i {
+  font-size: 12px;
+}
+
+/* ---------- Readonly Mode (default, no is-editing) ---------- */
+.settings-section.is-editable:not(.is-editing) .settings-path-input,
+.settings-section.is-editable:not(.is-editing) input[type="text"] {
+  background: #f5f7fa;
+  color: #555;
+  cursor: default;
+  border-color: #dde2ea;
+}
+
+.settings-section.is-editable:not(.is-editing) .settings-radio {
+  opacity: 0.65;
+  cursor: default;
+  pointer-events: none;
+}
+
+.settings-section.is-editable:not(.is-editing) .settings-table-actions {
+  display: none;
+}
+
+.settings-section.is-editable:not(.is-editing) [data-path-for] {
+  display: none;
+}
+
+.settings-section.is-editable:not(.is-editing) .settings-table input[type="checkbox"] {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.settings-section.is-editable:not(.is-editing) .settings-btn:not(.settings-edit-btn) {
+  display: none;
+}
+
+#obd-settings-root:not(.is-editing) .settings-path-input {
+  background: #f5f7fa;
+  color: #555;
+  cursor: default;
+  border-color: #dde2ea;
+}
+
+#obd-settings-root:not(.is-editing) .settings-select {
+  background: #f5f7fa;
+  color: #555;
+  pointer-events: none;
+  border-color: #dde2ea;
+}
+
+#obd-settings-root:not(.is-editing) .settings-btn:not(.settings-edit-btn) {
+  display: none;
+}
+
+#obd-settings-root.is-editing [data-obd-edit-toggle] {
+  display: none;
+}
+
+#obd-settings-root:not(.is-editing) #btn-save-obd,
+#obd-settings-root:not(.is-editing) #btn-cancel-obd-edit {
+  display: none;
+}
+
+[data-obd-panel="obd-address"]:not(.is-address-editing) .settings-path-input,
+[data-obd-panel="obd-address"]:not(.is-address-editing) .settings-select {
+  background: #f5f7fa;
+  color: #555;
+  border-color: #dde2ea;
+}
+
+[data-obd-panel="obd-address"]:not(.is-address-editing) .settings-radio {
+  opacity: 0.7;
+}
+
+[data-obd-panel="obd-address"]:not(.is-address-editing) #btn-save-obd-address,
+[data-obd-panel="obd-address"]:not(.is-address-editing) #btn-cancel-obd-address-edit {
+  display: none;
+}
+
+.settings-static-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.settings-static-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-static-row .settings-form-label {
+  min-width: 84px;
+  text-align: left;
+}
+
+.settings-static-field {
+  flex: 1;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid #dce2ea;
+  border-radius: 3px;
+  background: #f7f9fb;
+  color: #243447;
+  line-height: 1.5;
+}
+
+.settings-standard-pin-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.settings-standard-pin-list--ethernet {
+  grid-template-columns: 1fr;
+}
+
+.settings-standard-pin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #dce2ea;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.settings-standard-pin__index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 11px;
+  background: #e7edf4;
+  border: 1px solid #c8d1dc;
+  color: #24415d;
+  font-size: 11px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+.settings-standard-pin__name {
+  min-width: 0;
+  color: #33475c;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.settings-standard-note {
+  margin-top: 12px;
+  color: #607086;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.settings-obd-diagram-card {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
+.settings-obd-diagram-card__image {
+  display: block;
+  width: min(100%, 1180px);
+  height: auto;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .settings-nav__item {
+    padding: 7px 12px;
+    font-size: 11.5px;
+  }
+  .settings-form-label {
+    min-width: 80px;
+  }
+  .settings-standard-pin-list {
+    grid-template-columns: 1fr;
+  }
+  .settings-card__header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .settings-card__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .settings-obd-diagram-card {
+    padding-top: 4px;
+  }
+}
+
+/* ---------- Driver Update ---------- */
+.driver-update-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.driver-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid #dce2ea;
+  border-radius: 4px;
+  background: #fdfdfe;
+  transition: background 0.1s;
+}
+
+.driver-item:hover {
+  background: #f7f9fb;
+}
+
+.driver-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.driver-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #243447;
+}
+
+.driver-version {
+  font-size: 11px;
+  color: #607086;
+}

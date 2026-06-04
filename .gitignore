@@ -1,0 +1,24 @@
+# Git ignore rules for GDTTools
+
+# IDE / Editor config
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary and Scratch Directories
+scratch/
+.agents/
+.gemini/
+*.log
+tmp/
+temp/
+
+# OS Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
