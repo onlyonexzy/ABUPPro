@@ -29,7 +29,7 @@ function getArg(name, defaultVal) {
 
 const OFFLINE = args.includes('--offline');
 const INPUT = getArg('--input', 'index.html');
-const OUTPUT = getArg('--output', 'GDTTools-standalone.html');
+const OUTPUT = getArg('--output', 'release/GDTTools-standalone.html');
 
 // ── MIME 类型映射 ───────────────────────────────────────────
 const MIME_MAP = {
@@ -282,6 +282,10 @@ async function build() {
 
   // ── 输出 ───────────────────────────────────────────────────
   const outputPath = path.resolve(ROOT, OUTPUT);
+  const outputDir = path.dirname(outputPath);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
   fs.writeFileSync(outputPath, html, 'utf-8');
   const outputSize = (fs.statSync(outputPath).size / 1024).toFixed(1);
   console.log(`\n=== 打包完成 ===`);
