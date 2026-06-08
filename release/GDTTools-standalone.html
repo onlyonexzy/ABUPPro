@@ -14387,6 +14387,20 @@ select {
   border-bottom: 2px dotted #94a3b8;
 }
 
+.basic-diag-comm-section {
+  margin-bottom: 20px;
+}
+.basic-diag-comm-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f6bff;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid #e2e8f0;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+
 
 </style>
     <style>/* assets/css/quick-diag.css */
@@ -42644,90 +42658,129 @@ render();})();
 
     let fieldsHtml = "";
     if (isCanBus) {
-      if (ecu.frameFormat === undefined) ecu.frameFormat = "11bit";
-      if (ecu.stmin === undefined) ecu.stmin = "0 ms";
-      if (ecu.bs === undefined) ecu.bs = "8";
-      if (ecu.p2Client_timeout === undefined) ecu.p2Client_timeout = "150 ms";
-      if (ecu.p2StarClient_timeout === undefined) ecu.p2StarClient_timeout = "5100 ms";
+      if (ecu.iso15765_stmin === undefined) ecu.iso15765_stmin = "0";
+      if (ecu.stmin_tx === undefined) ecu.stmin_tx = "65535";
+      if (ecu.bs === undefined) ecu.bs = "0";
+      let p2Val = String(ecu.p2Client_timeout || "150").replace(/\s*ms\s*/i, "");
+      ecu.p2Client_timeout = p2Val;
+      
+      if (ecu.secAlgoDllPath === undefined) ecu.secAlgoDllPath = "";
+      if (ecu.secAlgoType === undefined) ecu.secAlgoType = "SA_TYPE_INVALID";
 
       fieldsHtml = `
-        <div class="basic-diag-comm-grid">
-          <div class="basic-diag-comm-item">
-            <span>ECU名称</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="name" value="${esc(ecu.name)}" />
+        <div class="basic-diag-comm-section">
+          <div class="basic-diag-comm-section-title">通用</div>
+          <div class="basic-diag-comm-grid">
+            <div class="basic-diag-comm-item">
+              <span>名称</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="name" value="${esc(ecu.name)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>功能地址</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="funcAddr" value="${esc(ecu.funcAddr || "")}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>ISO15765_STMIN</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="iso15765_stmin" value="${esc(ecu.iso15765_stmin)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>STMIN_TX</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="stmin_tx" value="${esc(ecu.stmin_tx)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>BS</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="bs" value="${esc(ecu.bs)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>P2Timeout</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p2Client_timeout" value="${esc(ecu.p2Client_timeout)}" />
+            </div>
           </div>
-          <div class="basic-diag-comm-item">
-            <span>帧格式</span>
-            <select class="basic-diag-comm-select" data-role="bd-comm-field" data-field="frameFormat">
-              <option value="11bit" ${ecu.frameFormat === "11bit" ? "selected" : ""}>11bit</option>
-              <option value="29bit" ${ecu.frameFormat === "29bit" ? "selected" : ""}>29bit</option>
-            </select>
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>请求地址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="requestAddr" value="${esc(ecu.requestAddr || ecu.nadAddr || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>响应地址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="responseAddr" value="${esc(ecu.responseAddr || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>功能寻址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="funcAddr" value="${esc(ecu.funcAddr || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>Stmin</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="stmin" value="${esc(ecu.stmin)}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>BS</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="bs" value="${esc(ecu.bs)}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>P2Client_timeout</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p2Client_timeout" value="${esc(ecu.p2Client_timeout)}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>P2*Client_timeout</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p2StarClient_timeout" value="${esc(ecu.p2StarClient_timeout)}" />
+        </div>
+        
+        <div class="basic-diag-comm-section" style="margin-top: 20px;">
+          <div class="basic-diag-comm-section-title">安全算法</div>
+          <div class="basic-diag-comm-grid">
+            <div class="basic-diag-comm-item" style="grid-column: span 2;">
+              <span>安全算法库路径</span>
+              <div class="basic-diag-sec-algo-file-row" style="display: flex; gap: 6px; align-items: center;">
+                <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="secAlgoDllPath" value="${esc(ecu.secAlgoDllPath)}" placeholder="选择安全算法DLL文件..." style="flex: 1;" />
+                <button class="basic-diag-sec-algo-file-btn" type="button" onclick="const input = this.previousElementSibling; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.dll'; fileInput.onchange = (e) => { if (e.target.files[0]) { input.value = 'C:\\\\DiagDLL\\\\' + e.target.files[0].name; input.dispatchEvent(new Event('input')); input.dispatchEvent(new Event('change')); } }; fileInput.click();" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #cdd5df; border-radius: 4px; background: #f8fafc; cursor: pointer;"><i class="fa-solid fa-folder-open"></i></button>
+              </div>
+            </div>
+            <div class="basic-diag-comm-item" style="grid-column: span 2;">
+              <span>安全算法类型</span>
+              <select class="basic-diag-comm-select" data-role="bd-comm-field" data-field="secAlgoType">
+                <option value="SA_TYPE_INVALID" ${ecu.secAlgoType === "SA_TYPE_INVALID" ? "selected" : ""}>SA_TYPE_INVALID</option>
+                <option value="standard" ${ecu.secAlgoType === "standard" ? "selected" : ""}>标准算法</option>
+                <option value="custom" ${ecu.secAlgoType === "custom" ? "selected" : ""}>自定义算法</option>
+                <option value="aes128" ${ecu.secAlgoType === "aes128" ? "selected" : ""}>AES-128</option>
+                <option value="seed-key" ${ecu.secAlgoType === "seed-key" ? "selected" : ""}>Seed-Key</option>
+              </select>
+            </div>
           </div>
         </div>
       `;
     } else if (isEth) {
       if (ecu.port === undefined) ecu.port = "13400";
       if (ecu.funcAddr === undefined) ecu.funcAddr = "0xE000";
-      if (ecu.p6Client_timeout === undefined) ecu.p6Client_timeout = "5000 ms";
-      if (ecu.p6StarClient_timeout === undefined) ecu.p6StarClient_timeout = "9950 ms";
+      let p6Val = String(ecu.p6Client_timeout || "5000").replace(/\s*ms\s*/i, "");
+      ecu.p6Client_timeout = p6Val;
+
+      if (ecu.secAlgoDllPath === undefined) ecu.secAlgoDllPath = "";
+      if (ecu.secAlgoType === undefined) ecu.secAlgoType = "SA_TYPE_INVALID";
 
       fieldsHtml = `
-        <div class="basic-diag-comm-grid">
-          <div class="basic-diag-comm-item">
-            <span>ECU名称</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="name" value="${esc(ecu.name)}" />
+        <div class="basic-diag-comm-section">
+          <div class="basic-diag-comm-section-title">通用</div>
+          <div class="basic-diag-comm-grid">
+            <div class="basic-diag-comm-item">
+              <span>名称</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="name" value="${esc(ecu.name)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>逻辑地址</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="logicAddr" value="${esc(ecu.logicAddr || "")}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>功能地址</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="funcAddr" value="${esc(ecu.funcAddr || "")}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>IP地址</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="ip" value="${esc(ecu.ip || "")}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>端口</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="port" value="${esc(ecu.port)}" />
+            </div>
+            <div class="basic-diag-comm-item">
+              <span>P6Timeout</span>
+              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p6Client_timeout" value="${esc(ecu.p6Client_timeout)}" />
+            </div>
           </div>
-          <div class="basic-diag-comm-item">
-            <span>逻辑地址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="logicAddr" value="${esc(ecu.logicAddr || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>功能寻址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="funcAddr" value="${esc(ecu.funcAddr || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>IP地址</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="ip" value="${esc(ecu.ip || "")}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>端口</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="port" value="${esc(ecu.port)}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>P6Client_timeout</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p6Client_timeout" value="${esc(ecu.p6Client_timeout)}" />
-          </div>
-          <div class="basic-diag-comm-item">
-            <span>P6*Client_timeout</span>
-            <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p6StarClient_timeout" value="${esc(ecu.p6StarClient_timeout)}" />
+        </div>
+        
+        <div class="basic-diag-comm-section" style="margin-top: 20px;">
+          <div class="basic-diag-comm-section-title">安全算法</div>
+          <div class="basic-diag-comm-grid">
+            <div class="basic-diag-comm-item" style="grid-column: span 2;">
+              <span>安全算法库路径</span>
+              <div class="basic-diag-sec-algo-file-row" style="display: flex; gap: 6px; align-items: center;">
+                <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="secAlgoDllPath" value="${esc(ecu.secAlgoDllPath)}" placeholder="选择安全算法DLL文件..." style="flex: 1;" />
+                <button class="basic-diag-sec-algo-file-btn" type="button" onclick="const input = this.previousElementSibling; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.dll'; fileInput.onchange = (e) => { if (e.target.files[0]) { input.value = 'C:\\\\DiagDLL\\\\' + e.target.files[0].name; input.dispatchEvent(new Event('input')); input.dispatchEvent(new Event('change')); } }; fileInput.click();" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #cdd5df; border-radius: 4px; background: #f8fafc; cursor: pointer;"><i class="fa-solid fa-folder-open"></i></button>
+              </div>
+            </div>
+            <div class="basic-diag-comm-item" style="grid-column: span 2;">
+              <span>安全算法类型</span>
+              <select class="basic-diag-comm-select" data-role="bd-comm-field" data-field="secAlgoType">
+                <option value="SA_TYPE_INVALID" ${ecu.secAlgoType === "SA_TYPE_INVALID" ? "selected" : ""}>SA_TYPE_INVALID</option>
+                <option value="standard" ${ecu.secAlgoType === "standard" ? "selected" : ""}>标准算法</option>
+                <option value="custom" ${ecu.secAlgoType === "custom" ? "selected" : ""}>自定义算法</option>
+                <option value="aes128" ${ecu.secAlgoType === "aes128" ? "selected" : ""}>AES-128</option>
+                <option value="seed-key" ${ecu.secAlgoType === "seed-key" ? "selected" : ""}>Seed-Key</option>
+              </select>
+            </div>
           </div>
         </div>
       `;

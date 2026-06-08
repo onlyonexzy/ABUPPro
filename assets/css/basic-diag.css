@@ -2055,4 +2055,18 @@
   border-bottom: 2px dotted #94a3b8;
 }
 
+.basic-diag-comm-section {
+  margin-bottom: 20px;
+}
+.basic-diag-comm-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f6bff;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid #e2e8f0;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+
 
