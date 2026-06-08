@@ -25,6 +25,33 @@
     const CUSTOM_SERVICE_IDX = -1;
 
   /* ============================
+     DID & RID 数据源定义
+     ============================ */
+  const DID_DATASOURCE = [
+    { id: "F189", name: "应用软件版本 (App Software Version)" },
+    { id: "F190", name: "车辆识别码 (VIN)" },
+    { id: "F187", name: "供应商编码 (Supplier Code)" },
+    { id: "F18A", name: "ECU零件号 (ECU Part Number)" },
+    { id: "F18B", name: "ECU硬件号 (ECU Hardware Number)" },
+    { id: "F18C", name: "ECU软件号 (ECU Software Number)" },
+    { id: "F191", name: "ECU名称 (ECU Name)" },
+    { id: "F1C0", name: "标定软件版本 (Calibration Software Version)" },
+    { id: "F1C1", name: "底层软件版本 (Boot Software Version)" },
+    { id: "F193", name: "节点地址 (Node Address)" },
+    { id: "F195", name: "系统配置 (System Configuration)" },
+    { id: "F1A0", name: "底盘号 (Chassis Number)" },
+    { id: "F1A1", name: "生产日期 (Production Date)" }
+  ];
+
+  const RID_DATASOURCE = [
+    { id: "FF01", name: "擦除内存 (Erase Memory)" },
+    { id: "FF00", name: "例程校验 (Check Routine)" },
+    { id: "FF02", name: "检查依赖关系 (Check Dependencies)" },
+    { id: "0202", name: "驱动板校验 (Driver Board Check)" },
+    { id: "0301", name: "清除存储器 (Clear Flash Memory)" }
+  ];
+
+  /* ============================
      UDS 服务定义
      ============================ */
   const UDS_SERVICES = [
@@ -93,14 +120,28 @@
       subFunctions: [
         { value: "01", label: "01 按状态掩码报告DTC数量 (reportNumberOfDTCByStatusMask)" },
         { value: "02", label: "02 按状态掩码报告DTC (reportDTCByStatusMask)" },
+        { value: "04", label: "04 按DTC编号报告快照 (reportDTCSnapshotRecordByDTCNumber)" },
+        { value: "06", label: "06 按DTC编号报告扩展数据 (reportDTCExtendedDataRecordByDTCNumber)" },
         { value: "0A", label: "0A 报告支持的DTC (reportSupportedDTC)" },
       ],
       defaultSub: "02",
       extraParam: { name: "statusMask", label: "状态掩码", default: "09" },
-      buildRequest(sub, extra) {
-        return sub === "0A" ? `19 ${sub}` : `19 ${sub} ${extra || "09"}`;
+      buildRequest(sub, extra, dids, writeDid, writeData, dtcNum, dtcRecord) {
+        if (sub === "0A") return `19 ${sub}`;
+        if (sub === "04" || sub === "06") {
+          const code = dtcNum || "C1 00 87";
+          const cleanCode = code.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+          let formattedCode = "";
+          for (let i = 0; i < cleanCode.length; i += 2) {
+            formattedCode += cleanCode.slice(i, i + 2) + " ";
+          }
+          formattedCode = formattedCode.trim() || code;
+          const rec = dtcRecord || "01";
+          return `19 ${sub} ${formattedCode} ${rec}`;
+        }
+        return `19 ${sub} ${extra || "09"}`;
       },
-      mockResponse(sub) {
+      mockResponse(sub, extra, dids, writeDid, writeData, dtcNum, dtcRecord) {
         if (sub === "01") {
           return { positive: true, raw: "59 01 09 00 05", fields: [
             ["ServiceID", "59 (positiveResponse)"],
@@ -108,6 +149,18 @@
             ["statusAvailabilityMask", "09"],
             ["DTCFormatIdentifier", "00 (ISO 14229-1)"],
             ["DTCCount", "05"],
+          ]};
+        }
+        if (sub === "04" || sub === "06") {
+          const code = dtcNum || "C1 00 87";
+          const rec = dtcRecord || "01";
+          const name = sub === "04" ? "reportDTCSnapshotRecordByDTCNumber" : "reportDTCExtendedDataRecordByDTCNumber";
+          return { positive: true, raw: `59 ${sub} ${code} ${rec} 12 56 00 00`, fields: [
+            ["ServiceID", "59 (positiveResponse)"],
+            ["subFunction", `${sub} (${name})`],
+            ["DTCAndStatusRecord", `${code} (status: 2F)`],
+            ["RecordNumber", rec],
+            ["Data", "12 56 00 00 (里程: 12560km)"]
           ]};
         }
         return { positive: true, raw: "59 02 09 U0100 87 08 B1241 00 24", fields: [
@@ -139,7 +192,12 @@
       ],
       selectedDids: ["F189"],
       buildRequest(_, __, selectedDids) {
-        return "22 " + (selectedDids || ["F189"]).map(d => `${d.slice(0, 2)} ${d.slice(2)}`).join(" ");
+        const dids = (selectedDids || ["F189"]).map(d => {
+          const clean = d.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+          if (clean.length <= 2) return clean;
+          return `${clean.slice(0, 2)} ${clean.slice(2)}`;
+        });
+        return "22 " + dids.join(" ");
       },
       mockResponse(_, __, selectedDids) {
         const did = (selectedDids || ["F189"])[0];
@@ -233,12 +291,46 @@
       defaultData: "4C 47 57 43 41 4E",
       buildRequest(_, __, ___, did, data) {
         did = did || "F190";
-        return `2E ${did.slice(0, 2)} ${did.slice(2)} ${data || "00"}`;
+        const cleanDid = did.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+        const formattedDid = cleanDid.length <= 2 ? cleanDid : `${cleanDid.slice(0, 2)} ${cleanDid.slice(2)}`;
+        return `2E ${formattedDid} ${data || "00"}`;
       },
       mockResponse() {
         return { positive: true, raw: "6E F1 90", fields: [
           ["ServiceID", "6E (positiveResponse)"],
           ["DID", "F190"],
+        ]};
+      },
+    },
+    {
+      sid: 0x2F,
+      hex: "2F",
+      name: "InputOutputControlByIdentifier",
+      label: "IO控制",
+      paramType: "didIoControl",
+      defaultDid: "F190",
+      defaultSub: "03",
+      buildRequest(sub, extra, dids, did, data) {
+        did = did || "F190";
+        sub = sub || "03";
+        const cleanDid = did.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+        const formattedDid = cleanDid.length <= 2 ? cleanDid : `${cleanDid.slice(0, 2)} ${cleanDid.slice(2)}`;
+        const stateStr = (sub === "03" && data) ? ` ${data}` : "";
+        return `2F ${formattedDid} ${sub}${stateStr}`;
+      },
+      mockResponse(sub, extra, dids, did, data) {
+        did = did || "F190";
+        sub = sub || "03";
+        const controlTypes = {
+          "00": "ReturnControlToECU",
+          "01": "ResetToDefault",
+          "02": "FreezeCurrentState",
+          "03": "ShortTermAdjustment"
+        };
+        return { positive: true, raw: `6F ${did.slice(0, 2)} ${did.slice(2)} ${sub}`, fields: [
+          ["ServiceID", "6F (positiveResponse)"],
+          ["DID", did],
+          ["ControlParameter", `${sub} (${controlTypes[sub] || "unknown"})`],
         ]};
       },
     },
@@ -256,7 +348,10 @@
       defaultSub: "01",
       extraParam: { name: "routineId", label: "例程ID", default: "FF 00" },
       buildRequest(sub, extra) {
-        return `31 ${sub} ${extra || "FF 00"}`;
+        const val = extra || "FF 00";
+        const clean = val.replace(/[^0-9a-fA-F]/g, "").toUpperCase();
+        const formatted = clean.length <= 2 ? clean : `${clean.slice(0, 2)} ${clean.slice(2)}`;
+        return `31 ${sub} ${formatted}`;
       },
       mockResponse(sub) {
         return { positive: true, raw: `71 ${sub} FF 00 00`, fields: [
@@ -540,11 +635,11 @@
           id: "can1", name: "CAN1", type: "can", busType: "CAN",
           baudrate: "500Kbps",
           children: [
-            { id: "can1-ecu1", name: "ECM", type: "ecu", requestAddr: "0618", responseAddr: "0619", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
-            { id: "can1-ecu2", name: "TCU", type: "ecu", requestAddr: "0641", responseAddr: "0642", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
-            { id: "can1-ecu3", name: "ABS", type: "ecu", requestAddr: "0760", responseAddr: "0761", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
-            { id: "can1-ecu4", name: "BCM", type: "ecu", requestAddr: "0740", responseAddr: "0748", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
-            { id: "can1-ecu5", name: "SRS", type: "ecu", requestAddr: "0750", responseAddr: "0758", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
+            { id: "can1-ecu1", name: "ECM", type: "ecu", requestAddr: "0618", responseAddr: "0619", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
+            { id: "can1-ecu2", name: "TCU", type: "ecu", requestAddr: "0641", responseAddr: "0642", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
+            { id: "can1-ecu3", name: "ABS", type: "ecu", requestAddr: "0760", responseAddr: "0761", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
+            { id: "can1-ecu4", name: "BCM", type: "ecu", requestAddr: "0740", responseAddr: "0748", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
+            { id: "can1-ecu5", name: "SRS", type: "ecu", requestAddr: "0750", responseAddr: "0758", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" },
           ],
         },
         {
@@ -567,15 +662,19 @@
      ============================ */
   const state = {
     treeCollapsed: false,
+    busConfigDialogOpen: false,
+    editingBusId: "",
+    editingBusData: null,
+    contextMenu: { open: false, type: "", busId: "", ecuId: "", x: 0, y: 0 },
     expandedBusIds: ["can1", "eth1"],
     selectedBusId: "can1",
     selectedEcuId: "can1-ecu1",
     activeTab: "service",
     commHold: {
-      active: false,
+      active: true,
       cycle: 2000,
-      type: "testerPresent",
-      data: "3E 80"
+      type: "功能寻址",
+      data: "3E80"
     },
     selectedServiceIdx: 0,
     subFunctionValues: {},
@@ -583,6 +682,10 @@
     selectedDids: { "F189": true },
     writeDid: "F190",
     writeData: "4C 47 57 43 41 4E",
+    ioDid: "F190",
+    ioState: "00",
+    dtcNumber: "C1 00 87",
+    dtcRecordNum: "01",
     hexInput: "",
     funcAddr: false,
     lastResponse: null,
@@ -615,15 +718,25 @@
     },
     pdxDtcExtraResults: {},
     pdxConfigVersionOpen: false,
+    pdxDidSearchQuery: "",
+    tempSelectedPdxDids: {},
+    pdxDtcLoading: false,
+    pdxDidLoading: false,
+    pdxUdsLoading: false,
     pdxDtcDetailsOpen: false,
     pdxSelectedDtcCode: "",
     secAlgoOpen: false,
     secAlgoPos: null,
     secAlgo: {
-      dllPath: "",
-      mask: "00 00 00 00",
+      busId: "can1",
+      ecuId: "can1-ecu1",
+      algoType: "4bytes", // "4bytes" or "16bytes"
       level: "01",
-      type: "standard",
+      levelManual: "01",
+      mask: "00 00 00 00",
+      fileSource: "ecuFile", // "ecuFile" or "localFile"
+      dllPath: "",
+      localDllPath: "",
     },
     // 指令流程
     flowSteps: [],
@@ -672,7 +785,7 @@
     if (bus.type === "lin") {
       return { id: "__tpl__", name: "ECU1", type: "ecu", nadAddr: "01" };
     }
-    return { id: "__tpl__", name: "ECU1", type: "ecu", requestAddr: "0700", responseAddr: "0708", funcAddr: "07DF", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" };
+    return { id: "__tpl__", name: "ECU1", type: "ecu", requestAddr: "0700", responseAddr: "0708", funcAddr: "0x760", p2Client_timeout: "150 ms", p2StarClient_timeout: "5100 ms" };
   }
 
   function getSelectedEcu() {
@@ -682,6 +795,40 @@
       return (bus.children || []).find(e => e.id === state.selectedEcuId) || null;
     }
     return buildTemplateEcu(bus);
+  }
+
+  function getEcuDisplayLabel(ecu, bus) {
+    const isEth = bus && (bus.type === "ethernet" || bus.id === "eth1");
+    const rawAddr = isEth ? ecu.logicAddr : (ecu.requestAddr || ecu.nadAddr);
+    if (!rawAddr) return ecu.name;
+    let addr = String(rawAddr).trim();
+    if (!addr.toLowerCase().startsWith("0x")) {
+      addr = "0x" + addr;
+    }
+    return `${ecu.name} (${addr})`;
+  }
+
+  function updateTitleBreadcrumb(ecu, bus) {
+    const win = root.closest(".workspace-window");
+    if (win) {
+      const titleEl = win.querySelector(".window-title");
+      if (titleEl) {
+        if (ecu) {
+          const busName = bus ? bus.name : "";
+          let addrPart = "";
+          if (bus && (bus.type === "ethernet" || bus.id === "eth1")) {
+            addrPart = ecu.logicAddr ? ecu.logicAddr.replace(/^0[xX]/, "") : "";
+          } else {
+            const req = (ecu.requestAddr || ecu.nadAddr || "").replace(/^0[xX]/, "");
+            const resp = (ecu.responseAddr || "").replace(/^0[xX]/, "");
+            addrPart = resp ? `${req}/${resp}` : req;
+          }
+          titleEl.innerHTML = `<i class="fa-solid fa-terminal"></i> 基础诊断 <span style="margin: 0 4px; color: #94a3b8; font-weight: normal;">&gt;</span> <span style="font-size: 11px; font-weight: normal; color: #475569; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${esc(ecu.name)} - (${esc(addrPart)}) - ${esc(busName)}</span>`;
+        } else {
+          titleEl.innerHTML = `<i class="fa-solid fa-terminal"></i> 基础诊断`;
+        }
+      }
+    }
   }
 
   function shouldShowPdxTab() {
@@ -712,7 +859,8 @@
     const dids = Object.keys(state.selectedDids).filter(k => state.selectedDids[k]);
     if (svc.paramType === "didSelect") return svc.buildRequest(sub, extra, dids);
     if (svc.paramType === "didWrite") return svc.buildRequest(sub, extra, null, state.writeDid, state.writeData);
-    return svc.buildRequest(sub, extra);
+    if (svc.paramType === "didIoControl") return svc.buildRequest(sub, extra, null, state.ioDid, state.ioState);
+    return svc.buildRequest(sub, extra, dids, state.writeDid, state.writeData, state.dtcNumber, state.dtcRecordNum);
   }
 
   /* ============================
@@ -720,16 +868,6 @@
      ============================ */
   function renderTree() {
     const buses = getBusConfig();
-    const getEcuDisplayLabel = (ecu, bus) => {
-      const isEth = bus && (bus.type === "ethernet" || bus.id === "eth1");
-      const rawAddr = isEth ? ecu.logicAddr : (ecu.requestAddr || ecu.nadAddr);
-      if (!rawAddr) return ecu.name;
-      let addr = String(rawAddr).trim();
-      if (!addr.toLowerCase().startsWith("0x")) {
-        addr = "0x" + addr;
-      }
-      return `${ecu.name} (${addr})`;
-    };
 
     return `
       <aside class="basic-diag-left">
@@ -789,6 +927,21 @@
     if (!ecu) return `<div class="basic-diag-addr-bar"><span style="color:#999;">请在左侧选择一个 ECU</span></div>`;
 
     const eth = isEthernet();
+    
+    // Format request address with 0x prefix for display
+    let reqDisplay = "";
+    if (ecu.requestAddr || ecu.nadAddr) {
+      const raw = ecu.requestAddr || ecu.nadAddr;
+      reqDisplay = String(raw).toLowerCase().startsWith("0x") ? raw : "0x" + raw;
+    }
+    
+    // Format response address with 0x prefix for display
+    let respDisplay = "";
+    if (ecu.responseAddr) {
+      const raw = ecu.responseAddr;
+      respDisplay = String(raw).toLowerCase().startsWith("0x") ? raw : "0x" + raw;
+    }
+
     return `
       <div class="basic-diag-addr-bar">
         <span class="basic-diag-addr-bar__ecu-name"><i class="fa-solid fa-microchip"></i>${esc(ecu.name)}</span>
@@ -802,25 +955,28 @@
         ${eth ? `
           <div class="basic-diag-addr-bar__group">
             <span>逻辑地址</span>
-            <input type="text" value="${esc(ecu.logicAddr || "--")}" readonly />
+            <input type="text" id="bd-addr-logic" value="${esc(ecu.logicAddr || "")}" style="font-family:Consolas,monospace;" />
           </div>
           <div class="basic-diag-addr-bar__group">
             <span>IP地址</span>
-            <input type="text" value="${esc(ecu.ip || "--")}" readonly />
+            <input type="text" id="bd-addr-ip" value="${esc(ecu.ip || "")}" style="font-family:Consolas,monospace;" />
           </div>
         ` : `
           <div class="basic-diag-addr-bar__group">
             <span>请求地址</span>
-            <input type="text" value="${esc(ecu.requestAddr || ecu.nadAddr || "--")}" readonly />
+            <input type="text" id="bd-addr-request" value="${esc(reqDisplay)}" style="font-family:Consolas,monospace;" />
           </div>
           <div class="basic-diag-addr-bar__group">
             <span>响应地址</span>
-            <input type="text" value="${esc(ecu.responseAddr || "--")}" readonly />
+            <input type="text" id="bd-addr-response" value="${esc(respDisplay)}" style="font-family:Consolas,monospace;" />
+          </div>
+          
+          <!-- 29bit ID Checkbox -->
+          <div class="basic-diag-addr-bar__group" style="flex-direction: row; align-items: center; gap: 6px; padding: 0 8px;">
+            <input type="checkbox" id="bd-comm-29bit-check" ${ecu.is29bit ? "checked" : ""} style="width: 14px; height: 14px; margin: 0; cursor: pointer;" />
+            <span style="font-size: 12px; color: #4d5f76; cursor: pointer; user-select: none;" onclick="document.getElementById('bd-comm-29bit-check').click()">29bit ID</span>
           </div>
         `}
-        <div class="basic-diag-addr-bar__group">
-          <span class="basic-diag-addr-bar__bus-tag">${esc(bus ? bus.name : "")}</span>
-        </div>
         <div class="basic-diag-addr-bar__spacer"></div>
         <button class="basic-diag-sec-algo-btn ${state.secAlgoOpen ? "is-active" : ""}" data-role="bd-toggle-sec-algo" title="安全算法">
           <i class="fa-solid fa-shield-halved"></i> 安全算法
@@ -837,6 +993,20 @@
     const posStyle = state.secAlgoPos
       ? `top:${state.secAlgoPos.top}px;right:auto;left:${state.secAlgoPos.left}px;`
       : "";
+
+    const buses = getBusConfig();
+    const selectedBus = buses.find(b => b.id === sa.busId) || buses[0];
+    const isTemplateEcuInDialog = sa.ecuId === "__tpl__";
+    
+    // Find the DLL file of the selected ECU in the dialog
+    let ecuDllName = "GWM_SA.dll";
+    if (!isTemplateEcuInDialog && selectedBus) {
+      const childEcu = (selectedBus.children || []).find(e => e.id === sa.ecuId);
+      if (childEcu && childEcu.secAlgoDllPath) {
+        ecuDllName = childEcu.secAlgoDllPath.substring(childEcu.secAlgoDllPath.lastIndexOf('\\') + 1) || "GWM_SA.dll";
+      }
+    }
+
     return `
       <div class="basic-diag-sec-algo-dialog" style="${posStyle}">
         <div class="basic-diag-sec-algo-dialog__header" data-role="bd-sec-drag-handle">
@@ -846,39 +1016,96 @@
           </button>
         </div>
         <div class="basic-diag-sec-algo-dialog__body">
-          <div class="basic-diag-sec-algo-form-row">
-            <label>DLL 文件</label>
-            <div class="basic-diag-sec-algo-file-row">
-              <input type="text" class="basic-diag-sec-algo-input" value="${esc(sa.dllPath)}" data-role="bd-sec-dll" placeholder="选择安全算法DLL文件..." readonly />
-              <button class="basic-diag-sec-algo-file-btn" data-role="bd-sec-browse"><i class="fa-solid fa-folder-open"></i></button>
+          
+          <!-- 目标 ECU -->
+          <div class="sec-algo-section">
+            <div class="sec-algo-section-title">目标 ECU</div>
+            <div class="sec-algo-row" style="margin-bottom: 8px;">
+              <span class="sec-algo-label">总线:</span>
+              <select class="sec-algo-select" id="bd-sec-bus-select">
+                ${buses.map(b => `<option value="${esc(b.id)}" ${b.id === sa.busId ? "selected" : ""}>${esc(b.name)}</option>`).join("")}
+              </select>
+            </div>
+            <div class="sec-algo-row">
+              <span class="sec-algo-label">ECU:</span>
+              <select class="sec-algo-select" id="bd-sec-ecu-select">
+                ${(selectedBus.children || []).map(e => `<option value="${esc(e.id)}" ${e.id === sa.ecuId ? "selected" : ""}>${esc(e.name)}</option>`).join("")}
+                <option value="__tpl__" ${isTemplateEcuInDialog ? "selected" : ""}>ECU1</option>
+              </select>
             </div>
           </div>
-          <div class="basic-diag-sec-algo-form-row">
-            <label>安全掩码</label>
-            <input type="text" class="basic-diag-sec-algo-input" value="${esc(sa.mask)}" data-role="bd-sec-mask" placeholder="如: 00 00 00 00" />
+
+          <!-- 算法类型 -->
+          <div class="sec-algo-section">
+            <div class="sec-algo-section-title">算法类型</div>
+            <div class="sec-algo-radio-group">
+              <label class="sec-algo-radio-label">
+                <input type="radio" name="bd-sec-algo-type" value="4bytes" ${sa.algoType === "4bytes" ? "checked" : ""} />
+                <span>4字节安全算法</span>
+              </label>
+              <label class="sec-algo-radio-label">
+                <input type="radio" name="bd-sec-algo-type" value="16bytes" ${sa.algoType === "16bytes" ? "checked" : ""} />
+                <span>16字节安全算法</span>
+              </label>
+            </div>
           </div>
-          <div class="basic-diag-sec-algo-form-row">
-            <label>算法等级</label>
-            <select class="basic-diag-sec-algo-select" data-role="bd-sec-level">
-              <option value="01" ${sa.level === "01" ? "selected" : ""}>Level 01 (0x01/0x02)</option>
-              <option value="03" ${sa.level === "03" ? "selected" : ""}>Level 03 (0x03/0x04)</option>
-              <option value="05" ${sa.level === "05" ? "selected" : ""}>Level 05 (0x05/0x06)</option>
-              <option value="09" ${sa.level === "09" ? "selected" : ""}>Level 09 (0x09/0x0A)</option>
-              <option value="11" ${sa.level === "11" ? "selected" : ""}>Level 11 (0x11/0x12)</option>
-            </select>
+
+          <!-- 算法等级 -->
+          <div class="sec-algo-section">
+            <div class="sec-algo-section-title">算法等级</div>
+            ${isTemplateEcuInDialog ? `
+              <input type="text" class="basic-diag-sec-algo-input" value="${esc(sa.levelManual || '')}" id="bd-sec-level-input" placeholder="请输入算法等级" style="height: 30px;" />
+            ` : `
+              <select class="sec-algo-select" id="bd-sec-level-select" style="width: 100%;">
+                <option value="01" ${sa.level === "01" ? "selected" : ""}>Level 01 (0x01/0x02)</option>
+                <option value="03" ${sa.level === "03" ? "selected" : ""}>Level 03 (0x03/0x04)</option>
+                <option value="05" ${sa.level === "05" ? "selected" : ""}>Level 05 (0x05/0x06)</option>
+                <option value="09" ${sa.level === "09" ? "selected" : ""}>Level 09 (0x09/0x0A)</option>
+                <option value="11" ${sa.level === "11" ? "selected" : ""}>Level 11 (0x11/0x12)</option>
+              </select>
+            `}
           </div>
-          <div class="basic-diag-sec-algo-form-row">
-            <label>算法类型</label>
-            <select class="basic-diag-sec-algo-select" data-role="bd-sec-type">
-              <option value="standard" ${sa.type === "standard" ? "selected" : ""}>标准算法</option>
-              <option value="custom" ${sa.type === "custom" ? "selected" : ""}>自定义算法</option>
-              <option value="aes128" ${sa.type === "aes128" ? "selected" : ""}>AES-128</option>
-              <option value="seed-key" ${sa.type === "seed-key" ? "selected" : ""}>Seed-Key</option>
-            </select>
+
+          <!-- 安全掩码 (选填) -->
+          <div class="sec-algo-section">
+            <div class="sec-algo-section-title">安全掩码 (选填)</div>
+            <input type="text" class="basic-diag-sec-algo-input" value="${esc(sa.mask)}" id="bd-sec-mask-input" placeholder="00 00 00 00" style="height: 30px; font-family: Consolas, monospace;" />
           </div>
+
+          <!-- 算法文件 -->
+          <div class="sec-algo-section">
+            <div class="sec-algo-section-title">算法文件</div>
+            ${sa.algoType === "16bytes" ? `
+              <div style="font-size: 12px; color: #334155; padding-left: 2px; font-weight: 500;">云端计算</div>
+            ` : `
+              <div class="sec-algo-radio-group-vertical">
+                <label class="sec-algo-radio-label-vertical">
+                  <input type="radio" name="bd-sec-file-source" value="ecuFile" ${sa.fileSource === "ecuFile" ? "checked" : ""} />
+                  <span>使用该ECU通讯设置文件 <span style="color: #64748b; font-family: Consolas, monospace; margin-left: 4px;">${esc(ecuDllName)}</span></span>
+                </label>
+                <label class="sec-algo-radio-label-vertical" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="radio" name="bd-sec-file-source" value="localFile" ${sa.fileSource === "localFile" ? "checked" : ""} />
+                    <span>重新上传本地DLL文件</span>
+                  </div>
+                  ${sa.fileSource === "localFile" ? `
+                    <button class="basic-diag-sec-algo-file-btn" id="bd-sec-upload-btn" title="上传DLL" style="width: 24px; height: 24px; font-size: 11px;">
+                      <i class="fa-solid fa-folder-open"></i>
+                    </button>
+                  ` : ""}
+                </label>
+                ${(sa.fileSource === "localFile" && sa.localDllPath) ? `
+                  <div style="font-size: 11px; color: #2563eb; font-family: Consolas, monospace; padding-left: 20px; margin-top: 2px; word-break: break-all;">
+                    已选择: ${esc(sa.localDllPath.substring(sa.localDllPath.lastIndexOf('\\') + 1))}
+                  </div>
+                ` : ""}
+              </div>
+            `}
+          </div>
+
         </div>
         <div class="basic-diag-sec-algo-dialog__footer">
-          <button class="basic-diag-sec-algo-send" data-role="bd-sec-send">
+          <button class="basic-diag-sec-algo-send" id="bd-sec-send-btn">
             <i class="fa-solid fa-paper-plane"></i> 发送安全算法
           </button>
         </div>
@@ -935,6 +1162,8 @@
     const svc = UDS_SERVICES[state.selectedServiceIdx];
     if (!svc) return '<div class="basic-diag-param"></div>';
 
+    const isTemplateEcu = state.selectedEcuId === "__tpl__";
+
     let paramHtml = "";
 
     if (svc.hex === "10") {
@@ -969,23 +1198,64 @@
       paramHtml = `
         <div class="basic-diag-param__row">
           <span class="basic-diag-param__label">子功能:</span>
-          <div class="basic-diag-radio-group">
+          <select class="basic-diag-select" data-role="bd-subfunc" style="min-width: 200px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; outline: none; background: #fff;">
             ${svc.subFunctions.map(sf => `
-              <label>
-                <input type="radio" name="bd-subfunc" value="${esc(sf.value)}" ${sf.value === curVal ? "checked" : ""} data-role="bd-subfunc" />
+              <option value="${esc(sf.value)}" ${sf.value === curVal ? "selected" : ""}>
                 ${esc(sf.label)}
-              </label>
+              </option>
             `).join("")}
-          </div>
+          </select>
         </div>`;
       if (svc.extraParam) {
         const extraVal = state.extraParamValues[state.selectedServiceIdx] || svc.extraParam.default;
-        paramHtml += `
-          <div class="basic-diag-param__row">
-            <span class="basic-diag-param__label">${esc(svc.extraParam.label)}:</span>
-            <input type="text" value="${esc(extraVal)}" data-role="bd-extra-param"
-              style="font-family:Consolas,monospace;font-size:11px;padding:2px 6px;border:1px solid #ccc;border-radius:3px;width:80px;" />
-          </div>`;
+        if (svc.hex === "31") {
+          const cleanRid = String(extraVal).replace(/\s+/g, '').toUpperCase();
+          const ridItem = RID_DATASOURCE.find(r => r.id === cleanRid);
+          const ridName = ridItem ? ridItem.name : "未知例程";
+          paramHtml += `
+            <div class="basic-diag-param__row" style="margin-top: 8px;">
+              <span class="basic-diag-param__label">例程ID:</span>
+              <div class="basic-diag-did-picker" style="display:flex; gap:8px; align-items:center;">
+                <input type="text" value="${esc(extraVal)}" data-role="bd-did-picker-val-31" style="font-family:Consolas,monospace; font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; width:100px; background:#fff; text-align:center;" />
+                <span id="bd-rid-name-label-31" style="font-size:12px; color:#555;">${esc(ridName)}</span>
+                <button type="button" class="basic-diag-btn-select-did" data-service="31" ${isTemplateEcu ? 'disabled style="background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:not-allowed; opacity:0.65;"' : 'style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;"'}>选择例程ID</button>
+              </div>
+            </div>`;
+        } else if (svc.hex === "19") {
+          if (curVal === "04" || curVal === "06") {
+            const cleanDtc = String(state.dtcNumber).replace(/\s+/g, '').toUpperCase();
+            const dtcItem = PDX_MOCK_DTCS.find(d => d.hex.replace(/\s+/g, '').toUpperCase() === cleanDtc);
+            const dtcDesc = dtcItem ? dtcItem.desc : "未知故障码";
+            paramHtml += `
+              <div class="basic-diag-param__row" style="margin-top: 8px;">
+                <span class="basic-diag-param__label">故障码:</span>
+                <div class="basic-diag-did-picker" style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" value="${esc(state.dtcNumber)}" data-role="bd-dtc-picker-val" style="font-family:Consolas,monospace; font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; width:100px; background:#fff; text-align:center;" />
+                  <span id="bd-dtc-desc-label-19" style="font-size:12px; color:#555;">${esc(dtcDesc)}</span>
+                  <button type="button" class="basic-diag-btn-select-did" data-service="19" ${isTemplateEcu ? 'disabled style="background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:not-allowed; opacity:0.65;"' : 'style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;"'}>选择故障码</button>
+                </div>
+              </div>
+              <div class="basic-diag-param__row" style="margin-top: 8px;">
+                <span class="basic-diag-param__label">编号:</span>
+                <input type="text" value="${esc(state.dtcRecordNum)}" data-role="bd-dtc-record-num"
+                  style="font-family:Consolas,monospace;font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:60px;" />
+              </div>`;
+          } else if (curVal === "01" || curVal === "02") {
+            paramHtml += `
+              <div class="basic-diag-param__row" style="margin-top: 8px;">
+                <span class="basic-diag-param__label">${esc(svc.extraParam.label)}:</span>
+                <input type="text" value="${esc(extraVal)}" data-role="bd-extra-param"
+                  style="font-family:Consolas,monospace;font-size:11px;padding:2px 6px;border:1px solid #ccc;border-radius:3px;width:80px;" />
+              </div>`;
+          }
+        } else {
+          paramHtml += `
+            <div class="basic-diag-param__row" style="margin-top: 8px;">
+              <span class="basic-diag-param__label">${esc(svc.extraParam.label)}:</span>
+              <input type="text" value="${esc(extraVal)}" data-role="bd-extra-param"
+                style="font-family:Consolas,monospace;font-size:11px;padding:2px 6px;border:1px solid #ccc;border-radius:3px;width:80px;" />
+            </div>`;
+        }
       }
     } else if (svc.paramType === "dtcGroup") {
       const groupVal = state.extraParamValues[state.selectedServiceIdx] || svc.defaultGroup;
@@ -997,28 +1267,61 @@
           <span style="font-size:10px;color:#999;">FF FF FF = 全部DTC</span>
         </div>`;
     } else if (svc.paramType === "didSelect") {
+      const activeDid = Object.keys(state.selectedDids).find(k => state.selectedDids[k]) || "F189";
+      const didItem = DID_DATASOURCE.find(d => d.id === activeDid);
+      const didName = didItem ? didItem.name : "未知识别符";
       paramHtml = `
         <div class="basic-diag-param__row">
           <span class="basic-diag-param__label">选择DID:</span>
-        </div>
-        <div class="basic-diag-did-list">
-          ${svc.didList.map(did => `
-            <label class="basic-diag-did-item">
-              <input type="checkbox" data-role="bd-did-check" data-did="${esc(did.id)}" ${state.selectedDids[did.id] ? "checked" : ""} />
-              <span class="basic-diag-did-item__id">${esc(did.id)}</span>
-              <span>${esc(did.name)}</span>
-            </label>
-          `).join("")}
+          <div class="basic-diag-did-picker" style="display:flex; gap:8px; align-items:center;">
+            <input type="text" value="${esc(activeDid)}" data-role="bd-did-picker-val-22" style="font-family:Consolas,monospace; font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; width:100px; background:#fff; text-align:center;" />
+            <span id="bd-did-name-label-22" style="font-size:12px; color:#555;">${esc(didName)}</span>
+            <button type="button" class="basic-diag-btn-select-did" data-service="22" ${isTemplateEcu ? 'disabled style="background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:not-allowed; opacity:0.65;"' : 'style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;"'}>选择DID</button>
+          </div>
         </div>`;
     } else if (svc.paramType === "didWrite") {
+      const didItem = DID_DATASOURCE.find(d => d.id === state.writeDid);
+      const didName = didItem ? didItem.name : "未知识别符";
       paramHtml = `
         <div class="basic-diag-param__row">
           <span class="basic-diag-param__label">DID:</span>
-          <input type="text" value="${esc(state.writeDid)}" data-role="bd-write-did"
-            style="font-family:Consolas,monospace;font-size:11px;padding:2px 6px;border:1px solid #ccc;border-radius:3px;width:60px;" />
-          <span class="basic-diag-param__label" style="margin-left:8px;">数据:</span>
+          <div class="basic-diag-did-picker" style="display:flex; gap:8px; align-items:center;">
+            <input type="text" value="${esc(state.writeDid)}" data-role="bd-write-did" style="font-family:Consolas,monospace; font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; width:100px; background:#fff; text-align:center;" />
+            <span id="bd-did-name-label-2E" style="font-size:12px; color:#555;">${esc(didName)}</span>
+            <button type="button" class="basic-diag-btn-select-did" data-service="2E" ${isTemplateEcu ? 'disabled style="background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:not-allowed; opacity:0.65;"' : 'style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;"'}>选择DID</button>
+          </div>
+        </div>
+        <div class="basic-diag-param__row" style="margin-top: 8px;">
+          <span class="basic-diag-param__label">数据:</span>
           <input type="text" value="${esc(state.writeData)}" data-role="bd-write-data"
-            style="font-family:Consolas,monospace;font-size:11px;padding:2px 6px;border:1px solid #ccc;border-radius:3px;flex:1;min-width:100px;" />
+            style="font-family:Consolas,monospace;font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;flex:1;min-width:100px;" />
+        </div>`;
+    } else if (svc.paramType === "didIoControl") {
+      const curIoVal = state.subFunctionValues[state.selectedServiceIdx] || "03";
+      const didItem = DID_DATASOURCE.find(d => d.id === state.ioDid);
+      const didName = didItem ? didItem.name : "未知识别符";
+      paramHtml = `
+        <div class="basic-diag-param__row">
+          <span class="basic-diag-param__label">DID:</span>
+          <div class="basic-diag-did-picker" style="display:flex; gap:8px; align-items:center;">
+            <input type="text" value="${esc(state.ioDid)}" data-role="bd-io-did" style="font-family:Consolas,monospace; font-size:12px; padding:4px 8px; border:1px solid #ccc; border-radius:4px; width:100px; background:#fff; text-align:center;" />
+            <span id="bd-did-name-label-2F" style="font-size:12px; color:#555;">${esc(didName)}</span>
+            <button type="button" class="basic-diag-btn-select-did" data-service="2F" ${isTemplateEcu ? 'disabled style="background:#94a3b8; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:not-allowed; opacity:0.65;"' : 'style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:4px 12px; font-size:12px; cursor:pointer;"'}>选择DID</button>
+          </div>
+        </div>
+        <div class="basic-diag-param__row" style="margin-top: 8px;">
+          <span class="basic-diag-param__label">控制参数:</span>
+          <select class="basic-diag-select" data-role="bd-subfunc" style="min-width: 180px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; outline: none; background: #fff;">
+            <option value="00" ${curIoVal === "00" ? "selected" : ""}>00 ReturnControlToECU (交回控制权)</option>
+            <option value="01" ${curIoVal === "01" ? "selected" : ""}>01 ResetToDefault (复位默认值)</option>
+            <option value="02" ${curIoVal === "02" ? "selected" : ""}>02 FreezeCurrentState (冻结当前状态)</option>
+            <option value="03" ${curIoVal === "03" ? "selected" : ""}>03 ShortTermAdjustment (短期调整/执行控制)</option>
+          </select>
+        </div>
+        <div class="basic-diag-param__row" id="bd-io-state-row" style="margin-top: 8px; ${curIoVal === '03' ? '' : 'display: none;'}">
+          <span class="basic-diag-param__label">控制状态:</span>
+          <input type="text" value="${esc(state.ioState)}" data-role="bd-io-state"
+            style="font-family:Consolas,monospace;font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;width:100px;" />
         </div>`;
     }
 
@@ -1156,13 +1459,18 @@
         reqContent = `<div style="display:flex;align-items:center;gap:4px;">延时 <input type="number" class="flow-delay-input" data-flow-idx="${i}" value="${step.delayMs || 100}" style="width:60px;height:20px;text-align:center;padding:2px;border:1px solid #c8d1dc;border-radius:3px;font-size:11px;" /> ms</div>`;
       }
 
+      // 成对的自动安全算法步骤隐藏第二个的删除按钮
+      const isAutoSecKey = step.autoSecGroup && steps.filter(x => x.autoSecGroup === step.autoSecGroup)[0] !== step;
+
       return `
         <tr class="${isRunning ? 'is-running' : ''} ${isSelected ? 'is-selected' : ''}" data-role="bd-flow-row" data-flow-idx="${i}" style="cursor:pointer;">
           <td><input type="checkbox" class="flow-check" data-role="bd-flow-check" data-flow-idx="${i}" ${step.enabled ? 'checked' : ''} /></td>
           <td>${i}</td>
           <td class="flow-hex">${reqContent}</td>
           <td class="flow-resp ${step.respOk === true ? 'is-ok' : step.respOk === false ? 'is-err' : ''}">${step.type === 'delay' ? (step.response || '等待执行') : esc(step.response || '')}</td>
-          <td><button class="basic-diag-flow-delete" data-role="bd-flow-delete" data-flow-idx="${i}" title="删除"><i class="fa-solid fa-xmark"></i></button></td>
+          <td>
+            ${isAutoSecKey ? '' : `<button class="basic-diag-flow-delete" data-role="bd-flow-delete" data-flow-idx="${i}" title="删除"><i class="fa-solid fa-xmark"></i></button>`}
+          </td>
         </tr>`;
     }).join('');
 
@@ -1197,6 +1505,7 @@
             <button class="basic-diag-flow-action-btn" data-role="bd-flow-left-up" title="上移步骤" style="border:none; background:transparent; font-size:18px; color:#3b82f6; cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s;"><i class="fa-solid fa-circle-arrow-up"></i></button>
             <button class="basic-diag-flow-action-btn" data-role="bd-flow-left-down" title="下移步骤" style="border:none; background:transparent; font-size:18px; color:#3b82f6; cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s;"><i class="fa-solid fa-circle-arrow-down"></i></button>
             <button class="basic-diag-flow-action-btn" data-role="bd-flow-left-delay" title="添加延时" style="border:none; background:transparent; font-size:18px; color:#f59e0b; cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s;"><i class="fa-solid fa-clock"></i></button>
+            <button class="basic-diag-flow-action-btn" data-role="bd-flow-left-auto-sec" title="自动安全算法" style="border:none; background:transparent; font-size:18px; color:#10b981; cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center; transition:transform 0.1s;"><i class="fa-solid fa-shield-halved"></i></button>
           </div>
           <!-- 右侧表格区 -->
           <div class="basic-diag-flow-body" style="flex:1; overflow-y:auto; min-height:0;">
@@ -1205,7 +1514,7 @@
                 <tr><th style="width:28px;">☑</th><th style="width:36px;">序号</th><th>请求/延时</th><th>响应</th><th style="width:30px;"></th></tr>
               </thead>
               <tbody>
-                ${rows || '<tr><td colspan="5" class="basic-diag-flow-empty">使用左侧的 <i class="fa-solid fa-plus"></i> 添加调试指令，或 <i class="fa-solid fa-clock"></i> 添加延时</td></tr>'}
+                ${rows || '<tr><td colspan="5" class="basic-diag-flow-empty">使用左侧的 <i class="fa-solid fa-plus"></i> 添加调试指令，<i class="fa-solid fa-shield-halved"></i> 自动安全算法，或 <i class="fa-solid fa-clock"></i> 添加延时</td></tr>'}
               </tbody>
             </table>
           </div>
@@ -1264,10 +1573,14 @@
      ============================ */
   function renderPdxConfigDialog() {
     if (!state.pdxConfigVersionOpen) return "";
+    const searchQuery = (state.pdxDidSearchQuery || "").toLowerCase().trim();
     const didCheckboxes = PDX_MOCK_DIDS.map(did => {
-      const checked = state.selectedPdxDids[did.id] === true;
+      const checked = (state.tempSelectedPdxDids && state.tempSelectedPdxDids[did.id] !== undefined)
+        ? state.tempSelectedPdxDids[did.id] === true
+        : state.selectedPdxDids[did.id] === true;
+      const matchesSearch = !searchQuery || did.id.toLowerCase().includes(searchQuery) || did.name.toLowerCase().includes(searchQuery);
       return `
-        <label style="display:flex; align-items:center; gap:8px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; font-size:12px; font-weight:500; color:#334155; transition:all 0.15s; user-select:none;">
+        <label class="pdx-config-item" data-did-id="${esc(did.id)}" data-did-name="${esc(did.name)}" style="display:${matchesSearch ? 'flex' : 'none'}; align-items:center; gap:8px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; font-size:12px; font-weight:500; color:#334155; transition:all 0.15s; user-select:none;">
           <input type="checkbox" class="pdx-config-checkbox" data-did-id="${esc(did.id)}" ${checked ? "checked" : ""} style="width:15px; height:15px; cursor:pointer; accent-color:#2f6bff;" />
           <span style="font-family:Consolas,monospace; font-weight:600; color:#0f172a; min-width:36px;">${esc(did.id)}</span>
           <span style="color:#64748b;">${esc(did.name)}</span>
@@ -1280,6 +1593,14 @@
           <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #f1f5f9; background:#fafafa;">
             <span style="font-size:15px; font-weight:600; color:#0f172a; display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-sliders" style="color:#2f6bff;"></i> 配置读取项 (DID 多选配置)</span>
             <button type="button" data-role="bd-pdx-close-config" style="border:none; background:transparent; font-size:18px; color:#94a3b8; cursor:pointer; width:28px; height:28px; display:flex; align-items:center; justify-content:center;">&times;</button>
+          </div>
+          <!-- 搜索框 -->
+          <div style="padding:12px 20px 8px 20px; background:#fff; border-bottom:1px solid #f1f5f9;">
+            <div style="position:relative; display:flex; align-items:center;">
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:12px; color:#94a3b8; font-size:13px;"></i>
+              <input type="text" id="pdx-did-search-input" value="${esc(state.pdxDidSearchQuery || '')}" placeholder="搜索 DID 编码或描述名称..." style="width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:8px 12px 8px 34px; font-size:12px; outline:none; transition:all 0.15s; box-sizing:border-box;" />
+              <button type="button" id="pdx-did-clear-search" style="position:absolute; right:10px; border:none; background:transparent; color:#94a3b8; cursor:pointer; font-size:14px; padding:4px; display: ${state.pdxDidSearchQuery ? 'block' : 'none'};">&times;</button>
+            </div>
           </div>
           <div style="padding:10px 20px; display:flex; gap:8px; border-bottom:1px solid #f1f5f9; background:#fff;">
             <button type="button" data-role="bd-pdx-config-all" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:4px; padding:4px 10px; font-size:11px; font-weight:600; color:#334155; cursor:pointer;">全选</button>
@@ -1508,7 +1829,7 @@
             </tr>
           `;
         }).join("")
-      : `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px;">无活动故障码，请选择掩码配置并点击“读取故障码”</td></tr>`;
+      : `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:16px;">无活动故障码，请选择掩码配置并点击“获取故障信息”</td></tr>`;
 
     // 快照信息与扩展信息详细内容渲染
     let udsDetailContentHtml = "";
@@ -1648,9 +1969,14 @@
               <div class="basic-diag-pdx-column" style="flex:${state.pdxColWidths[0]}; display:${state.pdxColWidths[0] <= 0.001 ? 'none' : 'flex'}; flex-direction:column; min-width:0; overflow:hidden; padding-right:4px;">
                 <div class="basic-diag-pdx-title" style="flex-shrink:0;">
                   <span><i class="fa-solid fa-bug" style="margin-right:4px;color:#d9534f;"></i>故障码 (DTC)</span>
-                  <button class="basic-diag-pdx-btn" data-role="bd-pdx-read-dtc"><i class="fa-solid fa-play" style="margin-right:3px;"></i>获取故障信息</button>
+                  <button class="basic-diag-pdx-btn" data-role="bd-pdx-read-dtc"><i class="fa-solid fa-play" style="margin-right:3px;"></i>故障比对</button>
                 </div>
-                <div style="flex:1; overflow-y:auto; border:1px solid #c8d1dc; border-radius:3px; background:#fff;">
+                <div style="flex:1; overflow-y:auto; border:1px solid #c8d1dc; border-radius:3px; background:#fff; position:relative;">
+                  ${state.pdxDtcLoading ? `
+                    <div class="pdx-panel-loading-overlay" style="position: absolute; inset: 0; background: rgba(255,255,255,0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 10;">
+                      <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #2f6bff;"></i>
+                      <span style="font-size: 11px; color: #64748b; font-weight: 600;">正在比对故障码...</span>
+                    </div>` : ''}
                   <table class="basic-diag-pdx-table">
                     <thead><tr><th style="width:70px;">DTC</th><th style="width:70px;">HEX码</th><th style="width:50px;">status</th><th>描述</th><th style="width:75px;">是否存在</th></tr></thead>
                     <tbody>${dtcRows}</tbody>
@@ -1669,7 +1995,12 @@
                   <span><i class="fa-solid fa-database" style="margin-right:4px;color:#337ab7;"></i>DID 列表</span>
                   <button class="basic-diag-pdx-btn" data-role="bd-pdx-read-did"><i class="fa-solid fa-play" style="margin-right:3px;"></i>获取DID信息</button>
                 </div>
-                <div style="flex:1; overflow-y:auto; border:1px solid #c8d1dc; border-radius:3px; background:#fff;">
+                <div style="flex:1; overflow-y:auto; border:1px solid #c8d1dc; border-radius:3px; background:#fff; position:relative;">
+                  ${state.pdxDidLoading ? `
+                    <div class="pdx-panel-loading-overlay" style="position: absolute; inset: 0; background: rgba(255,255,255,0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 10;">
+                      <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #2f6bff;"></i>
+                      <span style="font-size: 11px; color: #64748b; font-weight: 600;">正在读取DID信息...</span>
+                    </div>` : ''}
                   <table class="basic-diag-pdx-table">
                     <thead><tr><th style="width:55px;">DID</th><th>名称</th><th style="width:75px;">预期范围</th><th style="width:130px;">当前值</th><th style="width:75px;">校验结果</th></tr></thead>
                     <tbody>${didRows}</tbody>
@@ -1684,12 +2015,9 @@
 
               <!-- 第三列：UDS 故障诊断大面板 -->
               <div class="basic-diag-pdx-column basic-diag-pdx-column--uds" style="flex:${state.pdxColWidths[2]}; display:${state.pdxColWidths[2] <= 0.001 ? 'none' : 'flex'}; flex-direction:column; min-width:0; overflow:hidden; padding-left:4px;">
-                <div class="basic-diag-pdx-title" style="flex-shrink:0;">
-                  <span><i class="fa-solid fa-gauge" style="margin-right:4px;color:#2f6bff;"></i>UDS 故障诊断</span>
-                </div>
                 <div class="basic-diag-pdx-uds-toolbar">
                   <button class="basic-diag-pdx-uds-toolbar__btn basic-diag-pdx-uds-toolbar__btn--primary" data-role="bd-pdx-uds-read">
-                    <i class="fa-solid fa-book-open"></i>读取故障码
+                    <i class="fa-solid fa-book-open"></i>获取故障信息
                   </button>
                   <button class="basic-diag-pdx-uds-toolbar__btn basic-diag-pdx-uds-toolbar__btn--danger" data-role="bd-pdx-uds-clear">
                     <i class="fa-solid fa-trash-can"></i>清除故障码
@@ -1702,7 +2030,12 @@
                 </div>
 
                 <!-- UDS 故障码结果表格 -->
-                <div data-role="bd-pdx-uds-table-container" style="flex:${state.pdxUdsInnerSplitRatio * 2.2}; display:${state.pdxUdsInnerSplitRatio <= 0.001 ? 'none' : 'block'}; overflow-y:auto; border:1px solid #cbd5e1; border-radius:4px 4px 0 0; background:#fff; min-height:0;">
+                <div data-role="bd-pdx-uds-table-container" style="flex:${state.pdxUdsInnerSplitRatio * 2.2}; display:${state.pdxUdsInnerSplitRatio <= 0.001 ? 'none' : 'block'}; overflow-y:auto; border:1px solid #cbd5e1; border-radius:4px 4px 0 0; background:#fff; min-height:0; position:relative;">
+                  ${state.pdxUdsLoading ? `
+                    <div class="pdx-panel-loading-overlay" style="position: absolute; inset: 0; background: rgba(255,255,255,0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 10;">
+                      <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #2f6bff;"></i>
+                      <span style="font-size: 11px; color: #64748b; font-weight: 600;">正在获取故障信息...</span>
+                    </div>` : ''}
                   <table class="basic-diag-pdx-table">
                     <thead>
                       <tr>
@@ -1774,6 +2107,63 @@
   /* ============================
      Render: Comm Tab
      ============================ */
+  function renderCommSecAlgoBlock(ecu) {
+    if (ecu.algoSource === undefined) ecu.algoSource = "default";
+    if (ecu.defaultAlgoIndex === undefined) ecu.defaultAlgoIndex = "1";
+    if (ecu.secAlgoDllPath === undefined) ecu.secAlgoDllPath = "";
+    if (ecu.secAlgoType === undefined) ecu.secAlgoType = "SA_TYPE_INVALID";
+
+    const saDllPath = ecu.secAlgoDllPath || "";
+    const filename = saDllPath ? saDllPath.substring(saDllPath.lastIndexOf('\\') + 1) : "GWM_SA.dll";
+
+    return `
+      <div class="basic-diag-comm-section" style="margin-top: 20px;">
+        <div class="basic-diag-comm-section-title">安全算法</div>
+        <div style="font-size: 12px; color: #4d5f76; margin-bottom: 8px; font-weight: 500;">算法来源</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 2px;">
+          
+          <!-- 默认算法 Row -->
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <label class="sec-algo-radio-label" style="font-weight: 500; min-width: 80px;">
+              <input type="radio" name="bd-comm-algo-source" value="default" ${ecu.algoSource === "default" ? "checked" : ""} />
+              <span>默认算法</span>
+            </label>
+            
+            <select class="sec-algo-select" id="bd-comm-default-algo-select" style="max-width: 260px; height: 30px; ${ecu.algoSource === "default" ? "" : "background: #f1f5f9; cursor: not-allowed;"}" ${ecu.algoSource === "default" ? "" : "disabled"}>
+              <option value="1" ${ecu.defaultAlgoIndex === "1" ? "selected" : ""}>1: GWM_SA (通用算法)</option>
+              <option value="2" ${ecu.defaultAlgoIndex === "2" ? "selected" : ""}>2: standard (标准算法)</option>
+            </select>
+            
+            <span style="font-size: 12px; color: #64748b; font-family: Consolas, monospace; margin-left: 4px;">
+              ${ecu.defaultAlgoIndex === "2" ? "standard.dll" : "GWM_SA.dll"}
+            </span>
+          </div>
+
+          <!-- 自选算法 Row -->
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 2px;">
+            <label class="sec-algo-radio-label" style="font-weight: 500;">
+              <input type="radio" name="bd-comm-algo-source" value="custom" ${ecu.algoSource === "custom" ? "checked" : ""} />
+              <span>自选算法</span>
+            </label>
+            
+            ${ecu.algoSource === "custom" ? `
+              <div class="basic-diag-comm-grid" style="margin-top: 4px; gap: 10px; width: 100%;">
+                <div class="basic-diag-comm-item" style="grid-column: span 2;">
+                  <span>安全算法库路径</span>
+                  <div class="basic-diag-sec-algo-file-row" style="display: flex; gap: 6px; align-items: center; width: 100%;">
+                    <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="secAlgoDllPath" value="${esc(ecu.secAlgoDllPath)}" placeholder="选择安全算法DLL文件..." style="flex: 1; height: 30px;" />
+                    <button class="basic-diag-sec-algo-file-btn" id="bd-comm-browse-btn" type="button" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc; cursor: pointer;"><i class="fa-solid fa-folder-open"></i></button>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
   function renderCommTab() {
     const ecu = getSelectedEcu();
     const bus = getSelectedBus();
@@ -1790,9 +2180,6 @@
       let p2Val = String(ecu.p2Client_timeout || "150").replace(/\s*ms\s*/i, "");
       ecu.p2Client_timeout = p2Val;
       
-      if (ecu.secAlgoDllPath === undefined) ecu.secAlgoDllPath = "";
-      if (ecu.secAlgoType === undefined) ecu.secAlgoType = "SA_TYPE_INVALID";
-
       fieldsHtml = `
         <div class="basic-diag-comm-section">
           <div class="basic-diag-comm-section-title">通用</div>
@@ -1823,38 +2210,13 @@
             </div>
           </div>
         </div>
-        
-        <div class="basic-diag-comm-section" style="margin-top: 20px;">
-          <div class="basic-diag-comm-section-title">安全算法</div>
-          <div class="basic-diag-comm-grid">
-            <div class="basic-diag-comm-item" style="grid-column: span 2;">
-              <span>安全算法库路径</span>
-              <div class="basic-diag-sec-algo-file-row" style="display: flex; gap: 6px; align-items: center;">
-                <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="secAlgoDllPath" value="${esc(ecu.secAlgoDllPath)}" placeholder="选择安全算法DLL文件..." style="flex: 1;" />
-                <button class="basic-diag-sec-algo-file-btn" type="button" onclick="const input = this.previousElementSibling; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.dll'; fileInput.onchange = (e) => { if (e.target.files[0]) { input.value = 'C:\\\\DiagDLL\\\\' + e.target.files[0].name; input.dispatchEvent(new Event('input')); input.dispatchEvent(new Event('change')); } }; fileInput.click();" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #cdd5df; border-radius: 4px; background: #f8fafc; cursor: pointer;"><i class="fa-solid fa-folder-open"></i></button>
-              </div>
-            </div>
-            <div class="basic-diag-comm-item" style="grid-column: span 2;">
-              <span>安全算法类型</span>
-              <select class="basic-diag-comm-select" data-role="bd-comm-field" data-field="secAlgoType">
-                <option value="SA_TYPE_INVALID" ${ecu.secAlgoType === "SA_TYPE_INVALID" ? "selected" : ""}>SA_TYPE_INVALID</option>
-                <option value="standard" ${ecu.secAlgoType === "standard" ? "selected" : ""}>标准算法</option>
-                <option value="custom" ${ecu.secAlgoType === "custom" ? "selected" : ""}>自定义算法</option>
-                <option value="aes128" ${ecu.secAlgoType === "aes128" ? "selected" : ""}>AES-128</option>
-                <option value="seed-key" ${ecu.secAlgoType === "seed-key" ? "selected" : ""}>Seed-Key</option>
-              </select>
-            </div>
-          </div>
-        </div>
+        ${renderCommSecAlgoBlock(ecu)}
       `;
     } else if (isEth) {
       if (ecu.port === undefined) ecu.port = "13400";
       if (ecu.funcAddr === undefined) ecu.funcAddr = "0xE000";
       let p6Val = String(ecu.p6Client_timeout || "5000").replace(/\s*ms\s*/i, "");
       ecu.p6Client_timeout = p6Val;
-
-      if (ecu.secAlgoDllPath === undefined) ecu.secAlgoDllPath = "";
-      if (ecu.secAlgoType === undefined) ecu.secAlgoType = "SA_TYPE_INVALID";
 
       fieldsHtml = `
         <div class="basic-diag-comm-section">
@@ -1877,38 +2239,12 @@
               <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="ip" value="${esc(ecu.ip || "")}" />
             </div>
             <div class="basic-diag-comm-item">
-              <span>端口</span>
-              <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="port" value="${esc(ecu.port)}" />
-            </div>
-            <div class="basic-diag-comm-item">
               <span>P6Timeout</span>
               <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="p6Client_timeout" value="${esc(ecu.p6Client_timeout)}" />
             </div>
           </div>
         </div>
-        
-        <div class="basic-diag-comm-section" style="margin-top: 20px;">
-          <div class="basic-diag-comm-section-title">安全算法</div>
-          <div class="basic-diag-comm-grid">
-            <div class="basic-diag-comm-item" style="grid-column: span 2;">
-              <span>安全算法库路径</span>
-              <div class="basic-diag-sec-algo-file-row" style="display: flex; gap: 6px; align-items: center;">
-                <input class="basic-diag-comm-input" type="text" data-role="bd-comm-field" data-field="secAlgoDllPath" value="${esc(ecu.secAlgoDllPath)}" placeholder="选择安全算法DLL文件..." style="flex: 1;" />
-                <button class="basic-diag-sec-algo-file-btn" type="button" onclick="const input = this.previousElementSibling; const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.dll'; fileInput.onchange = (e) => { if (e.target.files[0]) { input.value = 'C:\\\\DiagDLL\\\\' + e.target.files[0].name; input.dispatchEvent(new Event('input')); input.dispatchEvent(new Event('change')); } }; fileInput.click();" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #cdd5df; border-radius: 4px; background: #f8fafc; cursor: pointer;"><i class="fa-solid fa-folder-open"></i></button>
-              </div>
-            </div>
-            <div class="basic-diag-comm-item" style="grid-column: span 2;">
-              <span>安全算法类型</span>
-              <select class="basic-diag-comm-select" data-role="bd-comm-field" data-field="secAlgoType">
-                <option value="SA_TYPE_INVALID" ${ecu.secAlgoType === "SA_TYPE_INVALID" ? "selected" : ""}>SA_TYPE_INVALID</option>
-                <option value="standard" ${ecu.secAlgoType === "standard" ? "selected" : ""}>标准算法</option>
-                <option value="custom" ${ecu.secAlgoType === "custom" ? "selected" : ""}>自定义算法</option>
-                <option value="aes128" ${ecu.secAlgoType === "aes128" ? "selected" : ""}>AES-128</option>
-                <option value="seed-key" ${ecu.secAlgoType === "seed-key" ? "selected" : ""}>Seed-Key</option>
-              </select>
-            </div>
-          </div>
-        </div>
+        ${renderCommSecAlgoBlock(ecu)}
       `;
     } else {
       fieldsHtml = `
@@ -2031,12 +2367,12 @@
               </tbody>
             </table>
             <div style="width:20px; text-align:center; color:#64748b;">
-              <i class="fa-solid fa-chevron-down uds-toggle-icon" style="font-size:12px; transition: transform 0.2s;"></i>
+              <i class="fa-solid fa-chevron-right uds-toggle-icon" style="font-size:12px; transition: transform 0.2s;"></i>
             </div>
           </div>
 
           <!-- 下方详细信息包装区 -->
-          <div class="uds-dtc-details-wrapper" style="display:flex; flex-direction:column; gap:6px;">
+          <div class="uds-dtc-details-wrapper" style="display:none; flex-direction:column; gap:6px;">
             <!-- 快照信息表 -->
             <div style="font-size:11px; font-weight:bold; color:#1e293b; padding:4px 8px; background:#f1f5f9; border-left:3px solid #2f6bff; margin-top:2px; margin-bottom:2px; text-align:left; border-radius:0 3px 3px 0;">快照信息</div>
             <table class="pdx-check-table" style="width:100%; border-collapse:collapse; border:1px solid #cbd5e1; border-radius:4px; overflow:hidden;">
@@ -2199,8 +2535,8 @@
                 <button class="pdx-row-btn pdx-row-btn--pass ${isPass ? "active" : ""}" data-type="dtc" data-code="${row.code}" data-value="pass" type="button">PASS</button>
                 <button class="pdx-row-btn pdx-row-btn--fail ${isFail ? "active" : ""}" data-type="dtc" data-code="${row.code}" data-value="fail" type="button">FAIL</button>
               </div>
-              <span class="print-only pdx-check-status ${isFail ? "is-fail" : "is-pass"}">
-                ${isFail ? "FAIL" : "PASS"}
+              <span class="print-only pdx-check-status ${isPass ? 'is-pass' : isFail ? 'is-fail' : 'is-pending'}">
+                ${isPass ? 'PASS' : isFail ? 'FAIL' : '未选择'}
               </span>
             </td>
             <td>
@@ -2234,8 +2570,8 @@
                 <button class="pdx-row-btn pdx-row-btn--pass ${isPass ? "active" : ""}" data-type="did" data-id="${row.id}" data-value="pass" type="button">PASS</button>
                 <button class="pdx-row-btn pdx-row-btn--fail ${isFail ? "active" : ""}" data-type="did" data-id="${row.id}" data-value="fail" type="button">FAIL</button>
               </div>
-              <span class="print-only pdx-check-status ${isFail ? "is-fail" : "is-pass"}">
-                ${isFail ? "FAIL" : "PASS"}
+              <span class="print-only pdx-check-status ${isPass ? 'is-pass' : isFail ? 'is-fail' : 'is-pending'}">
+                ${isPass ? 'PASS' : isFail ? 'FAIL' : '未选择'}
               </span>
             </td>
             <td>
@@ -2322,19 +2658,19 @@
           <!-- 报告 Tab 多页签切换 (屏幕显示，打印时自动隐藏) -->
           <div class="pdx-report-tabs no-print" style="margin: 4px 0 2px 0;">
             <button class="pdx-report-tab-btn ${state.pdxReportActiveTab === 'dtc' ? 'is-active' : ''}" data-role="bd-report-tab" data-tab="dtc" type="button">
-              <i class="fa-solid fa-bug"></i> 故障码测试 (DTC)
+              <i class="fa-solid fa-bug"></i> 故障比对
             </button>
             <button class="pdx-report-tab-btn ${state.pdxReportActiveTab === 'did' ? 'is-active' : ''}" data-role="bd-report-tab" data-tab="did" type="button">
-              <i class="fa-solid fa-database"></i> 配置项校验 (DID)
+              <i class="fa-solid fa-database"></i> DID校验
             </button>
             <button class="pdx-report-tab-btn ${state.pdxReportActiveTab === 'uds' ? 'is-active' : ''}" data-role="bd-report-tab" data-tab="uds" type="button">
-              <i class="fa-solid fa-file-invoice"></i> 快照和扩展信息
+              <i class="fa-solid fa-file-invoice"></i> 故障信息
             </button>
           </div>
 
           <!-- DTC测试结果 Section -->
           <section class="flash-config-sheet flash-config-sheet--main pdx-report-section ${state.pdxReportActiveTab === 'dtc' ? '' : 'is-hidden-tab'}" style="margin-top: 0; margin-bottom: 0;">
-            <div class="flash-config-sheet__title">DTC测试结果</div>
+            <div class="flash-config-sheet__title">故障比对结果</div>
             <div class="pdx-check-table-wrap" style="max-height: 450px !important; overflow-y: auto;">
               <table class="pdx-check-table">
                 <thead>
@@ -2361,7 +2697,7 @@
 
           <!-- DID测试结果 Section -->
           <section class="flash-config-sheet flash-config-sheet--main pdx-report-section ${state.pdxReportActiveTab === 'did' ? '' : 'is-hidden-tab'}" style="margin-top: 0; margin-bottom: 0;">
-            <div class="flash-config-sheet__title">DID测试结果</div>
+            <div class="flash-config-sheet__title">DID校验结果</div>
             <div class="pdx-check-table-wrap" style="max-height: 450px !important; overflow-y: auto;">
               <table class="pdx-check-table">
                 <thead>
@@ -2817,6 +3153,11 @@
      ============================ */
   function render() {
     const ecu = getSelectedEcu();
+    const bus = getSelectedBus();
+
+    // Update workspace window title bar breadcrumbs dynamically
+    updateTitleBreadcrumb(ecu, bus);
+
     root.innerHTML = `
       <div class="basic-diag-shell ${state.treeCollapsed ? "is-tree-collapsed" : ""}">
         ${renderTree()}
@@ -2839,9 +3180,127 @@
             </div>
           `}
         </section>
-      </div>`;
+      </div>
+      ${renderBusConfigDialog()}
+      ${renderContextMenu()}
+    `;
     bindEvents();
     syncHexInput();
+  }
+
+  function renderContextMenu() {
+    if (!state.contextMenu || !state.contextMenu.open) return "";
+    const { type, x, y } = state.contextMenu;
+    const style = `position: fixed; left: ${x}px; top: ${y}px; z-index: 9999;`;
+    
+    if (type === "bus") {
+      return `
+        <div class="basic-diag-context-menu" style="${style}">
+          <button class="basic-diag-context-menu__item" data-role="bd-context-edit-bus">
+            <i class="fa-regular fa-pen-to-square"></i>
+            <span>编辑总线</span>
+          </button>
+        </div>
+      `;
+    } else if (type === "ecu") {
+      return `
+        <div class="basic-diag-context-menu" style="${style}">
+          <button class="basic-diag-context-menu__item basic-diag-context-menu__item--danger" data-role="bd-context-delete-ecu">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>删除ECU</span>
+          </button>
+        </div>
+      `;
+    }
+    return "";
+  }
+
+  function renderBusConfigDialog() {
+    if (!state.busConfigDialogOpen) return "";
+    const bus = getBusConfig().find(b => b.id === state.editingBusId);
+    if (!bus) return "";
+    
+    const data = state.editingBusData || {};
+    const isCanFd = data.type === "canfd";
+    const isCanOrCanFd = data.type === "can" || data.type === "canfd";
+    
+    return `
+      <div class="bd-modal-overlay">
+        <div class="bd-bus-dialog-card">
+          <div class="bd-bus-dialog-header">
+            <span class="bd-bus-dialog-title">
+              <i class="fa-solid fa-gear" style="color: #2f6bff; margin-right: 6px;"></i>
+              ${esc(data.name || bus.name)} 总线参数设置
+            </span>
+            <button class="bd-bus-dialog-close-btn" data-role="bd-bus-dialog-close">&times;</button>
+          </div>
+          <div class="bd-bus-dialog-body">
+            <div class="bd-bus-grid">
+              <div class="bd-bus-field-group">
+                <label>总线类型</label>
+                <input type="text" class="bd-bus-input is-readonly" value="${esc(data.type ? data.type.toUpperCase() : bus.type.toUpperCase())}" readonly />
+              </div>
+              <div class="bd-bus-field-group">
+                <label>总线名称</label>
+                <input type="text" class="bd-bus-input" data-field="name" value="${esc(data.name)}" />
+              </div>
+              
+              <div class="bd-bus-field-group">
+                <label>标准波特率</label>
+                <select class="bd-bus-select" data-field="baudrate" ${isCanOrCanFd ? "" : "disabled"}>
+                  <option value="250Kbps" ${data.baudrate === "250Kbps" ? "selected" : ""}>250 kbps</option>
+                  <option value="500Kbps" ${data.baudrate === "500Kbps" || data.baudrate === "500K/2M" ? "selected" : ""}>500 kbps</option>
+                  <option value="1Mbps" ${data.baudrate === "1Mbps" ? "selected" : ""}>1 Mbps</option>
+                </select>
+              </div>
+              <div class="bd-bus-field-group">
+                <label>数据波特率</label>
+                <select class="bd-bus-select" data-field="dataBaudrate" ${isCanFd ? "" : "disabled"}>
+                  <option value="2 Mbps" ${data.dataBaudrate === "2 Mbps" || data.dataBaudrate === "2M" ? "selected" : ""}>2 Mbps</option>
+                  <option value="5 Mbps" ${data.dataBaudrate === "5 Mbps" || data.dataBaudrate === "5M" ? "selected" : ""}>5 Mbps</option>
+                </select>
+              </div>
+              
+              <div class="bd-bus-field-group">
+                <label>采样点</label>
+                <input type="text" class="bd-bus-input" data-field="samplePoint" value="${esc(data.samplePoint)}" />
+              </div>
+              <div class="bd-bus-field-group">
+                <label>Tq</label>
+                <input type="text" class="bd-bus-input" data-field="tq" value="${esc(data.tq)}" />
+              </div>
+              
+              <div class="bd-bus-field-group">
+                <label>时间量</label>
+                <input type="text" class="bd-bus-input" data-field="timeAmount" value="${esc(data.timeAmount)}" />
+              </div>
+              <div class="bd-bus-field-group">
+                <label>预定标器</label>
+                <input type="text" class="bd-bus-input" data-field="prescaler" value="${esc(data.prescaler)}" />
+              </div>
+              
+              <div class="bd-bus-field-group">
+                <label>位定时段1</label>
+                <input type="text" class="bd-bus-input" data-field="timeSegment1" value="${esc(data.timeSegment1)}" />
+              </div>
+              <div class="bd-bus-field-group">
+                <label>位定时段2</label>
+                <input type="text" class="bd-bus-input" data-field="timeSegment2" value="${esc(data.timeSegment2)}" />
+              </div>
+              
+              <div class="bd-bus-field-group" style="grid-column: span 2;">
+                <label>同步跳转宽度 (SJW)</label>
+                <input type="text" class="bd-bus-input" data-field="sjw" value="${esc(data.sjw)}" />
+              </div>
+            </div>
+          </div>
+          <div class="bd-bus-dialog-footer">
+            <button class="bd-bus-btn bd-bus-btn--cancel" data-role="bd-bus-dialog-close">取消</button>
+            <button class="bd-bus-btn bd-bus-btn--save" data-role="bd-bus-dialog-save">保存</button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   /* ============================
@@ -2934,14 +3393,6 @@
 
     // PDX Defined DTCs
     PDX_MOCK_DTCS.forEach(dtc => {
-      let status = "不存在";
-      if (dtc.code === "U010087" || dtc.code === "C056100") {
-        status = "存在";
-      } else if (dtc.code === "B124100" || dtc.code === "U012100" || dtc.code === "U030000") {
-        status = "不存在";
-      }
-      state.pdxDtcResults[dtc.code] = status;
-      
       // Simulating UDS sequence: For each supported DTC, read 19 04 and 19 06 with FF mask
       newTrace.push({ time: now(), dir: "Tx", data: `19 04 ${dtc.hex} FF` });
       let allSnapsData = [];
@@ -2964,7 +3415,6 @@
     // Extra DTCs: "U029300", "B10001B"
     const extraCodes = ["U029300", "B10001B"];
     extraCodes.forEach(code => {
-      state.pdxDtcExtraResults[code] = "多余";
       const hex = code === "U029300" ? "C2 93 00" : "90 00 1B";
       newTrace.push({ time: now(), dir: "Tx", data: `19 04 ${hex} FF` });
       let allSnapsData = [];
@@ -2985,12 +3435,39 @@
     });
 
     if (!quiet) {
+      state.pdxDtcLoading = true;
       state.pdxTraceLog = [...newTrace, ...state.pdxTraceLog].slice(0, 200);
       render();
+
+      setTimeout(() => {
+        PDX_MOCK_DTCS.forEach(dtc => {
+          let status = "不存在";
+          if (dtc.code === "U010087" || dtc.code === "C056100") {
+            status = "存在";
+          }
+          state.pdxDtcResults[dtc.code] = status;
+        });
+        extraCodes.forEach(code => {
+          state.pdxDtcExtraResults[code] = "多余";
+        });
+        state.pdxDtcLoading = false;
+        render();
+      }, 1200);
+    } else {
+      PDX_MOCK_DTCS.forEach(dtc => {
+        let status = "不存在";
+        if (dtc.code === "U010087" || dtc.code === "C056100") {
+          status = "存在";
+        }
+        state.pdxDtcResults[dtc.code] = status;
+      });
+      extraCodes.forEach(code => {
+        state.pdxDtcExtraResults[code] = "多余";
+      });
     }
     return newTrace;
   }
-  function pdxUdsReadDtc() {
+  function pdxUdsReadDtc(quiet = false) {
     const maskHex = state.pdxMaskInput || "08";
     const mask = parseInt(maskHex, 16) || 0;
     const newTrace = [];
@@ -3006,7 +3483,7 @@
       { code: "B10001B", hex: "90 00 1B", desc: "--", statusByte: "2C" }
     ];
     
-    // 筛选出符合掩码的 (按位与不为0)
+    // 筛选出符合掩码 of (按位与不为0)
     const matched = allCandidates.filter(d => {
       const statusVal = parseInt(d.statusByte, 16) || 0;
       return (statusVal & mask) !== 0;
@@ -3076,18 +3553,31 @@
       newTrace.push({ time: now(), dir: "Rx", data: `59 06 ${d.hex} FF ${allExtData.join(" ")}` });
     });
 
-    // 保存结果
-    state.pdxUdsDtcResults = matched;
-    // 默认选中第一个
-    if (matched.length > 0) {
-      state.pdxUdsSelectedDtcCode = matched[0].code;
+    if (!quiet) {
+      state.pdxUdsLoading = true;
+      state.pdxTraceLog = [...newTrace, ...state.pdxTraceLog].slice(0, 200);
+      render();
+
+      setTimeout(() => {
+        state.pdxUdsDtcResults = matched;
+        if (matched.length > 0) {
+          state.pdxUdsSelectedDtcCode = matched[0].code;
+        } else {
+          state.pdxUdsSelectedDtcCode = "";
+        }
+        state.pdxUdsLoading = false;
+        render();
+        if (typeof showToast === 'function') showToast(`UDS获取故障信息完成，共 ${matched.length} 个故障码`);
+      }, 1200);
     } else {
-      state.pdxUdsSelectedDtcCode = "";
+      state.pdxUdsDtcResults = matched;
+      if (matched.length > 0) {
+        state.pdxUdsSelectedDtcCode = matched[0].code;
+      } else {
+        state.pdxUdsSelectedDtcCode = "";
+      }
     }
-    
-    state.pdxTraceLog = [...newTrace, ...state.pdxTraceLog].slice(0, 200);
-    render();
-    if (typeof showToast === 'function') showToast(`UDS读取故障码完成，共 ${matched.length} 个故障码`);
+    return newTrace;
   }
 
   function pdxUdsClearDtc() {
@@ -3129,35 +3619,216 @@
       const reason = reasonCycle[index % reasonCycle.length];
       const pass = reason === "通过";
       const displayVal = reason === "负响应" ? "7F 22 31" : reason === "无响应" ? "--" : val;
-      state.pdxDidResults[did.id] = { value: displayVal, pass, validationResult: reason };
       newTrace.push({ time: now(), dir: "Tx", data: `22 ${did.id.slice(0,2)} ${did.id.slice(2)}` });
       newTrace.push({ time: now(), dir: "Rx", data: reason === "负响应" ? `7F 22 31` : reason === "无响应" ? "--" : `62 ${did.id.slice(0,2)} ${did.id.slice(2)} ${val}` });
     });
+
     if (!quiet) {
+      state.pdxDidLoading = true;
       state.pdxTraceLog = [...newTrace, ...state.pdxTraceLog].slice(0, 200);
       render();
+
+      setTimeout(() => {
+        PDX_MOCK_DIDS.forEach((did, index) => {
+          const isConfigured = state.selectedPdxDids[did.id] === true;
+          if (!isConfigured) return;
+          const val = mockVals[did.id] || "MOCK";
+          const reason = reasonCycle[index % reasonCycle.length];
+          const pass = reason === "通过";
+          const displayVal = reason === "负响应" ? "7F 22 31" : reason === "无响应" ? "--" : val;
+          state.pdxDidResults[did.id] = { value: displayVal, pass, validationResult: reason };
+        });
+        state.pdxDidLoading = false;
+        render();
+      }, 1200);
+    } else {
+      PDX_MOCK_DIDS.forEach((did, index) => {
+        const isConfigured = state.selectedPdxDids[did.id] === true;
+        if (!isConfigured) return;
+        const val = mockVals[did.id] || "MOCK";
+        const reason = reasonCycle[index % reasonCycle.length];
+        const pass = reason === "通过";
+        const displayVal = reason === "负响应" ? "7F 22 31" : reason === "无响应" ? "--" : val;
+        state.pdxDidResults[did.id] = { value: displayVal, pass, validationResult: reason };
+      });
     }
     return newTrace;
   }
 
   function pdxReadAll() {
+    state.pdxDtcLoading = true;
+    state.pdxDidLoading = true;
+    state.pdxUdsLoading = true;
+
     state.pdxDidResults = {};
     state.pdxDtcResults = {};
     state.pdxDtcExtraResults = {};
     
     const dtcTrace = pdxReadDtc(true);
     const didTrace = pdxReadDid(true);
+    const udsTrace = pdxUdsReadDtc(true);
     
-    state.pdxTraceLog = [...dtcTrace, ...didTrace, ...state.pdxTraceLog].slice(0, 200);
-    
-    // 一键读取，同时也读取底部的 UDS 故障码并格式化报文联动
-    pdxUdsReadDtc();
+    state.pdxTraceLog = [...dtcTrace, ...didTrace, ...udsTrace, ...state.pdxTraceLog].slice(0, 200);
+    render();
+
+    setTimeout(() => {
+      state.pdxDtcLoading = false;
+      state.pdxDidLoading = false;
+      state.pdxUdsLoading = false;
+      render();
+      if (typeof showToast === 'function') showToast("一键读取PDX校验数据完成！");
+    }, 1500);
   }
 
   /* ============================
      Event Binding
      ============================ */
   function bindEvents() {
+    if (!state.globalListenersBound) {
+      state.globalListenersBound = true;
+      document.addEventListener("click", (e) => {
+        if (state.contextMenu && state.contextMenu.open && !e.target.closest('.basic-diag-context-menu')) {
+          state.contextMenu.open = false;
+          render();
+        }
+      });
+      document.addEventListener("contextmenu", (e) => {
+        if (state.contextMenu && state.contextMenu.open && !e.target.closest('[data-role="bd-pick-bus"]') && !e.target.closest('[data-role="bd-pick-ecu"]')) {
+          state.contextMenu.open = false;
+          render();
+        }
+      });
+    }
+
+    // 绑定右键菜单
+    root.querySelectorAll('[data-role="bd-pick-bus"]').forEach(btn => {
+      btn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        state.contextMenu = {
+          open: true,
+          type: "bus",
+          busId: btn.dataset.busId,
+          ecuId: "",
+          x: e.clientX,
+          y: e.clientY
+        };
+        render();
+      });
+    });
+
+    root.querySelectorAll('[data-role="bd-pick-ecu"]').forEach(btn => {
+      btn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        state.contextMenu = {
+          open: true,
+          type: "ecu",
+          busId: btn.dataset.busId,
+          ecuId: btn.dataset.ecuId,
+          x: e.clientX,
+          y: e.clientY
+        };
+        render();
+      });
+    });
+
+    // 右键菜单项点击
+    root.querySelector('[data-role="bd-context-edit-bus"]')?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const busId = state.contextMenu.busId;
+      state.contextMenu.open = false;
+      const bus = getBusConfig().find(b => b.id === busId);
+      if (bus) {
+        state.editingBusId = busId;
+        state.editingBusData = {
+          name: bus.name,
+          type: bus.type,
+          baudrate: bus.baudrate || "500Kbps",
+          dataBaudrate: bus.dataBaudrate || "2 Mbps",
+          samplePoint: bus.samplePoint || "80%",
+          tq: bus.tq || "0.125 us",
+          timeAmount: bus.timeAmount || "16",
+          prescaler: bus.prescaler || "1",
+          timeSegment1: bus.timeSegment1 || "11",
+          timeSegment2: bus.timeSegment2 || "4",
+          sjw: bus.sjw || "1"
+        };
+        state.busConfigDialogOpen = true;
+      }
+      render();
+    });
+
+    root.querySelector('[data-role="bd-context-delete-ecu"]')?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const busId = state.contextMenu.busId;
+      const ecuId = state.contextMenu.ecuId;
+      state.contextMenu.open = false;
+      
+      const bus = getBusConfig().find(b => b.id === busId);
+      if (bus && bus.children) {
+        bus.children = bus.children.filter(x => x.id !== ecuId);
+        if (state.selectedEcuId === ecuId) {
+          state.selectedEcuId = "";
+        }
+      }
+      render();
+      if (typeof showToast === 'function') showToast("ECU删除成功！");
+    });
+
+    // 弹窗关闭
+    root.querySelectorAll('[data-role="bd-bus-dialog-close"]').forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.busConfigDialogOpen = false;
+        render();
+      });
+    });
+
+    // 弹窗输入双向绑定
+    root.querySelectorAll('.bd-bus-dialog-card .bd-bus-input, .bd-bus-dialog-card .bd-bus-select').forEach(el => {
+      el.addEventListener("change", () => {
+        const field = el.dataset.field;
+        if (field && state.editingBusData) {
+          state.editingBusData[field] = el.value;
+        }
+      });
+      el.addEventListener("input", () => {
+        const field = el.dataset.field;
+        if (field && state.editingBusData) {
+          state.editingBusData[field] = el.value;
+        }
+      });
+    });
+
+    // 弹窗保存
+    root.querySelector('[data-role="bd-bus-dialog-save"]')?.addEventListener("click", () => {
+      const targetBus = getBusConfig().find(b => b.id === state.editingBusId);
+      if (targetBus && state.editingBusData) {
+        targetBus.name = state.editingBusData.name;
+        if (targetBus.type === "canfd") {
+          if (state.editingBusData.baudrate === "500Kbps" && state.editingBusData.dataBaudrate === "2 Mbps") {
+            targetBus.baudrate = "500K/2M";
+          } else {
+            const std = state.editingBusData.baudrate.replace("Kbps", "K").replace("Mbps", "M");
+            const dat = state.editingBusData.dataBaudrate.replace("Kbps", "K").replace("Mbps", "M").replace(/\s+/g, "");
+            targetBus.baudrate = `${std}/${dat}`;
+          }
+        } else {
+          targetBus.baudrate = state.editingBusData.baudrate;
+        }
+        targetBus.samplePoint = state.editingBusData.samplePoint;
+        targetBus.tq = state.editingBusData.tq;
+        targetBus.timeAmount = state.editingBusData.timeAmount;
+        targetBus.prescaler = state.editingBusData.prescaler;
+        targetBus.timeSegment1 = state.editingBusData.timeSegment1;
+        targetBus.timeSegment2 = state.editingBusData.timeSegment2;
+        targetBus.sjw = state.editingBusData.sjw;
+      }
+      state.busConfigDialogOpen = false;
+      render();
+      if (typeof showToast === 'function') showToast("保存总线设置成功！");
+    });
+
     root.querySelectorAll('[data-role="bd-toggle-bus"]').forEach(btn => {
       btn.addEventListener("click", () => {
         const busId = btn.dataset.busId;
@@ -3181,6 +3852,9 @@
         if (state.activeTab === "pdx") {
           state.activeTab = "service";
         }
+        // Sync security algorithm dialog
+        state.secAlgo.busId = busId;
+        state.secAlgo.ecuId = "__tpl__";
         render();
       });
     });
@@ -3193,6 +3867,9 @@
         state.hexInput = "";
         state.pdxDidResults = {};
         state.pdxDtcResults = {};
+        // Sync security algorithm dialog
+        state.secAlgo.busId = state.selectedBusId;
+        state.secAlgo.ecuId = state.selectedEcuId;
         render();
       });
     });
@@ -3241,11 +3918,15 @@
       });
     });
 
-    root.querySelectorAll('[data-role="bd-subfunc"]').forEach(radio => {
-      radio.addEventListener("change", () => {
-        state.subFunctionValues[state.selectedServiceIdx] = radio.value;
+    root.querySelectorAll('[data-role="bd-subfunc"]').forEach(el => {
+      el.addEventListener("change", () => {
+        state.subFunctionValues[state.selectedServiceIdx] = el.value;
         state.hexInput = "";
         syncHexInput();
+        const svc = UDS_SERVICES[state.selectedServiceIdx];
+        if (svc && (svc.hex === "2F" || svc.hex === "19")) {
+          render();
+        }
       });
     });
 
@@ -3255,24 +3936,128 @@
       syncHexInput();
     });
 
-    root.querySelectorAll('[data-role="bd-did-check"]').forEach(cb => {
-      cb.addEventListener("change", () => {
-        state.selectedDids[cb.dataset.did] = cb.checked;
-        state.hexInput = "";
-        syncHexInput();
-      });
-    });
-
-    root.querySelector('[data-role="bd-write-did"]')?.addEventListener("input", (e) => {
-      state.writeDid = e.target.value;
-      state.hexInput = "";
-      syncHexInput();
-    });
-
     root.querySelector('[data-role="bd-write-data"]')?.addEventListener("input", (e) => {
       state.writeData = e.target.value;
       state.hexInput = "";
       syncHexInput();
+    });
+
+    root.querySelector('[data-role="bd-io-state"]')?.addEventListener("input", (e) => {
+      state.ioState = e.target.value;
+      state.hexInput = "";
+      syncHexInput();
+    });
+
+    root.querySelector('[data-role="bd-dtc-record-num"]')?.addEventListener("input", (e) => {
+      state.dtcRecordNum = e.target.value;
+      state.hexInput = "";
+      syncHexInput();
+    });
+
+    root.querySelector('[data-role="bd-did-picker-val-22"]')?.addEventListener("input", (e) => {
+      const val = e.target.value;
+      state.selectedDids = {};
+      state.selectedDids[val] = true;
+      state.hexInput = "";
+      syncHexInput();
+      const label = root.querySelector("#bd-did-name-label-22");
+      if (label) {
+        const clean = val.replace(/\s+/g, "").toUpperCase();
+        const found = DID_DATASOURCE.find(d => d.id === clean);
+        label.textContent = found ? found.name : "未知识别符";
+      }
+    });
+
+    root.querySelector('[data-role="bd-write-did"]')?.addEventListener("input", (e) => {
+      const val = e.target.value;
+      state.writeDid = val;
+      state.hexInput = "";
+      syncHexInput();
+      const label = root.querySelector("#bd-did-name-label-2E");
+      if (label) {
+        const clean = val.replace(/\s+/g, "").toUpperCase();
+        const found = DID_DATASOURCE.find(d => d.id === clean);
+        label.textContent = found ? found.name : "未知识别符";
+      }
+    });
+
+    root.querySelector('[data-role="bd-io-did"]')?.addEventListener("input", (e) => {
+      const val = e.target.value;
+      state.ioDid = val;
+      state.hexInput = "";
+      syncHexInput();
+      const label = root.querySelector("#bd-did-name-label-2F");
+      if (label) {
+        const clean = val.replace(/\s+/g, "").toUpperCase();
+        const found = DID_DATASOURCE.find(d => d.id === clean);
+        label.textContent = found ? found.name : "未知识别符";
+      }
+    });
+
+    root.querySelector('[data-role="bd-did-picker-val-31"]')?.addEventListener("input", (e) => {
+      const val = e.target.value;
+      state.extraParamValues[state.selectedServiceIdx] = val;
+      state.hexInput = "";
+      syncHexInput();
+      const label = root.querySelector("#bd-rid-name-label-31");
+      if (label) {
+        const clean = val.replace(/\s+/g, "").toUpperCase();
+        const found = RID_DATASOURCE.find(r => r.id === clean);
+        label.textContent = found ? found.name : "未知例程";
+      }
+    });
+
+    root.querySelector('[data-role="bd-dtc-picker-val"]')?.addEventListener("input", (e) => {
+      const val = e.target.value;
+      state.dtcNumber = val;
+      state.hexInput = "";
+      syncHexInput();
+      const label = root.querySelector("#bd-dtc-desc-label-19");
+      if (label) {
+        const clean = val.replace(/\s+/g, "").toUpperCase();
+        const found = PDX_MOCK_DTCS.find(d => d.hex.replace(/\s+/g, "").toUpperCase() === clean);
+        label.textContent = found ? found.desc : "未知故障码";
+      }
+    });
+
+    root.querySelectorAll('.basic-diag-btn-select-did').forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (state.selectedEcuId === "__tpl__") {
+          return; // Template ECU cannot select, only manual input
+        }
+        const service = btn.dataset.service; // "22", "2E", "2F", "31", "19"
+        let curVal = "";
+        if (service === "22") {
+          curVal = Object.keys(state.selectedDids).find(k => state.selectedDids[k]) || "F189";
+        } else if (service === "2E") {
+          curVal = state.writeDid;
+        } else if (service === "2F") {
+          curVal = state.ioDid;
+        } else if (service === "31") {
+          curVal = state.extraParamValues[state.selectedServiceIdx] || "FF 00";
+        } else if (service === "19") {
+          curVal = state.dtcNumber;
+        }
+        
+        showDidSelectModal(service, curVal, (newVal) => {
+          if (service === "22") {
+            state.selectedDids = {};
+            state.selectedDids[newVal] = true;
+          } else if (service === "2E") {
+            state.writeDid = newVal;
+          } else if (service === "2F") {
+            state.ioDid = newVal;
+          } else if (service === "31") {
+            const formatted = newVal.length === 4 ? `${newVal.slice(0, 2)} ${newVal.slice(2)}` : newVal;
+            state.extraParamValues[state.selectedServiceIdx] = formatted;
+          } else if (service === "19") {
+            state.dtcNumber = newVal;
+          }
+          state.hexInput = "";
+          syncHexInput();
+          render();
+        });
+      });
     });
 
     root.querySelector('[data-role="bd-hex-input"]')?.addEventListener("input", (e) => {
@@ -3325,6 +4110,8 @@
     root.querySelector('[data-role="bd-pdx-read-all"]')?.addEventListener("click", pdxReadAll);
     root.querySelector('[data-role="bd-pdx-config-version"]')?.addEventListener("click", () => {
       state.pdxConfigVersionOpen = true;
+      state.pdxDidSearchQuery = "";
+      state.tempSelectedPdxDids = { ...state.selectedPdxDids };
       render();
     });
     root.querySelectorAll('[data-role="bd-pdx-close-config"]').forEach(el => {
@@ -3334,24 +4121,34 @@
       });
     });
     root.querySelector('[data-role="bd-pdx-config-all"]')?.addEventListener("click", () => {
-      root.querySelectorAll('.pdx-config-checkbox').forEach(cb => cb.checked = true);
-    });
-    root.querySelector('[data-role="bd-pdx-config-none"]')?.addEventListener("click", () => {
-      root.querySelectorAll('.pdx-config-checkbox').forEach(cb => cb.checked = false);
-    });
-    root.querySelector('[data-role="bd-pdx-config-invert"]')?.addEventListener("click", () => {
-      root.querySelectorAll('.pdx-config-checkbox').forEach(cb => cb.checked = !cb.checked);
-    });
-    root.querySelector('[data-role="bd-pdx-save-config"]')?.addEventListener("click", () => {
-      PDX_MOCK_DIDS.forEach(did => {
-        state.selectedPdxDids[did.id] = false;
-      });
       root.querySelectorAll('.pdx-config-checkbox').forEach(cb => {
-        const id = cb.dataset.didId;
-        if (cb.checked) {
-          state.selectedPdxDids[id] = true;
+        const item = cb.closest('.pdx-config-item');
+        if (item && item.style.display !== 'none') {
+          cb.checked = true;
+          state.tempSelectedPdxDids[cb.dataset.didId] = true;
         }
       });
+    });
+    root.querySelector('[data-role="bd-pdx-config-none"]')?.addEventListener("click", () => {
+      root.querySelectorAll('.pdx-config-checkbox').forEach(cb => {
+        const item = cb.closest('.pdx-config-item');
+        if (item && item.style.display !== 'none') {
+          cb.checked = false;
+          state.tempSelectedPdxDids[cb.dataset.didId] = false;
+        }
+      });
+    });
+    root.querySelector('[data-role="bd-pdx-config-invert"]')?.addEventListener("click", () => {
+      root.querySelectorAll('.pdx-config-checkbox').forEach(cb => {
+        const item = cb.closest('.pdx-config-item');
+        if (item && item.style.display !== 'none') {
+          cb.checked = !cb.checked;
+          state.tempSelectedPdxDids[cb.dataset.didId] = cb.checked;
+        }
+      });
+    });
+    root.querySelector('[data-role="bd-pdx-save-config"]')?.addEventListener("click", () => {
+      state.selectedPdxDids = { ...state.tempSelectedPdxDids };
       state.pdxConfigVersionOpen = false;
       render();
       showToast("保存配置读取项成功！");
@@ -3388,7 +4185,7 @@
 
     // UDS 读取故障码
     root.querySelector('[data-role="bd-pdx-uds-read"]')?.addEventListener("click", () => {
-      pdxUdsReadDtc();
+      pdxUdsReadDtc(false);
     });
 
     // UDS 清除故障码
@@ -3728,15 +4525,57 @@
       });
     });
 
+    // Checkbox changes immediately sync to temp state
+    root.querySelectorAll('.pdx-config-checkbox').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const id = e.target.dataset.didId;
+        state.tempSelectedPdxDids[id] = e.target.checked;
+      });
+    });
+
+    // Search input handlers
+    const searchInp = root.querySelector('#pdx-did-search-input');
+    if (searchInp) {
+      searchInp.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        state.pdxDidSearchQuery = e.target.value;
+        root.querySelectorAll('.pdx-config-item').forEach(item => {
+          const id = item.dataset.didId.toLowerCase();
+          const name = item.dataset.didName.toLowerCase();
+          if (id.includes(query) || name.includes(query)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+        const clearBtn = root.querySelector('#pdx-did-clear-search');
+        if (clearBtn) {
+          clearBtn.style.display = e.target.value ? 'block' : 'none';
+        }
+      });
+    }
+    root.querySelector('#pdx-did-clear-search')?.addEventListener('click', () => {
+      state.pdxDidSearchQuery = "";
+      render();
+    });
+
     root.querySelectorAll('.pdx-row-btn').forEach(btn => {
       btn.addEventListener("click", () => {
         const type = btn.dataset.type;
         const id = btn.dataset.id || btn.dataset.code;
         const val = btn.dataset.value;
         if (type === "dtc") {
-          state.pdxDtcManualOverrides[id] = val;
+          if (state.pdxDtcManualOverrides[id] === val) {
+            delete state.pdxDtcManualOverrides[id];
+          } else {
+            state.pdxDtcManualOverrides[id] = val;
+          }
         } else {
-          state.pdxDidManualOverrides[id] = val;
+          if (state.pdxDidManualOverrides[id] === val) {
+            delete state.pdxDidManualOverrides[id];
+          } else {
+            state.pdxDidManualOverrides[id] = val;
+          }
         }
         render();
       });
@@ -3913,40 +4752,112 @@
 
     root.querySelector('[data-role="bd-toggle-sec-algo"]')?.addEventListener("click", () => {
       state.secAlgoOpen = !state.secAlgoOpen;
+      if (state.secAlgoOpen) {
+        state.secAlgo.busId = state.selectedBusId || "can1";
+        state.secAlgo.ecuId = state.selectedEcuId || "__tpl__";
+      }
       render();
     });
     root.querySelector('[data-role="bd-close-sec-algo"]')?.addEventListener("click", () => {
       state.secAlgoOpen = false;
       render();
     });
-    root.querySelector('[data-role="bd-sec-mask"]')?.addEventListener("input", (e) => {
-      state.secAlgo.mask = e.target.value;
-    });
-    root.querySelector('[data-role="bd-sec-level"]')?.addEventListener("change", (e) => {
-      state.secAlgo.level = e.target.value;
-    });
-    root.querySelector('[data-role="bd-sec-type"]')?.addEventListener("change", (e) => {
-      state.secAlgo.type = e.target.value;
-    });
-    root.querySelector('[data-role="bd-sec-browse"]')?.addEventListener("click", () => {
-      state.secAlgo.dllPath = "C:\\DiagDLL\\SecurityAccess_v2.dll";
+
+    // Dropdown selectors for Bus and ECU
+    root.querySelector('#bd-sec-bus-select')?.addEventListener("change", (e) => {
+      state.secAlgo.busId = e.target.value;
+      const bus = getBusConfig().find(b => b.id === e.target.value);
+      if (bus && bus.children && bus.children.length > 0) {
+        state.secAlgo.ecuId = bus.children[0].id;
+      } else {
+        state.secAlgo.ecuId = "__tpl__";
+      }
       render();
     });
-    root.querySelector('[data-role="bd-sec-send"]')?.addEventListener("click", () => {
+    root.querySelector('#bd-sec-ecu-select')?.addEventListener("change", (e) => {
+      state.secAlgo.ecuId = e.target.value;
+      render();
+    });
+
+    // Algorithm Type radios
+    root.querySelectorAll('input[name="bd-sec-algo-type"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        state.secAlgo.algoType = e.target.value;
+        render();
+      });
+    });
+
+    // Algorithm Level
+    root.querySelector('#bd-sec-level-select')?.addEventListener("change", (e) => {
+      state.secAlgo.level = e.target.value;
+    });
+    root.querySelector('#bd-sec-level-input')?.addEventListener("input", (e) => {
+      state.secAlgo.levelManual = e.target.value;
+    });
+
+    // Mask input
+    root.querySelector('#bd-sec-mask-input')?.addEventListener("input", (e) => {
+      state.secAlgo.mask = e.target.value;
+    });
+
+    // Algorithm File source radios
+    root.querySelectorAll('input[name="bd-sec-file-source"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        state.secAlgo.fileSource = e.target.value;
+        render();
+      });
+    });
+
+    // Upload DLL file
+    root.querySelector('#bd-sec-upload-btn')?.addEventListener("click", () => {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.dll';
+      fileInput.onchange = (e) => {
+        if (e.target.files[0]) {
+          state.secAlgo.localDllPath = 'C:\\DiagDLL\\' + e.target.files[0].name;
+          render();
+        }
+      };
+      fileInput.click();
+    });
+
+    // Send Security Algorithm
+    root.querySelector('#bd-sec-send-btn')?.addEventListener("click", () => {
       const sa = state.secAlgo;
-      const seedReq = `27 ${sa.level}`;
+      const isTemplate = sa.ecuId === "__tpl__";
+      const rawLevel = isTemplate ? (sa.levelManual || "01") : (sa.level || "01");
+      const cleanLevel = rawLevel.replace(/[^0-9a-fA-F]/g, "").toUpperCase().padStart(2, "0").slice(-2);
+      
+      const seedReq = `27 ${cleanLevel}`;
       state.logSeq += 1;
       state.logEntries.push({ seq: state.logSeq, time: now(), dir: "Tx", data: seedReq });
       const seedHex = "3A 7B 2C 1D";
       state.logSeq += 1;
-      state.logEntries.push({ seq: state.logSeq, time: now(), dir: "Rx", data: `67 ${sa.level} ${seedHex}` });
+      state.logEntries.push({ seq: state.logSeq, time: now(), dir: "Rx", data: `67 ${cleanLevel} ${seedHex}` });
 
-      const keyLevel = String(parseInt(sa.level, 16) + 1).toString(16).toUpperCase().padStart(2, "0");
+      const keyLevelNum = parseInt(cleanLevel, 16) + 1;
+      const keyLevel = keyLevelNum.toString(16).toUpperCase().padStart(2, "0");
       const keyReq = `27 ${keyLevel} A1 B2 C3 D4`;
       state.logSeq += 1;
       state.logEntries.push({ seq: state.logSeq, time: now(), dir: "Tx", data: keyReq });
       state.logSeq += 1;
       state.logEntries.push({ seq: state.logSeq, time: now(), dir: "Rx", data: `67 ${keyLevel}` });
+
+      const buses = getBusConfig();
+      const selectedBus = buses.find(b => b.id === sa.busId);
+      const childEcu = selectedBus ? (selectedBus.children || []).find(e => e.id === sa.ecuId) : null;
+
+      let dllName = "(云端计算)";
+      if (sa.algoType === "4bytes") {
+        if (sa.fileSource === "ecuFile") {
+          dllName = childEcu && childEcu.secAlgoDllPath ? childEcu.secAlgoDllPath.substring(childEcu.secAlgoDllPath.lastIndexOf('\\') + 1) : "GWM_SA.dll";
+        } else {
+          dllName = sa.localDllPath ? sa.localDllPath.substring(sa.localDllPath.lastIndexOf('\\') + 1) : "(未选择本地文件)";
+        }
+      }
+
+      const algoTypeName = sa.algoType === "4bytes" ? "4字节安全算法" : "16字节安全算法";
 
       state.lastResponse = {
         positive: true,
@@ -3954,10 +4865,10 @@
         fields: [
           ["ServiceID", "67 (positiveResponse)"],
           ["accessType", `${keyLevel} (sendKey)`],
-          ["Algorithm", sa.type === "standard" ? "标准算法" : sa.type === "aes128" ? "AES-128" : sa.type === "seed-key" ? "Seed-Key" : "自定义算法"],
-          ["Level", `Level ${sa.level}`],
-          ["Mask", sa.mask],
-          ["DLL", sa.dllPath || "(未选择)"],
+          ["Algorithm", algoTypeName],
+          ["Level", `Level ${cleanLevel}`],
+          ["Mask", sa.mask || "(无)"],
+          ["DLL", dllName],
           ["Result", "安全访问已解锁"],
         ],
       };
@@ -4012,11 +4923,139 @@
             const addrBarNameEl = root.querySelector(`.basic-diag-addr-bar__ecu-name`);
             if (addrBarNameEl) addrBarNameEl.innerHTML = `<i class="fa-solid fa-microchip"></i>${esc(input.value)}`;
           }
+          if (field === "logicAddr") {
+            const topInput = root.querySelector('#bd-addr-logic');
+            if (topInput) topInput.value = input.value;
+            const bus = getSelectedBus();
+            const activeEcuNode = root.querySelector(`[data-role="bd-pick-ecu"][data-ecu-id="${ecu.id}"] span`);
+            if (activeEcuNode) activeEcuNode.textContent = getEcuDisplayLabel(ecu, bus);
+            updateTitleBreadcrumb(ecu, bus);
+          }
+          if (field === "ip") {
+            const topInput = root.querySelector('#bd-addr-ip');
+            if (topInput) topInput.value = input.value;
+          }
         }
       });
       input.addEventListener("change", () => {
         render();
       });
+    });
+
+    // -- Top-bar Address fields editing listeners --
+    root.querySelector('#bd-addr-request')?.addEventListener("input", (e) => {
+      const ecu = getSelectedEcu();
+      const bus = getSelectedBus();
+      if (ecu) {
+        const val = e.target.value;
+        if (ecu.requestAddr !== undefined) {
+          ecu.requestAddr = val.replace(/^0[xX]/i, '');
+        } else if (ecu.nadAddr !== undefined) {
+          ecu.nadAddr = val.replace(/^0[xX]/i, '');
+        }
+        
+        // Dynamically update UI text labels to avoid losing typing focus
+        const activeEcuNode = root.querySelector(`[data-role="bd-pick-ecu"][data-ecu-id="${ecu.id}"] span`);
+        if (activeEcuNode) {
+          activeEcuNode.textContent = getEcuDisplayLabel(ecu, bus);
+        }
+        updateTitleBreadcrumb(ecu, bus);
+      }
+    });
+    root.querySelector('#bd-addr-request')?.addEventListener("change", () => {
+      render();
+    });
+
+    root.querySelector('#bd-addr-response')?.addEventListener("input", (e) => {
+      const ecu = getSelectedEcu();
+      const bus = getSelectedBus();
+      if (ecu) {
+        ecu.responseAddr = e.target.value.replace(/^0[xX]/i, '');
+        updateTitleBreadcrumb(ecu, bus);
+      }
+    });
+    root.querySelector('#bd-addr-response')?.addEventListener("change", () => {
+      render();
+    });
+
+    root.querySelector('#bd-addr-logic')?.addEventListener("input", (e) => {
+      const ecu = getSelectedEcu();
+      const bus = getSelectedBus();
+      if (ecu) {
+        ecu.logicAddr = e.target.value;
+        
+        // Dynamically update UI text labels to avoid losing typing focus
+        const activeEcuNode = root.querySelector(`[data-role="bd-pick-ecu"][data-ecu-id="${ecu.id}"] span`);
+        if (activeEcuNode) {
+          activeEcuNode.textContent = getEcuDisplayLabel(ecu, bus);
+        }
+        updateTitleBreadcrumb(ecu, bus);
+        
+        // Symmetrically update inputs in Comm Tab
+        const tabInput = root.querySelector(`.basic-diag-comm-card input[data-role="bd-comm-field"][data-field="logicAddr"]`);
+        if (tabInput) tabInput.value = e.target.value;
+      }
+    });
+    root.querySelector('#bd-addr-logic')?.addEventListener("change", () => {
+      render();
+    });
+
+    root.querySelector('#bd-addr-ip')?.addEventListener("input", (e) => {
+      const ecu = getSelectedEcu();
+      if (ecu) {
+        ecu.ip = e.target.value;
+        
+        // Symmetrically update inputs in Comm Tab
+        const tabInput = root.querySelector(`.basic-diag-comm-card input[data-role="bd-comm-field"][data-field="ip"]`);
+        if (tabInput) tabInput.value = e.target.value;
+      }
+    });
+    root.querySelector('#bd-addr-ip')?.addEventListener("change", () => {
+      render();
+    });
+
+    root.querySelector('#bd-comm-29bit-check')?.addEventListener("change", (e) => {
+      const ecu = getSelectedEcu();
+      if (ecu) {
+        ecu.is29bit = e.target.checked;
+        render();
+      }
+    });
+
+    // -- Bind Comm Security Algorithm source radios --
+    root.querySelectorAll('input[name="bd-comm-algo-source"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        const ecu = getSelectedEcu();
+        if (ecu) {
+          ecu.algoSource = e.target.value;
+          render();
+        }
+      });
+    });
+
+    // -- Bind Comm Security Algorithm default select --
+    root.querySelector('#bd-comm-default-algo-select')?.addEventListener("change", (e) => {
+      const ecu = getSelectedEcu();
+      if (ecu) {
+        ecu.defaultAlgoIndex = e.target.value;
+        render();
+      }
+    });
+
+    // -- Bind Comm Security Algorithm browse button --
+    root.querySelector('#bd-comm-browse-btn')?.addEventListener("click", () => {
+      const ecu = getSelectedEcu();
+      if (!ecu) return;
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.dll';
+      fileInput.onchange = (e) => {
+        if (e.target.files[0]) {
+          ecu.secAlgoDllPath = 'C:\\DiagDLL\\' + e.target.files[0].name;
+          render();
+        }
+      };
+      fileInput.click();
     });
 
     // -- Bind Keep Alive / Comm Hold check listener --
@@ -4128,6 +5167,31 @@
       if (typeof showToast === 'function') showToast('已添加延时步骤');
     });
 
+    // -- Flow: Add auto security algorithm steps --
+    root.querySelector('[data-role="bd-flow-left-auto-sec"]')?.addEventListener('click', () => {
+      const sa = state.secAlgo;
+      const isTemplate = sa.ecuId === "__tpl__";
+      const rawLevel = isTemplate ? (sa.levelManual || "01") : (sa.level || "01");
+      const cleanLevel = rawLevel.replace(/[^0-9a-fA-F]/g, "").toUpperCase().padStart(2, "0").slice(-2);
+      
+      const keyLevelNum = parseInt(cleanLevel, 16) + 1;
+      const keyLevel = keyLevelNum.toString(16).toUpperCase().padStart(2, "0");
+
+      const seedHex = `27 ${cleanLevel}`;
+      const keyHex = `27 ${keyLevel}`;
+
+      const groupId = 'autosec-' + Date.now();
+      state.flowSteps.push({ type: 'cmd', hex: seedHex, enabled: true, response: '', respOk: null, autoSecGroup: groupId });
+      state.flowSteps.push({ type: 'cmd', hex: keyHex, enabled: true, response: '', respOk: null, autoSecGroup: groupId });
+
+      state.flowSelectedIdx = state.flowSteps.length - 1;
+      render();
+
+      if (typeof showToast === 'function') {
+        showToast(`已添加自动安全算法步骤: ${seedHex}, ${keyHex}`);
+      }
+    });
+
     // -- Flow: Check toggle --
     root.querySelectorAll('[data-role="bd-flow-check"]').forEach(cb => {
       cb.addEventListener('change', (e) => {
@@ -4142,7 +5206,12 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const idx = parseInt(btn.dataset.flowIdx, 10);
-        state.flowSteps.splice(idx, 1);
+        const targetStep = state.flowSteps[idx];
+        if (targetStep && targetStep.autoSecGroup) {
+          state.flowSteps = state.flowSteps.filter(x => x.autoSecGroup !== targetStep.autoSecGroup);
+        } else {
+          state.flowSteps.splice(idx, 1);
+        }
         if (state.flowSelectedIdx === idx) state.flowSelectedIdx = -1;
         render();
       });
@@ -4459,6 +5528,126 @@
     document.getElementById("modal-comm-hold-settings")?.classList.add("is-hidden");
   });
 
-    render();
+  function showDidSelectModal(service, currentVal, onSelect) {
+    const is31 = service === "31";
+    const is19 = service === "19";
+    const title = is31 ? "选择例程标识符 (RID)" : is19 ? "选择DTC故障码" : "选择数据标识符 (DID)";
+    const placeholder = is31 ? "搜索例程ID或名称..." : is19 ? "搜索故障码或名称..." : "搜索DID或名称...";
+    
+    let dataSource = DID_DATASOURCE;
+    if (is31) {
+      dataSource = RID_DATASOURCE;
+    } else if (is19) {
+      dataSource = PDX_MOCK_DTCS.map(d => ({ id: d.hex, name: d.desc }));
+    }
+    
+    const cleanCurVal = String(currentVal).replace(/\s+/g, '').toUpperCase();
+
+    const modalHtml = `
+      <div class="bus-settings-overlay" id="bd-did-select-modal">
+        <div class="bus-settings-card" style="width: 460px; max-height: 80vh;">
+          <div class="bus-settings-header">
+            <h3 style="margin:0; font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; color:var(--text);">
+              <i class="fa-solid fa-search" style="color:#2f6bff;"></i>
+              ${title}
+            </h3>
+            <button type="button" id="bd-did-modal-close-btn" style="background:transparent; border:none; color:#94a3b8; cursor:pointer; font-size:16px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="bus-settings-body" style="padding:16px; display:flex; flex-direction:column; gap:12px; overflow:hidden; flex:1;">
+            <div style="position:relative;">
+              <input type="text" id="bd-did-search-input" placeholder="${placeholder}" autofocus
+                style="width:100%; box-sizing:border-box; padding:8px 32px 8px 12px; border:1px solid var(--border); border-radius:6px; font-size:12px; outline:none; background:var(--surface); color:var(--text);" />
+              <i class="fa-solid fa-magnifying-glass" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+            </div>
+            
+            <div id="bd-did-list-container" style="flex:1; overflow-y:auto; border:1px solid var(--border); border-radius:6px; background:var(--surface-2); max-height: 300px;">
+              <!-- 列表项 -->
+            </div>
+          </div>
+          <div class="bus-settings-footer" style="padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; background:var(--surface-2);">
+            <button type="button" id="bd-did-modal-ok-btn" style="background:#2f6bff; color:#fff; border:none; border-radius:4px; padding:6px 16px; font-size:12px; font-weight:600; cursor:pointer; box-shadow:0 2px 4px rgba(47,107,255,0.2);">确定</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const div = document.createElement("div");
+    div.innerHTML = modalHtml;
+    const modalEl = div.firstElementChild;
+    document.body.appendChild(modalEl);
+
+    let selectedId = cleanCurVal;
+
+    const renderList = (filterText = "") => {
+      const query = filterText.trim().toLowerCase();
+      const container = modalEl.querySelector("#bd-did-list-container");
+      
+      const filtered = dataSource.filter(item => {
+        return item.id.toLowerCase().includes(query) || item.name.toLowerCase().includes(query);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="padding:20px; text-align:center; color:#94a3b8; font-size:12px;">未找到匹配项</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        const isSelected = item.id.replace(/\s+/g, '').toUpperCase() === selectedId.replace(/\s+/g, '').toUpperCase();
+        return `
+          <div class="bd-did-list-item" data-id="${esc(item.id)}" 
+            style="padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; transition:all 0.15s; background: ${isSelected ? 'rgba(47, 107, 255, 0.15)' : 'transparent'};">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-family:Consolas,monospace; font-weight:600; font-size:12px; color: ${isSelected ? '#2f6bff' : 'var(--text)'};">${esc(item.id)}</span>
+              <span style="font-size:12px; color:var(--text); opacity:0.8;">${esc(item.name)}</span>
+            </div>
+            ${isSelected ? '<i class="fa-solid fa-circle-check" style="color:#2f6bff; font-size:14px;"></i>' : ''}
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".bd-did-list-item").forEach(row => {
+        row.addEventListener("click", () => {
+          selectedId = row.dataset.id;
+          renderList(filterText);
+        });
+
+        row.addEventListener("dblclick", () => {
+          selectedId = row.dataset.id;
+          confirmAndClose();
+        });
+      });
+    };
+
+    const confirmAndClose = () => {
+      if (selectedId) {
+        onSelect(selectedId);
+      }
+      closeModal();
+    };
+
+    const closeModal = () => {
+      modalEl.remove();
+    };
+
+    const searchInput = modalEl.querySelector("#bd-did-search-input");
+    searchInput.addEventListener("input", (e) => {
+      renderList(e.target.value);
+    });
+
+    modalEl.querySelector("#bd-did-modal-ok-btn").addEventListener("click", confirmAndClose);
+    modalEl.querySelector("#bd-did-modal-close-btn").addEventListener("click", closeModal);
+
+    modalEl.addEventListener("click", (e) => {
+      if (e.target === modalEl) {
+        closeModal();
+      }
+    });
+
+    renderList();
   }
+
+  render();
+}
 })();

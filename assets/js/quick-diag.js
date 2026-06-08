@@ -127,7 +127,7 @@
     treeCollapsed: false,
     expandedBusIds: ["can1", "eth1"],
     // ECU选中状态（复选框）
-    checkedEcuIds: new Set(["can1-ecu1", "can1-ecu2", "can1-ecu4", "eth1-ecu1", "eth1-ecu2"]),
+    checkedEcuIds: new Set(["can1-ecu1", "can1-ecu2", "can1-ecu4"]),
     // 功能列表（可动态增加）
     functions: [...DEFAULT_FUNCTIONS],
     // 选中高亮的功能
@@ -171,6 +171,22 @@
     return cnt > 0 && cnt < children.length;
   }
 
+  function hasCheckedCan() {
+    return [...state.checkedEcuIds].some(id => id.startsWith("can1"));
+  }
+
+  function hasCheckedEth() {
+    return [...state.checkedEcuIds].some(id => id.startsWith("eth1"));
+  }
+
+  function isCanDisabled() {
+    return hasCheckedEth();
+  }
+
+  function isEthDisabled() {
+    return hasCheckedCan();
+  }
+
   function now() {
     const d = new Date();
     return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}.${String(d.getMilliseconds()).padStart(3,"0")}`;
@@ -205,6 +221,8 @@
             const expanded = state.expandedBusIds.includes(bus.id);
             const allChecked = isBusAllChecked(bus);
             const partial = isBusPartialChecked(bus);
+            const isCan = bus.id === "can1";
+            const isDisabled = isCan ? isCanDisabled() : isEthDisabled();
             return `
               <div class="quick-diag-tree-group">
                 <div class="quick-diag-tree-node">
@@ -214,6 +232,7 @@
                   <input type="checkbox" class="quick-diag-tree-check"
                     data-role="qd-check-bus" data-bus-id="${esc(bus.id)}"
                     ${allChecked ? "checked" : ""}
+                    ${isDisabled ? "disabled" : ""}
                     ${partial && !allChecked ? 'data-indeterminate="true"' : ""} />
                   <span class="quick-diag-tree-label" data-role="qd-click-bus" data-bus-id="${esc(bus.id)}">
                     <i class="${getIconClass(bus.type)}"></i>
@@ -228,7 +247,8 @@
                       <div class="quick-diag-tree-child">
                         <input type="checkbox" class="quick-diag-tree-check"
                           data-role="qd-check-ecu" data-bus-id="${esc(bus.id)}" data-ecu-id="${esc(ecu.id)}"
-                          ${checked ? "checked" : ""} />
+                          ${checked ? "checked" : ""}
+                          ${isDisabled ? "disabled" : ""} />
                         <i class="${getIconClass(ecu.type)}"></i>
                         <span>${esc(getEcuDisplayLabel(ecu, bus))}</span>
                       </div>`;
@@ -379,8 +399,20 @@
           <button class="qd-modal-close" data-role="qd-close-add-modal"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="qd-modal-body">
-          <!-- 1. .tb2 File Picker (Required) -->
+          <!-- 1. Function Name (Required) -->
           <div class="qd-form-group">
+            <label class="qd-form-label">功能名称 <span style="color:#d9534f">*</span></label>
+            <input type="text" class="qd-form-input" id="qd-add-name-input" placeholder="请输入功能名称，导入 .tb2 后默认填充为文件名" />
+          </div>
+
+          <!-- 2. Function Description (Optional) -->
+          <div class="qd-form-group" style="margin-top: 14px;">
+            <label class="qd-form-label">功能描述</label>
+            <input type="text" class="qd-form-input" id="qd-add-desc-input" placeholder="请输入功能描述（选填）" />
+          </div>
+
+          <!-- 3. .tb2 File Picker (Required) -->
+          <div class="qd-form-group" style="margin-top: 14px;">
             <label class="qd-form-label">导入 .tb2 流程文件 <span style="color:#d9534f">*</span></label>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="qd-btn qd-btn--secondary" type="button" id="qd-add-tb2-picker" style="height: 30px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; cursor: pointer;">
@@ -391,7 +423,7 @@
             </div>
           </div>
 
-          <!-- 2. -j File Picker (Optional) -->
+          <!-- 4. -j File Picker (Optional) -->
           <div class="qd-form-group" style="margin-top: 14px;">
             <label class="qd-form-label">导入 -j 配置文件 <span style="font-weight: normal; color: #64748b; font-size: 11px;">(可选)</span></label>
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -405,12 +437,6 @@
               <i class="fa-solid fa-circle-info"></i>
               <span>备注：导入后则以 -j 中 ECU 为准</span>
             </div>
-          </div>
-          
-          <!-- 3. Function Name (Required) -->
-          <div class="qd-form-group" style="margin-top: 16px;">
-            <label class="qd-form-label">功能名称 <span style="color:#d9534f">*</span></label>
-            <input type="text" class="qd-form-input" id="qd-add-name-input" placeholder="请输入功能名称，导入 .tb2 后默认填充为文件名" />
           </div>
         </div>
         <div class="qd-modal-footer">
@@ -429,6 +455,7 @@
   function initModalEvents() {
     // === 添加 Modal 交互 ===
     const addNameInput = document.getElementById("qd-add-name-input");
+    const addDescInput = document.getElementById("qd-add-desc-input");
     const confirmAddBtn = document.getElementById("qd-confirm-add-btn");
     
     // .tb2 文件选择绑定
@@ -495,9 +522,12 @@
       }
 
       // 构建描述文案
-      let desc = `流程文件: ${tb2File.name}`;
-      if (jFile) {
-        desc += ` | ECU配置以 -j [${jFile.name}] 为准`;
+      let desc = addDescInput.value.trim();
+      if (!desc) {
+        desc = `流程文件: ${tb2File.name}`;
+        if (jFile) {
+          desc += ` | ECU配置以 -j [${jFile.name}] 为准`;
+        }
       }
 
       const newId = "custom-" + Date.now();
@@ -512,6 +542,7 @@
 
       // 重置弹框所有状态
       addNameInput.value = "";
+      addDescInput.value = "";
       tb2Label.textContent = "未选择文件";
       jLabel.textContent = "未选择文件";
       hiddenTb2Input.value = "";
@@ -754,12 +785,25 @@
         break;
       }
 
+
+
       // -- 树：总线复选框 --
       case "qd-check-bus": {
         const busId = target.dataset.busId;
         const bus = getBusConfig().find(b => b.id === busId);
         if (!bus) break;
         const checked = target.checked;
+        
+        if (checked) {
+          if (busId === "can1") {
+            const ethBus = getBusConfig().find(b => b.id === "eth1");
+            if (ethBus) (ethBus.children || []).forEach(e => state.checkedEcuIds.delete(e.id));
+          } else if (busId === "eth1") {
+            const canBus = getBusConfig().find(b => b.id === "can1");
+            if (canBus) (canBus.children || []).forEach(e => state.checkedEcuIds.delete(e.id));
+          }
+        }
+        
         (bus.children || []).forEach(ecu => {
           if (checked) state.checkedEcuIds.add(ecu.id);
           else state.checkedEcuIds.delete(ecu.id);
@@ -771,8 +815,21 @@
       // -- 树：ECU复选框 --
       case "qd-check-ecu": {
         const ecuId = target.dataset.ecuId;
-        if (target.checked) state.checkedEcuIds.add(ecuId);
-        else state.checkedEcuIds.delete(ecuId);
+        const busId = target.dataset.busId;
+        const checked = target.checked;
+        
+        if (checked) {
+          if (busId === "can1") {
+            const ethBus = getBusConfig().find(b => b.id === "eth1");
+            if (ethBus) (ethBus.children || []).forEach(e => state.checkedEcuIds.delete(e.id));
+          } else if (busId === "eth1") {
+            const canBus = getBusConfig().find(b => b.id === "can1");
+            if (canBus) (canBus.children || []).forEach(e => state.checkedEcuIds.delete(e.id));
+          }
+          state.checkedEcuIds.add(ecuId);
+        } else {
+          state.checkedEcuIds.delete(ecuId);
+        }
         render();
         break;
       }
