@@ -720,6 +720,17 @@
      ============================ */
   function renderTree() {
     const buses = getBusConfig();
+    const getEcuDisplayLabel = (ecu, bus) => {
+      const isEth = bus && (bus.type === "ethernet" || bus.id === "eth1");
+      const rawAddr = isEth ? ecu.logicAddr : (ecu.requestAddr || ecu.nadAddr);
+      if (!rawAddr) return ecu.name;
+      let addr = String(rawAddr).trim();
+      if (!addr.toLowerCase().startsWith("0x")) {
+        addr = "0x" + addr;
+      }
+      return `${ecu.name} (${addr})`;
+    };
+
     return `
       <aside class="basic-diag-left">
         <div class="basic-diag-tree-toolbar">
@@ -756,7 +767,7 @@
                       <button class="basic-diag-tree-child ${isActive ? "is-active" : ""}"
                         data-role="bd-pick-ecu" data-bus-id="${esc(bus.id)}" data-ecu-id="${esc(ecu.id)}">
                         <i class="${getIconClass(ecu.type)}"></i>
-                        <span>${esc(ecu.name)}</span>
+                        <span>${esc(getEcuDisplayLabel(ecu, bus))}</span>
                       </button>`;
                   }).join("")}
                 </div>

@@ -36,21 +36,21 @@
           id: "can1", name: "CAN1", type: "can", busType: "CAN",
           baudrate: "500Kbps",
           children: [
-            { id: "can1-ecu1", name: "ECM", type: "ecu" },
-            { id: "can1-ecu2", name: "TCU", type: "ecu" },
-            { id: "can1-ecu3", name: "ABS", type: "ecu" },
-            { id: "can1-ecu4", name: "BCM", type: "ecu" },
-            { id: "can1-ecu5", name: "SRS", type: "ecu" },
+            { id: "can1-ecu1", name: "ECM", type: "ecu", requestAddr: "0618" },
+            { id: "can1-ecu2", name: "TCU", type: "ecu", requestAddr: "0641" },
+            { id: "can1-ecu3", name: "ABS", type: "ecu", requestAddr: "0760" },
+            { id: "can1-ecu4", name: "BCM", type: "ecu", requestAddr: "0740" },
+            { id: "can1-ecu5", name: "SRS", type: "ecu", requestAddr: "0750" },
           ],
         },
         {
           id: "eth1", name: "Ethernet1", type: "ethernet", busType: "Ethernet",
           baudrate: "100Mbps",
           children: [
-            { id: "eth1-ecu1", name: "GW", type: "ecu" },
-            { id: "eth1-ecu2", name: "IVI", type: "ecu" },
-            { id: "eth1-ecu3", name: "TBOX", type: "ecu" },
-            { id: "eth1-ecu4", name: "ADAS", type: "ecu" },
+            { id: "eth1-ecu1", name: "GW", type: "ecu", logicAddr: "0x1010" },
+            { id: "eth1-ecu2", name: "IVI", type: "ecu", logicAddr: "0x2010" },
+            { id: "eth1-ecu3", name: "TBOX", type: "ecu", logicAddr: "0x3010" },
+            { id: "eth1-ecu4", name: "ADAS", type: "ecu", logicAddr: "0x4010" },
           ],
         },
       ];
@@ -181,6 +181,17 @@
      ============================ */
   function renderTree() {
     const buses = getBusConfig();
+    const getEcuDisplayLabel = (ecu, bus) => {
+      const isEth = bus && (bus.type === "ethernet" || bus.id === "eth1");
+      const rawAddr = isEth ? ecu.logicAddr : (ecu.requestAddr || ecu.nadAddr);
+      if (!rawAddr) return ecu.name;
+      let addr = String(rawAddr).trim();
+      if (!addr.toLowerCase().startsWith("0x")) {
+        addr = "0x" + addr;
+      }
+      return `${ecu.name} (${addr})`;
+    };
+
     return `
       <aside class="quick-diag-left">
         <div class="quick-diag-tree-toolbar">
@@ -219,7 +230,7 @@
                           data-role="qd-check-ecu" data-bus-id="${esc(bus.id)}" data-ecu-id="${esc(ecu.id)}"
                           ${checked ? "checked" : ""} />
                         <i class="${getIconClass(ecu.type)}"></i>
-                        <span>${esc(ecu.name)}</span>
+                        <span>${esc(getEcuDisplayLabel(ecu, bus))}</span>
                       </div>`;
                   }).join("")}
                 </div>

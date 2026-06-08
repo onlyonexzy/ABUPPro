@@ -28,11 +28,11 @@
       checked: true,
       expanded: true,
       children: [
-        { id: "can1-ecu1", name: "ECM", type: "ecu", checked: true },
-        { id: "can1-ecu2", name: "TCU", type: "ecu", checked: true },
-        { id: "can1-ecu3", name: "ABS", type: "ecu", checked: true },
-        { id: "can1-ecu4", name: "BCM", type: "ecu", checked: true },
-        { id: "can1-ecu5", name: "SRS", type: "ecu", checked: true },
+        { id: "can1-ecu1", name: "ECM", type: "ecu", checked: true, requestAddr: "0618" },
+        { id: "can1-ecu2", name: "TCU", type: "ecu", checked: true, requestAddr: "0641" },
+        { id: "can1-ecu3", name: "ABS", type: "ecu", checked: true, requestAddr: "0760" },
+        { id: "can1-ecu4", name: "BCM", type: "ecu", checked: true, requestAddr: "0740" },
+        { id: "can1-ecu5", name: "SRS", type: "ecu", checked: true, requestAddr: "0750" },
       ],
     },
     {
@@ -46,10 +46,10 @@
       checked: true,
       expanded: true,
       children: [
-        { id: "eth1-ecu1", name: "GW", type: "ecu", checked: true },
-        { id: "eth1-ecu2", name: "IVI", type: "ecu", checked: true },
-        { id: "eth1-ecu3", name: "TBOX", type: "ecu", checked: true },
-        { id: "eth1-ecu4", name: "ADAS", type: "ecu", checked: true },
+        { id: "eth1-ecu1", name: "GW", type: "ecu", checked: true, logicAddr: "0x1010" },
+        { id: "eth1-ecu2", name: "IVI", type: "ecu", checked: true, logicAddr: "0x2010" },
+        { id: "eth1-ecu3", name: "TBOX", type: "ecu", checked: true, logicAddr: "0x3010" },
+        { id: "eth1-ecu4", name: "ADAS", type: "ecu", checked: true, logicAddr: "0x4010" },
       ],
     },
   ];
@@ -84,6 +84,16 @@
       const map = { can: "fa-solid fa-road", canfd: "fa-solid fa-road", ethernet: "fa-solid fa-network-wired", lin: "fa-solid fa-link", ecu: "fa-solid fa-microchip", slave: "fa-solid fa-cube", master: "fa-solid fa-crown" };
       return map[type] || "fa-solid fa-microchip";
     };
+    const getEcuDisplayLabel = (ecu, bus) => {
+      const isEth = bus && (bus.type === "ethernet" || bus.id === "eth1");
+      const rawAddr = isEth ? ecu.logicAddr : (ecu.requestAddr || ecu.nadAddr);
+      if (!rawAddr) return ecu.name;
+      let addr = String(rawAddr).trim();
+      if (!addr.toLowerCase().startsWith("0x")) {
+        addr = "0x" + addr;
+      }
+      return `${ecu.name} (${addr})`;
+    };
 
     treeEl.innerHTML = busConfig.map(bus => {
       const expanded = expandedBusIds.includes(bus.id);
@@ -112,7 +122,7 @@
                 <button class="basic-diag-tree-child ${isActive ? "is-active" : ""}"
                   data-role="console-pick-ecu" data-bus-id="${esc(bus.id)}" data-ecu-id="${esc(ecu.id)}">
                   <i class="${getIconClass(ecu.type)}"></i>
-                  <span>${esc(ecu.name)}</span>
+                  <span>${esc(getEcuDisplayLabel(ecu, bus))}</span>
                 </button>`;
             }).join("")}
           </div>
